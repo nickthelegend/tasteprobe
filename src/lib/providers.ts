@@ -1,92 +1,89 @@
 import OpenAI from "openai";
-import type { Persona, TasteTag } from "./types";
+import { parseJsonObject } from "./json.mjs";
+import { parseQlooTags } from "./taste.mjs";
+import type { TasteTag, Usage } from "./types";
 
-const QLOO_URL = "https://api.qloo.com";
+export class ConfigError extends Error {}
+
+const QLOO_BASE_URL = () => process.env.QLOO_BASE_URL || "https://hackathon.api.qloo.com";
+const NEBIUS_BASE_URL = () => process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1";
+export const nebiusModel = () => process.env.NEBIUS_MODEL || "nvidia/Nemotron-3-Nano-30B-A3B";
+const REQUEST_TIMEOUT_MS = 90_000;
+
+export function requireKeys() {
+  if (!process.env.QLOO_API_KEY) throw new ConfigError("Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.");
+  if (!process.env.NEBIUS_API_KEY) throw new ConfigError("Nebius key not configured: add NEBIUS_API_KEY to .env.local to run NVIDIA Nemotron on Nebius.");
+  if (!configuredModels().length) throw new ConfigError("No assistant to test: set OPENAI_API_KEY or a MODEL_2_* OpenAI-compatible endpoint in .env.local.");
+}
 
 async function qloo(path: string, params: Record<string, string>) {
   const key = process.env.QLOO_API_KEY;
-  if (!key) throw new Error("Add QLOO_API_KEY to .env.local to load real taste data.");
-  const url = new URL(path, QLOO_URL);
-  Object.entries(params).forEach(([name, value]) => url.searchParams.set(name, value));
-  const response = await fetch(url, { headers: { "x-api-key": key, accept: "application/json" }, cache: "no-store" });
-  if (!response.ok) throw new Error(`Qloo request failed (${response.status}): ${await response.text()}`);
-  return response.json();
+  if (!key) throw new ConfigError("Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.");
+  const url = new URL(path, QLOO_BASE_URL());
+  for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
+  const response = await fetch(url, {
+    headers: { "x-api-key": key, accept: "application/json" },
+    cache: "no-store",
+    signal: AbortSignal.timeout(30_000),
+  });
+  const body = await response.text();
+  if (!response.ok) throw new Error(`Qloo ${path} returned ${response.status}: ${body.slice(0, 300) || response.statusText}`);
+  return JSON.parse(body);
 }
+
+type QlooPlace = { entity_id?: string; id?: string; name?: string; properties?: { address?: string; geocode?: { city?: string; name?: string } }; location?: unknown };
 
 export async function resolvePlace(brand: string, city: string) {
-  const payload = await qloo("/search", { query: brand, types: "urn:entity:place", take: "10" });
-  const candidates = payload.results ?? payload.entities ?? [];
-  const normalizedCity = city.toLocaleLowerCase();
-  const match = candidates.find((item: any) => {
-    const location = `${item.properties?.address ?? ""} ${item.properties?.geocode?.city ?? ""}`.toLocaleLowerCase();
-    return location.includes(normalizedCity);
-  }) ?? candidates[0];
-  if (!match?.entity_id && !match?.id) throw new Error(`Qloo could not resolve “${brand}” as a place. Try its exact listing name.`);
-  return { id: match.entity_id ?? match.id, name: match.name ?? brand, raw: payload };
+  const payload = await qloo("/search", { query: brand, types: "urn:entity:place", take: "15" });
+  const candidates: QlooPlace[] = payload.results ?? payload.entities ?? [];
+  const cityKey = city.toLocaleLowerCase();
+  const inCity = (item: QlooPlace) => `${item.properties?.address ?? ""} ${item.properties?.geocode?.city ?? ""} ${item.properties?.geocode?.name ?? ""}`
+    .toLocaleLowerCase().includes(cityKey);
+  const match = candidates.find(inCity) ?? candidates[0];
+  const id = match?.entity_id ?? match?.id;
+  if (!match || !id) throw new Error(`Qloo found no place called “${brand}”. Try the exact listing name as it appears on maps.`);
+  return {
+    id,
+    name: match.name ?? brand,
+    address: match.properties?.address,
+    cityMatched: inCity(match),
+    raw: payload,
+  };
 }
 
-const affinityTypes = [
-  { segment: "Cuisine", type: "urn:tag:genre:restaurant" },
-  { segment: "Music", type: "urn:tag:genre:music" },
-  { segment: "Places", type: "urn:tag:genre:place" },
-  { segment: "Culture", type: "urn:tag:keyword" },
-];
-
-export async function buildPersonas(entityId: string, city: string, limit: number): Promise<{ personas: Persona[]; raw: unknown[] }> {
-  const batches = await Promise.all(affinityTypes.map(async ({ segment, type }) => {
-    const payload = await qloo("/v2/insights", {
-      "filter.type": "urn:tag",
-      "signal.interests.entities": entityId,
-      "signal.location.query": city,
-      "filter.tag.types": type,
-      take: String(Math.min(50, limit)),
-    });
-    const tags: TasteTag[] = (payload.results?.tags ?? []).map((tag: any) => ({
-      name: tag.name,
-      id: tag.tag_id ?? tag.tag_value,
-      affinity: typeof tag.affinity === "number" ? tag.affinity : undefined,
-      types: tag.types,
-    })).filter((tag: TasteTag) => tag.name && tag.id);
-    return { segment, tags, payload };
-  }));
-  const available: { segment: string; tag: TasteTag }[] = [];
-  for (let index = 0; available.length < limit; index++) {
-    let found = false;
-    for (const batch of batches) {
-      if (batch.tags[index]) {
-        available.push({ segment: batch.segment, tag: batch.tags[index] });
-        found = true;
-        if (available.length === limit) break;
-      }
-    }
-    if (!found) break;
+export async function fetchTasteTags(entityId: string, city: string): Promise<{ tags: TasteTag[]; raw: unknown[] }> {
+  const base = { "filter.type": "urn:tag", "signal.interests.entities": entityId, take: "50" };
+  const local = await qloo("/v2/insights", { ...base, "signal.location.query": city });
+  let tags = parseQlooTags(local);
+  const raw: unknown[] = [{ scope: "city", payload: local }];
+  if (tags.length < 6) {
+    // Sparse local coverage: fall back to the place's global taste neighbourhood and say so in the cache.
+    const global = await qloo("/v2/insights", base);
+    raw.push({ scope: "global", payload: global });
+    const seen = new Set(tags.map((tag) => tag.id));
+    tags = [...tags, ...parseQlooTags(global).filter((tag) => !seen.has(tag.id))];
   }
-  if (available.length === 0) throw new Error("Qloo returned no taste tags for this place and city. Check the place selection or try another city.");
-  const personas = available.slice(0, limit).map(({ segment, tag }, index) => ({
-    id: `qloo-${index + 1}`,
-    name: `${segment} affinity: ${tag.name}`,
-    segment,
-    affinities: [tag],
-  }));
-  return { personas, raw: batches.map((batch, index) => ({ segment: batch.segment, payload: batch.payload })) };
+  if (!tags.length) throw new Error("Qloo returned no taste tags for this place. Check the place name or try a better-known listing.");
+  return { tags, raw };
 }
 
-type ChatModel = { id: string; name: string; client: OpenAI; model: string };
+type ChatModel = { id: string; name: string; model: string; client: OpenAI };
+
 function configuredModels(): ChatModel[] {
   const models: ChatModel[] = [];
-  if (process.env.OPENAI_API_KEY) models.push({
-    id: "openai", name: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
-    model: process.env.OPENAI_MODEL ?? "gpt-4o-mini", client: new OpenAI({ apiKey: process.env.OPENAI_API_KEY }),
-  });
+  if (process.env.OPENAI_API_KEY) {
+    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+    models.push({ id: "openai", name: model, model, client: new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: REQUEST_TIMEOUT_MS, maxRetries: 2 }) });
+  }
   for (const slot of [2, 3]) {
     const apiKey = process.env[`MODEL_${slot}_API_KEY`];
     const baseURL = process.env[`MODEL_${slot}_BASE_URL`];
     const model = process.env[`MODEL_${slot}_ID`];
     if (apiKey && baseURL && model) models.push({
       id: `system-${slot}`,
-      name: process.env[`MODEL_${slot}_NAME`] ?? model,
+      name: process.env[`MODEL_${slot}_NAME`] || model,
       model,
-      client: new OpenAI({ apiKey, baseURL }),
+      client: new OpenAI({ apiKey, baseURL, timeout: REQUEST_TIMEOUT_MS, maxRetries: 2 }),
     });
   }
   return models;
@@ -96,48 +93,79 @@ export function getTestModels() {
   return configuredModels().map(({ name }) => name);
 }
 
-export async function queryTestModels(prompt: string) {
-  const models = configuredModels();
-  if (!models.length) throw new Error("Configure OPENAI_API_KEY or MODEL_2_API_KEY, MODEL_2_BASE_URL, and MODEL_2_ID to test a real assistant.");
-  return Promise.all(models.map(async ({ client, model, name }) => {
-    const completion = await client.chat.completions.create({ model, messages: [{ role: "user", content: prompt }], temperature: 0 });
-    return { model: name, answer: completion.choices[0]?.message?.content ?? "", raw: completion };
+function describe(error: unknown) {
+  if (error instanceof OpenAI.APIError) return `${error.status ?? "network"} ${error.message}`;
+  return error instanceof Error ? error.message : String(error);
+}
+
+export async function askAssistants(prompt: string) {
+  return Promise.all(configuredModels().map(async ({ client, model, name }) => {
+    try {
+      const completion = await client.chat.completions.create({ model, messages: [{ role: "user", content: prompt }], temperature: 0.7 });
+      return { model: name, ok: true as const, answer: completion.choices[0]?.message?.content ?? "" };
+    } catch (error) {
+      return { model: name, ok: false as const, error: `${name}: ${describe(error)}` };
+    }
   }));
 }
 
-export async function extractEntities(answer: string, brand: string, category: string, city: string) {
+function nebius() {
   const apiKey = process.env.NEBIUS_API_KEY;
-  if (!apiKey) throw new Error("Add NEBIUS_API_KEY to .env.local to extract entities with NVIDIA Nemotron on Nebius.");
-  const client = new OpenAI({ apiKey, baseURL: process.env.NEBIUS_BASE_URL ?? "https://api.tokenfactory.nebius.com/v1" });
-  const model = process.env.NEBIUS_MODEL ?? "nvidia/Nemotron-3-Nano-30B-A3B";
-  const completion = await client.chat.completions.create({
-    model, temperature: 0,
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: "Extract restaurant or brand entities explicitly recommended in the answer. Return only JSON: {\"entities\":[\"name\"]}. Do not include the target unless it is explicitly named." },
-      { role: "user", content: `Target: ${brand}. Category: ${category}. Location: ${city}. Answer:\n${answer}` },
-    ],
-  });
-  const raw = completion.choices[0]?.message?.content ?? "{}";
-  const parsed = JSON.parse(raw) as { entities?: unknown };
-  const entities = Array.isArray(parsed.entities) ? parsed.entities.filter((item): item is string => typeof item === "string") : [];
-  return { model, entities, raw: completion };
+  if (!apiKey) throw new ConfigError("Nebius key not configured: add NEBIUS_API_KEY to .env.local to run NVIDIA Nemotron on Nebius.");
+  return new OpenAI({ apiKey, baseURL: NEBIUS_BASE_URL(), timeout: REQUEST_TIMEOUT_MS, maxRetries: 2 });
 }
 
-export async function suggestContentChange(brand: string, category: string, city: string, segment: string, competitors: string[]) {
-  const apiKey = process.env.NEBIUS_API_KEY;
-  if (!apiKey) throw new Error("Add NEBIUS_API_KEY to .env.local to use the Nemotron counterfactual agent.");
-  const client = new OpenAI({ apiKey, baseURL: process.env.NEBIUS_BASE_URL ?? "https://api.tokenfactory.nebius.com/v1" });
-  const model = process.env.NEBIUS_MODEL ?? "nvidia/Nemotron-3-Nano-30B-A3B";
-  const completion = await client.chat.completions.create({
-    model, temperature: 0.2,
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: "Propose one specific, testable restaurant website content change likely to help AI assistants match the restaurant to the stated taste segment. Do not claim it has been deployed. Return JSON: {\"change\":\"one or two sentences\"}." },
-      { role: "user", content: JSON.stringify({ brand, category, city, tasteSegment: segment, observedCompetitors: competitors }) },
-    ],
-  });
-  const parsed = JSON.parse(completion.choices[0]?.message?.content ?? "{}") as { change?: unknown };
+async function nemotron(messages: OpenAI.Chat.ChatCompletionMessageParam[], temperature: number) {
+  const model = nebiusModel();
+  try {
+    const completion = await nebius().chat.completions.create({ model, messages, temperature, max_tokens: 2048 });
+    const usage: Usage = { inputTokens: completion.usage?.prompt_tokens ?? 0, outputTokens: completion.usage?.completion_tokens ?? 0 };
+    return { model, text: completion.choices[0]?.message?.content ?? "", usage };
+  } catch (error) {
+    if (error instanceof ConfigError) throw error;
+    throw new Error(`Nebius ${model}: ${describe(error)}`);
+  }
+}
+
+export async function extractEntities(answer: string, category: string, city: string) {
+  const { text, usage, model } = await nemotron([
+    { role: "system", content: "You extract recommendations from an assistant's answer. List every distinct business or venue the answer recommends, using the name exactly as written, without addresses or branch notes. Ignore businesses mentioned only as comparisons. Reply with JSON only: {\"entities\":[\"Name\", ...]}." },
+    { role: "user", content: `Category: ${category}\nCity: ${city}\n\nAnswer:\n${answer}` },
+  ], 0);
+  const parsed = parseJsonObject(text);
+  const entities = Array.isArray(parsed.entities)
+    ? [...new Set(parsed.entities.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean))]
+    : [];
+  return { model, entities, usage, raw: text };
+}
+
+export async function suggestContentChange(input: { brand: string; category: string; city: string; segment: string; tastes: string[]; competitors: string[] }) {
+  const { text, usage, model } = await nemotron([
+    { role: "system", content: "You are a local-search strategist. Propose ONE specific, factual-sounding but non-fabricated content addition the business could publish on its website or listings so AI assistants connect it to the stated taste segment. Phrase it as copy the business would publish, under 45 words, with no prices, awards or claims that would need verification. Reply with JSON only: {\"change\":\"...\",\"rationale\":\"one sentence\"}." },
+    { role: "user", content: JSON.stringify(input) },
+  ], 0.3);
+  const parsed = parseJsonObject(text);
   if (typeof parsed.change !== "string" || !parsed.change.trim()) throw new Error("Nemotron did not return a usable content suggestion.");
-  return { change: parsed.change.trim(), model, raw: completion };
+  return { change: parsed.change.trim(), rationale: typeof parsed.rationale === "string" ? parsed.rationale.trim() : "", model, usage, raw: text };
+}
+
+let catalogCache: { at: number; result: { ok: boolean; detail: string } } | undefined;
+
+// Confirms the configured NVIDIA model is actually served for this Nebius key.
+export async function checkNebiusModel() {
+  if (!process.env.NEBIUS_API_KEY) return { ok: false, detail: "NEBIUS_API_KEY not set" };
+  if (catalogCache && Date.now() - catalogCache.at < 5 * 60_000) return catalogCache.result;
+  let result: { ok: boolean; detail: string };
+  try {
+    const ids: string[] = [];
+    for await (const model of nebius().models.list()) ids.push(model.id);
+    const wanted = nebiusModel();
+    result = ids.includes(wanted)
+      ? { ok: true, detail: wanted }
+      : { ok: false, detail: `${wanted} is not in your Nebius catalog. NVIDIA models available: ${ids.filter((id) => id.toLowerCase().startsWith("nvidia/")).join(", ") || "none"}` };
+  } catch (error) {
+    result = { ok: false, detail: `Nebius catalog check failed: ${describe(error)}` };
+  }
+  catalogCache = { at: Date.now(), result };
+  return result;
 }

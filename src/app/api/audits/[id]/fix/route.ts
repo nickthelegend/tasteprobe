@@ -1,58 +1,62 @@
 import { NextResponse } from "next/server";
-import { readAudits, saveAudit } from "@/lib/storage";
-import { extractEntities, queryTestModels, suggestContentChange } from "@/lib/providers";
-import { bootstrapInterval } from "@/lib/stats.mjs";
+import { pool, probePersona, type FailedRow, type ResponseRow } from "@/lib/probe";
+import { ConfigError, requireKeys, suggestContentChange } from "@/lib/providers";
+import { bootstrapDifference, bootstrapInterval } from "@/lib/stats.mjs";
+import { findAudit, readRaw, saveAudit, writeRaw } from "@/lib/storage";
+import { counterfactualPrompt } from "@/lib/taste.mjs";
 
+export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-async function pool<T, R>(values: T[], concurrency: number, task: (value: T) => Promise<R>): Promise<R[]> {
-  const output = new Array<R>(values.length);
-  let cursor = 0;
-  await Promise.all(Array.from({ length: Math.min(concurrency, values.length) }, async () => {
-    while (cursor < values.length) {
-      const index = cursor++;
-      output[index] = await task(values[index]);
-    }
-  }));
-  return output;
-}
-
-export async function POST(_: Request, context: { params: { id: string } }) {
+export async function POST(request: Request, context: { params: { id: string } }) {
   try {
-    const audit = (await readAudits()).find((item) => item.id === context.params.id);
+    requireKeys();
+    const audit = await findAudit(context.params.id);
     if (!audit) return NextResponse.json({ error: "Audit not found." }, { status: 404 });
-    const segment = audit.segments.slice().sort((a, b) => a.share - b.share)[0];
-    const personas = audit.personas.filter((item) => item.segment === segment?.name);
-    if (!segment || !personas.length) throw new Error("No taste segment is available to re-test.");
-    const competitors = segment.competitors.slice(0, 3).map((item) => item.name);
-    const suggestion = await suggestContentChange(audit.brand, audit.category, audit.city, segment.name, competitors);
-    const runs = await pool(personas, 3, async (persona) => {
-      const prompt = `You are choosing where to eat in ${audit.city}. Your interests include ${persona.affinities.map((item) => item.name).join(", ")}. Recommend up to 5 ${audit.category} restaurants in ${audit.city} and explain each choice. Consider this additional website information for ${audit.brand}: ${suggestion.change}. Include only real businesses.`;
-      const systems = await queryTestModels(prompt);
-      return Promise.all(systems.map(async (system) => {
-        const extracted = await extractEntities(system.answer, audit.brand, audit.category, audit.city);
-        return { persona, system: system.model, answer: system.answer, extraction: extracted, prompt };
-      }));
+    const body = await request.json().catch(() => ({})) as { segment?: string };
+    // Default to the weakest segment: lowest share, then the one where competitors are most visible.
+    const segment = body.segment
+      ? audit.segments.find((item) => item.id === body.segment)
+      : [...audit.segments].sort((a, b) => a.share - b.share || (b.competitors[0]?.mentions ?? 0) - (a.competitors[0]?.mentions ?? 0))[0];
+    if (!segment) throw new Error("That taste segment is not part of this audit.");
+    const personas = audit.personas.filter((persona) => persona.segment === segment.name);
+    const baseline = await readRaw<{ rows: ResponseRow[] }>(audit.id, "responses");
+    const beforeRows = baseline?.rows.filter((row) => row.segment === segment.name) ?? [];
+    if (!beforeRows.length) throw new Error("The cached baseline responses for this segment are missing, so a before/after comparison is not possible.");
+
+    const tastes = [...new Set(personas.flatMap((persona) => persona.affinities.map((tag) => tag.name)))].slice(0, 8);
+    const suggestion = await suggestContentChange({
+      brand: audit.brand, category: audit.category, city: audit.city, segment: segment.name, tastes,
+      competitors: segment.competitors.slice(0, 3).map((item) => item.name),
     });
-    const rows = runs.flat();
-    const beforeRows = await (async () => {
-      const { readFile } = await import("node:fs/promises");
-      const { join } = await import("node:path");
-      try {
-        const raw = JSON.parse(await readFile(join(process.cwd(), ".data", "raw", audit.id, "responses.json"), "utf8")) as { persona: { segment: string }; extraction: { entities: string[] } }[];
-        return raw.filter((row) => row.persona.segment === segment.name);
-      } catch { return []; }
-    })();
-    const before = beforeRows.length ? beforeRows.filter((row) => row.extraction.entities.some((name) => name.toLocaleLowerCase().includes(audit.brand.toLocaleLowerCase()))).length / beforeRows.length : segment.share;
-    const outcomes = rows.map((row) => row.extraction.entities.some((name) => name.toLocaleLowerCase().includes(audit.brand.toLocaleLowerCase())));
-    const after = outcomes.filter(Boolean).length / Math.max(outcomes.length, 1);
-    audit.counterfactual = { change: suggestion.change, segment: segment.name, before, after, interval: bootstrapInterval(outcomes), responses: rows.length };
+
+    const rows: ResponseRow[] = [];
+    const failures: FailedRow[] = [];
+    await pool(personas, 4, async (persona) => {
+      const result = await probePersona(persona, counterfactualPrompt(persona, audit.category, audit.city, audit.brand, suggestion.change), audit.brand, audit.category, audit.city);
+      rows.push(...result.rows);
+      failures.push(...result.failures);
+    });
+    await writeRaw(audit.id, "counterfactual", { suggestion, segment: segment.name, rows, failures });
+    if (!rows.length) throw new Error(`Every re-test call failed. First error: ${failures[0]?.error ?? "unknown"}`);
+
+    const before = beforeRows.map((row) => row.brand);
+    const after = rows.map((row) => row.brand);
+    audit.counterfactual = {
+      change: suggestion.change,
+      segment: segment.name,
+      before: before.filter(Boolean).length / before.length,
+      beforeResponses: before.length,
+      after: after.filter(Boolean).length / after.length,
+      afterResponses: after.length,
+      afterCi: bootstrapInterval(after),
+      deltaCi: bootstrapDifference(before, after),
+      model: suggestion.model,
+      createdAt: new Date().toISOString(),
+    };
     await saveAudit(audit);
-    const { writeFile } = await import("node:fs/promises");
-    const { join } = await import("node:path");
-    await writeFile(join(process.cwd(), ".data", "raw", audit.id, "counterfactual.json"), JSON.stringify({ suggestion: { ...suggestion }, rows }, null, 2), { mode: 0o600 });
     return NextResponse.json(audit.counterfactual);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Counterfactual re-test failed." }, { status: 502 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Counterfactual re-test failed." }, { status: error instanceof ConfigError ? 503 : 502 });
   }
 }
