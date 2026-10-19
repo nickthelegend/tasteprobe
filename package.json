@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "lint:no-mock": "node scripts/check-no-mock.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "14.2.31",
@@ -20,5 +22,6 @@
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",
     "typescript": "^5.8.3"
-  }
+  },
+  "license": "MIT"
 }
