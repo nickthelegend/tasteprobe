@@ -1,0 +1,31 @@
+export type TasteTag = { name: string; id: string; affinity?: number; types?: string[] };
+export type Persona = { id: string; name: string; segment: string; affinities: TasteTag[] };
+export type ModelResult = { model: string; mentioned: string[]; raw: string; prompt: string };
+export type SegmentResult = {
+  id: string;
+  name: string;
+  personas: number;
+  profileCount: number;
+  responses: number;
+  brandMentions: number;
+  share: number;
+  ci: [number, number];
+  competitors: { name: string; mentions: number; share: number }[];
+};
+export type Audit = {
+  id: string;
+  brand: string;
+  category: string;
+  city: string;
+  createdAt: string;
+  personas: Persona[];
+  segments: SegmentResult[];
+  modelSegments: { model: string; segments: SegmentResult[] }[];
+  systems: string[];
+  responseCount: number;
+  extractionModel: string;
+  extractionInputTokens: number;
+  extractionOutputTokens: number;
+  estimatedExtractionCostUsd: number | null;
+  counterfactual?: { change: string; segment: string; before: number; after: number; interval: [number, number]; responses: number };
+};

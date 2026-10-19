@@ -1,0 +1,9 @@
+.loom/
+node_modules/
+dist/
+.next/
+.env*
+!.env.example
+.data/
+*.tsbuildinfo
+next-env.d.ts
