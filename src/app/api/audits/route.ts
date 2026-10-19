@@ -4,7 +4,7 @@ import { estimateCost, pool, probePersona, sumUsage, toObservations, type Failed
 import { fetchTasteTags, nebiusModel, requireKeys, resolvePlace } from "@/lib/providers";
 import { summarizeObservations } from "@/lib/stats.mjs";
 import { readAudits, saveAudit, writeRaw } from "@/lib/storage";
-import { buildPersonas, personaPrompt } from "@/lib/taste.mjs";
+import { buildPersonas, matchesBrand, personaPrompt } from "@/lib/taste.mjs";
 import type { Audit, AuditEvent } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -58,6 +58,15 @@ export async function POST(request: Request) {
           rows.push(...result.rows);
           failures.push(...result.failures);
           done++;
+          send({
+            type: "answer",
+            personaId: persona.id,
+            segmentId: persona.segmentId,
+            answered: result.rows.length,
+            mentioned: result.rows.filter((row) => row.brand).length,
+            failed: result.failures.length,
+            rivals: [...new Set(result.rows.flatMap((row) => row.entities))].filter((entity) => !matchesBrand(entity, place.name)).slice(0, 3),
+          });
           send({ type: "progress", done, total: personas.length, mentions: rows.filter((row) => row.brand).length });
         });
         await writeRaw(auditId, "responses", { rows, failures });

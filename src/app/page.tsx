@@ -6,6 +6,7 @@ import { CounterfactualPanel } from "@/components/Counterfactual";
 import { Evidence } from "@/components/Evidence";
 import { ci, pct } from "@/components/format";
 import { PersonaGrid } from "@/components/Personas";
+import { TasteMap, type PersonaResult } from "@/components/TasteMap";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
 type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[] };
@@ -16,7 +17,7 @@ const STAGES: { id: Stage; label: string }[] = [
   { id: "query", label: "Ask assistants as each persona, extract with Nemotron" },
   { id: "stats", label: "Share of voice with bootstrap CIs" },
 ];
-type Run = { stage: Stage; message: string; place?: string; personas: Persona[]; done: number; total: number; mentions: number };
+type Run = { stage: Stage; message: string; place?: string; brand: string; personas: Persona[]; results: Record<string, PersonaResult>; rivals: string[]; done: number; total: number; mentions: number };
 
 async function readNdjson(response: Response, onEvent: (event: AuditEvent) => void) {
   const reader = response.body!.getReader();
@@ -56,6 +57,8 @@ export default function Home() {
   const [form, setForm] = useState({ brand: "", category: "restaurant", city: "", personaCount: 24 });
   const [segmentId, setSegmentId] = useState("");
   const [fixing, setFixing] = useState(false);
+  // Per-persona outcomes from this session's live streams, so the map of a just-finished audit stays lit.
+  const [liveResults, setLiveResults] = useState<Record<string, Record<string, PersonaResult>>>({});
 
   function select(audit: Audit) {
     setActive(audit);
@@ -77,19 +80,27 @@ export default function Home() {
   async function runAudit(event: FormEvent) {
     event.preventDefault();
     setError(""); setActive(null);
-    setRun({ stage: "resolve", message: "Starting", personas: [], done: 0, total: 0, mentions: 0 });
+    setRun({ stage: "resolve", message: "Starting", brand: form.brand, personas: [], results: {}, rivals: [], done: 0, total: 0, mentions: 0 });
+    let results: Record<string, PersonaResult> = {};
     try {
       const response = await fetch("/api/audits", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(form) });
       if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error ?? `Audit request failed (${response.status}).`);
       let finished = false;
       await readNdjson(response, (message) => {
         if (message.type === "stage") setRun((current) => current && { ...current, stage: message.stage, message: message.message });
-        if (message.type === "place") setRun((current) => current && { ...current, place: message.address ? `${message.name}, ${message.address}` : message.name });
+        if (message.type === "place") setRun((current) => current && { ...current, brand: message.name, place: message.address ? `${message.name}, ${message.address}` : message.name });
+        if (message.type === "answer") {
+          results = { ...results, [message.personaId]: { answered: message.answered, mentioned: message.mentioned, failed: message.failed } };
+          const latest = results;
+          setRun((current) => current && { ...current, results: latest, rivals: [...message.rivals, ...current.rivals.filter((name) => !message.rivals.includes(name))].slice(0, 8) });
+        }
         if (message.type === "personas") setRun((current) => current && { ...current, personas: message.personas, total: message.personas.length });
         if (message.type === "progress") setRun((current) => current && { ...current, done: message.done, total: message.total, mentions: message.mentions });
         if (message.type === "error") throw new Error(message.message);
         if (message.type === "done") {
           finished = true;
+          const final = results;
+          setLiveResults((current) => ({ ...current, [message.audit.id]: final }));
           setAudits((current) => [message.audit, ...current.filter((item) => item.id !== message.audit.id)]);
           select(message.audit);
         }
@@ -171,18 +182,16 @@ export default function Home() {
       <button onClick={() => setError("")} aria-label="Dismiss">×</button>
     </div>}
 
-    {run && <section className="card progress-card" aria-live="polite">
-      <div className="card-head"><div><h2>Running live audit</h2><p>{run.place ? `Matched in Qloo: ${run.place}` : run.message}</p></div><span className="tag">live</span></div>
+    {run && <section className="card progress-card map-card" aria-live="polite">
+      <div className="card-head"><div><h2>Live taste map</h2><p>{run.place ? `Matched in Qloo: ${run.place}` : run.message}</p></div><span className="tag tag-live">streaming</span></div>
       <ol className="stages">
         {STAGES.map((item, index) => <li key={item.id} className={index < stageIndex ? "complete" : index === stageIndex ? "active" : ""}>
           <span className="stage-mark">{index < stageIndex ? "✓" : ""}</span>{item.label}
         </li>)}
       </ol>
-      {run.total > 0 && <>
-        <div className="meter"><i style={{ width: `${(run.done / run.total) * 100}%` }} /></div>
-        <div className="meter-label"><span>{run.done}/{run.total} personas answered</span><span>{run.mentions} brand mentions so far</span></div>
-      </>}
-      {run.personas.length > 0 && <div style={{ marginTop: 18 }}><PersonaGrid personas={run.personas} limit={8} /></div>}
+      <TasteMap live brand={run.brand} personas={run.personas} results={run.results} rivals={run.rivals}
+        status={run.total ? `${run.done}/${run.total} personas answered · ${run.mentions} mentions` : run.message} />
+      {run.total > 0 && <div className="meter"><i style={{ width: `${(run.done / run.total) * 100}%` }} /></div>}
     </section>}
 
     {!active && !run && <section className="empty">
@@ -198,6 +207,11 @@ export default function Home() {
           <p>{active.category} · {active.city}{active.qlooAddress ? ` · ${active.qlooAddress}` : ""} · Qloo <code>{active.qlooEntityId}</code></p>
         </div>
       </div>
+
+      <section className="card map-card" style={{ marginBottom: 12 }}>
+        <div className="card-head"><div><h3>Taste map</h3><p>{liveResults[active.id] ? "Each dot is one Qloo persona, lit by whether assistants recommended you." : "Cluster glow shows each taste segment’s final share of voice. Re-run to watch personas answer live."}</p></div><span className="tag">qloo × nemotron</span></div>
+        <TasteMap live={false} brand={active.brand} personas={active.personas} results={liveResults[active.id] ?? {}} segments={active.segments} rivals={active.overall.competitors.map((item) => item.name)} />
+      </section>
 
       <section className="kpis">
         <div className="card kpi"><span className="label">Share of voice</span><span className="value">{pct(active.overall.share)}</span><span className="sub">95% CI {ci(active.overall.ci)} · {active.overall.brandMentions} of {active.responseCount} answers</span></div>

@@ -49,6 +49,7 @@ export type AuditEvent =
   | { type: "stage"; stage: "resolve" | "qloo" | "personas" | "query" | "stats"; message: string }
   | { type: "place"; name: string; entityId: string; address?: string }
   | { type: "personas"; personas: Persona[] }
+  | { type: "answer"; personaId: string; segmentId: string; answered: number; mentioned: number; failed: number; rivals: string[] }
   | { type: "progress"; done: number; total: number; mentions: number }
   | { type: "done"; audit: Audit }
   | { type: "error"; message: string };
