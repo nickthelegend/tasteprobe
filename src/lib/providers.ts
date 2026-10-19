@@ -94,7 +94,11 @@ export function getTestModels() {
 }
 
 function describe(error: unknown) {
-  if (error instanceof OpenAI.APIError) return `${error.status ?? "network"} ${error.message}`;
+  if (error instanceof OpenAI.APIError) {
+    if (error.status === 401 || error.status === 403) return `${error.status}: key rejected (check the API key and base URL)`;
+    const message = error.message.replace(/^\d{3}\s+/, "");
+    return `${error.status ?? "network"}: ${message}`;
+  }
   return error instanceof Error ? error.message : String(error);
 }
 
