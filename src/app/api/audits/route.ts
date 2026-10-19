@@ -24,7 +24,9 @@ export async function GET() {
 export async function POST(request: Request) {
   let input: z.infer<typeof requestSchema>;
   try {
-    input = requestSchema.parse(await request.json());
+    let body: unknown;
+    try { body = await request.json(); } catch { return NextResponse.json({ error: "Request body must be JSON." }, { status: 400 }); }
+    input = requestSchema.parse(body);
     requireKeys();
   } catch (error) {
     const message = error instanceof z.ZodError ? error.issues[0]?.message : error instanceof Error ? error.message : "Invalid request.";
