@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "results": {
+    "tags": [
+      { "tag_id": "urn:tag:genre:place:cocktail_bar", "name": "Cocktail Bar", "subtype": "urn:tag:genre:place", "query": { "affinity": 0.91 } },
+      { "tag_id": "urn:tag:genre:restaurant:indian", "name": "Indian", "subtype": "urn:tag:genre:restaurant", "query": { "affinity": 0.88 } },
+      { "tag_id": "urn:tag:keyword:place:craft_cocktails", "name": "Craft Cocktails", "subtype": "urn:tag:keyword:place", "query": { "affinity": 0.83 } },
+      { "tag_id": "urn:tag:genre:restaurant:indian", "name": "Indian", "subtype": "urn:tag:genre:restaurant", "query": { "affinity": 0.88 } },
+      { "tag_id": "urn:tag:genre:restaurant:fusion", "name": "Fusion", "subtype": "urn:tag:genre:restaurant", "query": { "affinity": 0.71 } },
+      { "tag_id": "urn:tag:keyword:place:seasonal_menu", "name": "Seasonal Menu", "subtype": "urn:tag:keyword:place", "query": { "affinity": 0.66 } },
+      { "tag_id": "urn:tag:genre:place:gastropub", "name": "Gastropub", "subtype": "urn:tag:genre:place", "query": { "affinity": 0.52 } },
+      { "tag_id": "urn:tag:genre:restaurant:small_plates", "name": "Small Plates", "types": ["urn:tag:genre:restaurant"], "affinity": 0.44 },
+      { "name": "Missing id is dropped" }
+    ]
+  }
+}

@@ -6,44 +6,101 @@ function quantile(sorted, probability) {
   return sorted[lower] + (sorted[upper] - sorted[lower]) * (index - lower);
 }
 
-export function bootstrapInterval(values, iterations = 1200, seed = 37) {
-  if (values.length === 0) return [0, 0];
+// Deterministic LCG so the same cached responses always produce the same intervals.
+export function seededRandom(seed = 37) {
   let state = seed >>> 0;
-  const random = () => {
+  return () => {
     state = (state * 1664525 + 1013904223) >>> 0;
     return state / 4294967296;
   };
+}
+
+function mean(values) {
+  let total = 0;
+  for (const value of values) total += Number(value);
+  return values.length ? total / values.length : 0;
+}
+
+function resample(values, random) {
+  const sample = new Array(values.length);
+  for (let index = 0; index < values.length; index++) sample[index] = values[Math.floor(random() * values.length)];
+  return sample;
+}
+
+export function bootstrapInterval(values, iterations = 2000, seed = 37) {
+  if (values.length === 0) return [0, 0];
+  const random = seededRandom(seed);
+  const samples = [];
+  for (let run = 0; run < iterations; run++) samples.push(mean(resample(values, random)));
+  samples.sort((left, right) => left - right);
+  return [quantile(samples, 0.025), quantile(samples, 0.975)];
+}
+
+// Responses from one persona (asked of several assistants) are correlated, so resample personas, not rows.
+export function clusteredBootstrapInterval(rows, iterations = 2000, seed = 37) {
+  if (rows.length === 0) return [0, 0];
+  const clusters = new Map();
+  rows.forEach((row, index) => {
+    const key = row.cluster ?? `row-${index}`;
+    clusters.set(key, [...(clusters.get(key) ?? []), Number(row.value)]);
+  });
+  const groups = [...clusters.values()];
+  const random = seededRandom(seed);
   const samples = [];
   for (let run = 0; run < iterations; run++) {
-    let total = 0;
-    for (let index = 0; index < values.length; index++) total += Number(values[Math.floor(random() * values.length)]);
-    samples.push(total / values.length);
+    let hits = 0;
+    let count = 0;
+    for (const group of resample(groups, random)) {
+      for (const value of group) hits += value;
+      count += group.length;
+    }
+    samples.push(count ? hits / count : 0);
   }
   samples.sort((left, right) => left - right);
   return [quantile(samples, 0.025), quantile(samples, 0.975)];
+}
+
+// Interval for (after − before) with each arm resampled independently.
+export function bootstrapDifference(before, after, iterations = 2000, seed = 41) {
+  if (before.length === 0 || after.length === 0) return [0, 0];
+  const random = seededRandom(seed);
+  const samples = [];
+  for (let run = 0; run < iterations; run++) samples.push(mean(resample(after, random)) - mean(resample(before, random)));
+  samples.sort((left, right) => left - right);
+  return [quantile(samples, 0.025), quantile(samples, 0.975)];
+}
+
+export function slug(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
 export function summarizeObservations(observations) {
   const groups = new Map();
   for (const observation of observations) groups.set(observation.segment, [...(groups.get(observation.segment) ?? []), observation]);
   return [...groups.entries()].map(([name, rows]) => {
-    const mentions = rows.map((row) => row.brand);
+    const mentions = rows.filter((row) => row.brand).length;
     const counts = new Map();
-    for (const row of rows) for (const item of new Set(row.recommended)) {
-      const normalized = item.trim();
-      if (normalized) counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
+    for (const row of rows) {
+      const seen = new Set();
+      for (const item of row.recommended) {
+        const display = item.trim();
+        const key = display.toLowerCase();
+        if (!display || seen.has(key)) continue;
+        seen.add(key);
+        const current = counts.get(key);
+        counts.set(key, { name: current?.name ?? display, mentions: (current?.mentions ?? 0) + 1 });
+      }
     }
     return {
-      id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      id: slug(name),
       name,
-      personas: rows.length,
-      profileCount: new Set(rows.map((row) => row.personaId).filter(Boolean)).size || rows.length,
+      personas: new Set(rows.map((row) => row.personaId).filter(Boolean)).size || rows.length,
       responses: rows.length,
-      brandMentions: mentions.filter(Boolean).length,
-      share: mentions.filter(Boolean).length / rows.length,
-      ci: bootstrapInterval(mentions),
-      competitors: [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5)
-        .map(([competitor, count]) => ({ name: competitor, mentions: count, share: count / rows.length })),
+      brandMentions: mentions,
+      share: mentions / rows.length,
+      ci: clusteredBootstrapInterval(rows.map((row) => ({ cluster: row.personaId, value: row.brand ? 1 : 0 }))),
+      competitors: [...counts.values()].sort((a, b) => b.mentions - a.mentions || a.name.localeCompare(b.name)).slice(0, 5)
+        .map((competitor) => ({ ...competitor, share: competitor.mentions / rows.length })),
     };
   }).sort((a, b) => a.name.localeCompare(b.name));
 }

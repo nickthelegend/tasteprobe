@@ -1,0 +1,10 @@
+import type { Persona, TasteTag } from "./types";
+
+export function normalizeName(value: string): string;
+export function matchesBrand(entity: string, brand: string): boolean;
+export function segmentLabel(subtype: string | undefined): string;
+export function parseQlooTags(payload: unknown): TasteTag[];
+export function groupTags(tags: TasteTag[], maxSegments?: number): { name: string; tags: TasteTag[] }[];
+export function buildPersonas(tags: TasteTag[], count: number, seed?: number): Persona[];
+export function personaPrompt(persona: Persona, category: string, city: string): string;
+export function counterfactualPrompt(persona: Persona, category: string, city: string, brand: string, change: string): string;
