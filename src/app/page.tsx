@@ -163,7 +163,7 @@ export default function Home() {
         </label>
         <button className="btn btn-primary" type="submit" disabled={!ready || run !== null}>{run ? <><span className="spinner" /> Running</> : "Run audit"}</button>
       </form>
-      <p className="form-note">Each persona asks every tested assistant once: {form.personaCount} personas × {status?.systems.length || 0} assistant(s) = {answersPerRun} live answers, each parsed by Nemotron. Start small for demos.</p>
+      <p className="form-note">Each persona asks every tested assistant once: {form.personaCount} personas × {status?.systems.length || 0} {(status?.systems.length || 0) === 1 ? "assistant" : "assistants"} = {answersPerRun} live answers, each parsed by Nemotron.{(status?.systems.length || 0) === 0 ? " Configure an assistant to enable audits." : " Start small for demos."}</p>
     </section>
 
     {missing.length > 0 && <div className="alert alert-danger" role="alert">
