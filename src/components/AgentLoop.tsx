@@ -49,7 +49,8 @@ export function AgentLoop({ audit, segmentId, ready, onRun }: { audit: Audit; se
     }
   }
 
-  return <div className="agent">
+  return <div className="agent notebook">
+    <header><span>Sommelier’s notebook</span><span>Nemotron agent · {runs.length} {runs.length === 1 ? "run" : "runs"} kept</span></header>
     <div className="cf-controls">
       <label className="field field-sm"><span>Copies to try</span>
         <select value={tries} onChange={(event) => setTries(Number(event.target.value))} disabled={running}>
@@ -67,6 +68,7 @@ export function AgentLoop({ audit, segmentId, ready, onRun }: { audit: Audit; se
     </div>
     <p className="footnote">Nemotron plans with tool calls (Qloo insights, propose copy, probe the segment against the placebo, read stats) and revises until a copy’s lift interval clears zero or the budget is spent. The code enforces the stop rule, not the model.</p>
     {error && <p className="agent-error" role="alert">{error}</p>}
+    {!running && !lines.length && !last && <p className="agent-empty">No agent runs on this audit yet. Each turn, tool call and stop reason is written here as it streams.</p>}
     {lines.length > 0 && <ol className="agent-log" aria-live="polite">
       {lines.map((line) => <li key={line.key} className={`agent-${line.kind}${line.ok === false ? " rejected" : ""}`}>
         <b>{line.title}</b>

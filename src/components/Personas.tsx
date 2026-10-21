@@ -2,7 +2,7 @@ import type { Persona } from "@/lib/types";
 
 export function PersonaGrid({ personas, limit = 12 }: { personas: Persona[]; limit?: number }) {
   return <div className="personas">
-    {personas.slice(0, limit).map((persona, index) => <article className="persona" key={persona.id} style={{ animationDelay: `${Math.min(index, 12) * 30}ms` }}>
+    {personas.slice(0, limit).map((persona) => <article className="persona" key={persona.id}>
       <header><span>{persona.id.toUpperCase()}</span><span>{persona.segment}</span></header>
       <div className="chips">
         {persona.affinities.map((tag, tagIndex) => <span key={tag.id} className={`chip ${tagIndex === 0 ? "primary" : ""}`} title={tag.id}>

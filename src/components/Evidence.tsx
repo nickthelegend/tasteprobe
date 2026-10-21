@@ -41,8 +41,8 @@ export function Evidence({ auditId, brand, segment, attemptId }: { auditId: stri
   const rows = current === "audit" ? source.filter((row) => !segment || row.segment === segment) : source;
 
   return <>
-    {attempt && <div className="cf-controls" style={{ marginBottom: 12 }}>
-      {VIEWS.map((item) => <button key={item.id} className="btn btn-ghost" aria-pressed={current === item.id} onClick={() => setView(item.id)} style={current === item.id ? { borderColor: "var(--accent)" } : undefined}>{item.label(attempt.attempt)}</button>)}
+    {attempt && <div className="cf-controls evidence-views">
+      {VIEWS.map((item) => <button key={item.id} className="btn btn-ghost" aria-pressed={current === item.id} onClick={() => setView(item.id)}>{item.label(attempt.attempt)}</button>)}
     </div>}
     {rows.length ? <div className="evidence">
       {rows.slice(0, 30).map((row, index) => <details key={`${row.personaId}-${row.model}-${index}`}>

@@ -1,168 +1,157 @@
+import { FlightBoard, Glass, type FlightItem } from "@/components/Flight";
 import { Logo } from "@/components/Logo";
 
 const REPO = "https://github.com/nickthelegend/tasteprobe";
-const GOLDEN = 2.399963;
 
-const Arrow = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
+const Arrow = ({ down = false }: { down?: boolean }) => <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{down ? <path d="M12 5v14M6 13l6 6 6-6" /> : <path d="M5 12h14M13 6l6 6-6 6" />}</svg>;
 
-// Illustrative layout of the taste map: three clusters of persona dots around the share-of-voice hub.
-// Dot states follow a fixed pattern purely to show what the legend means; the widget is labelled as an example.
-const CLUSTERS = [
-  { x: 64, y: 70, label: "Segment A", pattern: [1, 1, 0, 1, 1, 0, 1, 1, 0, 1] },
-  { x: 236, y: 70, label: "Segment B", pattern: [0, 1, 0, 0, 1, 0, 0, 0, 1] },
-  { x: 150, y: 168, label: "Segment C", pattern: [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0] },
+// Illustrative values only. Every surface that shows them carries the label "Example, not a real audit".
+const EXAMPLE_LABEL = "Example, not a real audit";
+const EXAMPLE_FLIGHT: FlightItem[] = [
+  { id: "a", name: "Cuisine tags", share: 0.58, interval: [0.41, 0.73], detail: "illustrative" },
+  { id: "b", name: "Ambience tags", share: 0.31, interval: [0.18, 0.47], detail: "illustrative" },
+  { id: "c", name: "Offering tags", share: 0.12, interval: [0.05, 0.27], detail: "illustrative" },
+  { id: "d", name: "Audience tags", share: 0, interval: [0, 0.13], detail: "illustrative" },
+];
+const EXAMPLE_REPOUR: FlightItem[] = [
+  { id: "baseline", name: "Baseline", share: 0.12, interval: [0.05, 0.27] },
+  { id: "placebo", name: "Placebo", share: 0.2, interval: [0.1, 0.36] },
+  { id: "fix", name: "Fix", share: 0.38, interval: [0.24, 0.54] },
 ];
 
-function ExampleMap() {
-  return <svg className="lp-map" viewBox="0 0 300 210" role="img" aria-label="Example layout of a taste map: persona dots grouped into three taste segments around a share-of-voice hub">
-    {[54, 86].map((r) => <ellipse key={r} cx="150" cy="108" rx={r * 1.55} ry={r} fill="none" stroke="#ead8e8" strokeDasharray="2 5" />)}
-    {CLUSTERS.map((cluster) => <line key={`s-${cluster.label}`} x1="150" y1="108" x2={cluster.x} y2={cluster.y} stroke="#ead8e8" />)}
-    {CLUSTERS.map((cluster) => <g key={cluster.label}>
-      {cluster.pattern.map((hit, k) => {
-        const r = 5.6 * Math.sqrt(k + 0.6);
-        const cx = cluster.x + Math.cos(k * GOLDEN) * r;
-        const cy = cluster.y + Math.sin(k * GOLDEN) * r;
-        return hit
-          ? <circle key={k} cx={cx} cy={cy} r="3.6" fill="#ff6ec7" />
-          : <circle key={k} cx={cx} cy={cy} r="3.1" fill="#f3ecff" stroke="#9b86d6" strokeWidth="1.2" />;
-      })}
-      <text x={cluster.x} y={cluster.y + (cluster.y > 108 ? 32 : -26)} textAnchor="middle" className="lp-map-label">{cluster.label}</text>
-    </g>)}
-    <circle cx="150" cy="108" r="27" fill="#ffe6f5" />
-    <text x="150" y="111" textAnchor="middle" className="lp-map-hub">—</text>
-    <text x="150" y="124" textAnchor="middle" className="lp-map-sub">your share</text>
-  </svg>;
+export type CellarStatus = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[] } | null;
+
+const COURSES: { title: string; body: React.ReactNode; tag: string }[] = [
+  { title: "Source the palates", tag: "Qloo Taste AI", body: <>Qloo <code>/search</code> resolves the venue, then <code>/v2/insights</code> returns up to 50 taste tags with affinity, scoped to the city.</> },
+  { title: "Seat the personas", tag: "≥ 8 per glass", body: <>Each persona anchors on one tag and blends in two affinity-weighted tags. Tags are grouped into taste segments by Qloo subtype, and each segment gets at least eight personas.</> },
+  { title: "Pour the question", tag: "brand never named", body: <>The baseline prompt holds only the persona’s tastes, the category and the city. It never names you, so every mention is earned.</> },
+  { title: "Take tasting notes", tag: "NVIDIA Nemotron", body: <>Every assistant answer is a tasting note. Nemotron on Nebius extracts the venues it recommends, cross-checked against a plain numbered-list parser.</> },
+  { title: "Measure the glass", tag: "Wilson 95%", body: <>Each glass fills to your share of the answers. The pour lines are a Wilson interval on a persona-adjusted sample size, because one persona’s answers move together.</> },
+  { title: "Re-pour three flights", tag: "paired bootstrap", body: <>Nemotron writes copy for the weakest glass. The same personas re-ask every assistant three ways at once: baseline, a placebo that only names you, and the fix.</> },
+  { title: "Keep the sommelier’s notebook", tag: "tool calling", body: <>A Nemotron agent revises copy with four tools under a budget. Every attempt is written down; the stop rule runs in code, not in the model.</> },
+];
+
+function cellarLine(status: CellarStatus, auditCount: number | null) {
+  if (!status) return "Checking the cellar…";
+  const keys = [
+    status.qloo ? "Qloo key set" : "Qloo key missing",
+    status.nebius.configured ? (status.nebius.ok ? "Nebius model reachable" : "Nebius check failed") : "Nebius key missing",
+    status.systems.length ? `${status.systems.length} ${status.systems.length === 1 ? "assistant" : "assistants"}` : "no assistant",
+  ];
+  const poured = auditCount === null ? "" : auditCount === 0 ? " · no flights poured on this server" : ` · ${auditCount} ${auditCount === 1 ? "flight" : "flights"} poured here`;
+  return `${keys.join(" · ")}${poured}`;
 }
 
-export function Landing() {
-  return <div className="lp">
-    <nav className="lp-nav" aria-label="Main">
-      <div className="lp-wrap lp-nav-row">
-        <ul>
-          <li><a href="#how">How it works</a></li>
-          <li><a href="#method">Method</a></li>
-          <li><a href="#faq">FAQ</a></li>
-        </ul>
-        <Logo href="#top" ring="#ffffff" dot="#ff6ec7" className="lp-logo" />
-        <div className="lp-act">
-          <a className="lp-act-link" href={REPO}>GitHub</a>
-          <a className="lp-btn lp-btn-white lp-btn-sm" href="#app">Run an audit</a>
-        </div>
-      </div>
-    </nav>
-
-    <header className="lp-hero" id="top">
-      <div className="lp-wrap lp-hero-grid">
-        <div className="lp-hero-copy">
-          <p className="lp-kicker">AI recommendation audit · grounded in Qloo taste data</p>
-          <h1 className="lp-h-hero">Does AI recommend you to your own audience?</h1>
-          <p className="lp-lead">TasteProbe builds personas from your venue’s real Qloo taste neighbourhood, asks live AI assistants for recommendations as each persona, and measures your share of voice per taste segment with confidence intervals.</p>
-          <div className="lp-cta">
-            <a className="lp-btn lp-btn-accent" href="#app">Run an audit <Arrow /></a>
-            <a className="lp-btn lp-btn-ghost" href="#how">How it works</a>
-          </div>
-        </div>
-        <aside className="lp-widget" aria-label="Example layout of an audit result">
-          <div className="lp-widget-top"><span className="lp-widget-title">Taste map</span><span className="lp-tag lp-tag-deep">Example layout</span></div>
-          <ExampleMap />
-          <ul className="lp-widget-rows">
-            <li><span>Share of voice, per segment</span><span className="lp-tag lp-tag-tint">95% CI</span></li>
-            <li><span>Rivals recommended instead</span><span className="lp-tag lp-tag-tint">Nemotron</span></li>
-            <li><span>Fix copy, re-tested live</span><span className="lp-tag lp-tag-tint">lift CI</span></li>
-          </ul>
-          <p className="lp-widget-note">Illustrative structure, not a result. Real audits run only on live Qloo, Nebius and assistant calls.</p>
-        </aside>
-      </div>
-    </header>
-
-    <div className="lp-built lp-paper">
-      <span className="lp-pill">Built on Qloo’s taste graph and NVIDIA Nemotron on Nebius</span>
-      <ul className="lp-built-row" aria-label="Technology used">
-        <li>Qloo /search</li><li>Qloo /v2/insights</li><li>NVIDIA Nemotron</li><li>Nebius Token Factory</li><li>OpenAI-compatible assistants</li>
-      </ul>
+export function Landing({ status, auditCount }: { status: CellarStatus; auditCount: number | null }) {
+  return <div className="sheet" id="top">
+    <div className="masthead">
+      <span className="masthead-title">TasteProbe tasting sheet</span>
+      <span className="masthead-live" aria-live="polite"><i className={status ? (status.qloo && status.nebius.ok && status.systems.length ? "ok" : "bad") : ""} />{cellarLine(status, auditCount)}</span>
     </div>
 
-    <section className="lp-sec lp-paper">
-      <div className="lp-wrap lp-intro">
-        <div>
-          <h2 className="lp-h-sec">AI assistants are the new shortlist.</h2>
-          <div className="lp-cta" style={{ marginTop: 32 }}>
-            <a className="lp-btn lp-btn-dark" href="#app">Run an audit <Arrow /></a>
-            <a className="lp-btn lp-btn-outline" href={`${REPO}#how-the-numbers-are-made`}>Read the method</a>
+    <header className="sheet-head">
+      <Logo href="#top" ring="#2a0f2e" dot="#ff6ec7" className="sheet-logo" />
+      <nav className="courses-nav" aria-label="Main">
+        <a href="#flight"><b>01</b>The flight</a>
+        <a href="#glass"><b>02</b>Reading a glass</a>
+        <a href="#repour"><b>03</b>Re-pour</a>
+        <a href="#label"><b>04</b>Back label</a>
+      </nav>
+      <a className="tp-btn tp-btn-berry" href="#room">Tasting room <Arrow down /></a>
+    </header>
+
+    <section className="hero" aria-labelledby="hero-title">
+      <div className="hero-copy">
+        <p className="kicker">A tasting flight for AI recommendations · Qloo × NVIDIA Nemotron on Nebius</p>
+        <h1 id="hero-title">Does AI recommend you to your own audience?</h1>
+        <div className="hero-side">
+          <p className="lead">TasteProbe builds taste personas from your venue’s real Qloo neighbourhood, asks live AI assistants for a recommendation as each one, and pours the result into a flight: one glass per taste segment, filled to your share of the answers.</p>
+          <div className="cta-row">
+            <a className="tp-btn tp-btn-pink" href="#room">Pour a flight <Arrow /></a>
+            <a className="tp-btn tp-btn-line" href="#flight">How it is poured</a>
           </div>
         </div>
-        <div className="lp-intro-copy">
-          <p><b>The baseline prompt never names you.</b> It holds only a persona’s tastes, the category and the city, so every baseline mention is earned.</p>
-          <p><b>Every number traces to a cached response.</b> Raw Qloo payloads, assistant answers and Nemotron extractions are kept with each audit.</p>
-        </div>
+      </div>
+      <FlightBoard items={EXAMPLE_FLIGHT} stamp={EXAMPLE_LABEL} size={112}
+        caption={<><b>{EXAMPLE_LABEL}.</b> The layout of a result, with made-up levels. Real flights appear in the tasting room only after live Qloo, Nebius and assistant calls.</>} />
+    </section>
+
+    <section className="menu" id="flight" aria-labelledby="flight-title">
+      <div className="sec-head">
+        <span className="sec-no">01</span>
+        <h2 id="flight-title">The flight, course by course</h2>
+        <p>Seven steps from a venue name to a measured glass. Each one is a real call or a computation you can replay from the cached responses.</p>
+      </div>
+      <ol className="menu-list">
+        {COURSES.map((course, index) => <li key={course.title}>
+          <span className="menu-no">{String(index + 1).padStart(2, "0")}</span>
+          <h3><span>{course.title}</span><i aria-hidden="true" /><em>{course.tag}</em></h3>
+          <p>{course.body}</p>
+        </li>)}
+      </ol>
+    </section>
+
+    <section className="anatomy" id="glass" aria-labelledby="glass-title">
+      <div className="sec-head">
+        <span className="sec-no">02</span>
+        <h2 id="glass-title">Reading a glass</h2>
+        <p>Every number on the board has one meaning. Nothing is smoothed, ranked or scored.</p>
+      </div>
+      <div className="anatomy-grid">
+        <figure className="anatomy-glass">
+          <span className="board-stamp">{EXAMPLE_LABEL}</span>
+          <Glass share={0.31} interval={[0.18, 0.47]} size={150} delay={200} label={`${EXAMPLE_LABEL}: a glass filled to 31% with pour lines at 18% and 47%`} />
+          <span className="anno anno-fill">fill · 31%</span>
+          <span className="anno anno-hi">upper pour line · 47%</span>
+          <span className="anno anno-lo">lower pour line · 18%</span>
+        </figure>
+        <dl className="anatomy-list">
+          <div><dt><i className="key key-fill" />Fill level</dt><dd>The share of usable answers in this taste segment that recommend you. The scale is linear: the 50 tick is half the answers.</dd></div>
+          <div><dt><i className="key key-band" />Pour lines</dt><dd>The 95% Wilson interval, widened by a design effect for persona clustering. Zero mentions still leaves a gap above the base, never a 0–0% line.</dd></div>
+          <div><dt><i className="key key-placard" />Placard</dt><dd>The segment’s Qloo tag subtype, its share and its interval. Calls that failed or could not be parsed are counted there and kept out of the denominator.</dd></div>
+          <div><dt><i className="key key-note" />Tasting notes</dt><dd>The raw assistant answers behind the glass, each with the venues Nemotron extracted and a flag where the list parser disagrees.</dd></div>
+        </dl>
       </div>
     </section>
 
-    <section className="lp-sec lp-paper lp-sec-tight" id="how">
-      <div className="lp-wrap">
-        <div className="lp-sec-head">
-          <h2 className="lp-h-sec">Audit, map, fix</h2>
-          <a className="lp-btn lp-btn-outline lp-btn-sm" href={`${REPO}#readme`}>Learn more <Arrow /></a>
-        </div>
-        <div className="lp-bento">
-          <article className="lp-card lp-c-tint">
-            <div className="lp-ui">
-              <div className="lp-ui-fields">
-                <span><small>Business</small>Exact listing name</span>
-                <span><small>Category</small>e.g. modern Indian restaurant</span>
-                <span><small>City</small>e.g. Mumbai</span>
-              </div>
-              <div className="lp-chips" aria-label="Persona counts you can choose">
-                {[16, 24, 48, 100, 200].map((count) => <span key={count} className={count === 24 ? "on" : ""}>{count}</span>)}
-              </div>
-            </div>
-            <div><h3 className="lp-h-card">1 · Audit</h3><p>Name a venue, its category and city. Qloo resolves it and returns up to 50 taste tags with affinity, scoped to the city. Each persona anchors on one tag and adds two more; every taste segment gets at least 8 personas.</p></div>
-          </article>
-          <article className="lp-card lp-c-tint-2">
-            <div><h3 className="lp-h-card">2 · Taste map</h3><p>Each dot is one persona, grouped into taste segments by Qloo tag subtype. Dots light up as live answers stream in.</p></div>
-            <div className="lp-ui lp-legend">
-              <span><i className="hit" />Recommends you</span>
-              <span><i className="miss" />Recommends others</span>
-              <span><i className="pending" />Awaiting answer</span>
-            </div>
-          </article>
-          <article className="lp-card lp-c-deep">
-            <div><h3 className="lp-h-card">3 · Fix &amp; re-test</h3><p>Nemotron on Nebius writes copy for the weakest segment. Every persona in it re-asks every assistant three ways at once: no snippet, a neutral placebo naming you, and the fix copy.</p></div>
-            <ul className="lp-steps">
-              <li><b>Baseline · placebo · fix</b><span className="lp-tag lp-tag-accent">live</span></li>
-              <li><b>Fix − placebo, 95% CI</b><span className="lp-tag lp-tag-accent">paired bootstrap</span></li>
-              <li><b>Plain-language verdict</b><span className="lp-tag lp-tag-accent">plain</span></li>
-            </ul>
-          </article>
-        </div>
+    <section className="repour" id="repour" aria-labelledby="repour-title">
+      <div className="sec-head">
+        <span className="sec-no">03</span>
+        <h2 id="repour-title">Re-pour, three ways</h2>
+        <p>A fix is tested as a prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.</p>
       </div>
-    </section>
-
-    <section className="lp-sec lp-paper lp-sec-tight" id="method" aria-label="Method in numbers">
-      <div className="lp-wrap lp-stats">
-        <div className="lp-stat"><b>50</b><span>Qloo taste tags per venue, at most</span></div>
-        <div className="lp-stat"><b>3</b><span>tags per persona: one anchor, two by affinity</span></div>
-        <div className="lp-stat"><b>95<em>%</em></b><span>Wilson intervals, widened for persona clustering</span></div>
-        <div className="lp-stat"><b>0</b><span>times the baseline prompt names your brand</span></div>
-      </div>
-    </section>
-
-    <section className="lp-sec lp-dark" id="faq">
-      <div className="lp-wrap lp-faq">
+      <div className="repour-grid">
         <div>
-          <h2 className="lp-h-sec">Questions, answered straight</h2>
-          <p className="lp-faq-sub">What TasteProbe measures, and what it doesn’t.</p>
+          <FlightBoard compact items={EXAMPLE_REPOUR} size={74} stamp={EXAMPLE_LABEL} />
+          <p className="repour-math"><b>Lift = fix − placebo</b>, with a 95% paired bootstrap interval over personas. The placebo names you without the copy, so the lift measures the copy rather than the name.</p>
         </div>
-        <div>
-          <details open><summary>Where do the personas come from?</summary><p>Qloo’s <code>/v2/insights</code> returns taste tags with affinity to your venue, scoped to the city. Tags are grouped into segments by subtype, and each persona blends one anchor tag with two affinity-weighted tags from other segments. They are composites of taste tags, not real individuals or a representative panel.</p></details>
-          <details><summary>Does the assistant know who is being audited?</summary><p>Not in the audit. The baseline prompt holds only the persona’s tastes, the category and the city. A fix re-test deliberately adds a retrieved snippet naming you to two arms, a neutral placebo and the fix copy, so the reported lift (fix minus placebo) measures the copy rather than mere exposure to your name. Nemotron extracts the venues each answer recommends, and names are matched after normalising case, accents, articles, possessives and “&”.</p></details>
-          <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Zero mentions never collapses to a 0–0% interval. Lift is a paired bootstrap over personas, because both arms ask the same personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
-          <details><summary>What does a fix change?</summary><p>Nothing on your site. It is a prompt-level counterfactual: the copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled. The baseline is re-asked in the same run, so model drift since the audit does not count as lift, and every attempt is kept.</p></details>
-          <details><summary>What does the agent loop do?</summary><p>Nemotron on Nebius calls four tools: live Qloo insights, propose copy, probe the segment (placebo vs fix on the next personas) and read the stats. It revises until a copy’s lift interval clears zero or its budget of tries, assistant calls, tokens or dollars is spent. The stop rule runs in code, not in the model. Tool calling on Nebius is unverified until the first live run.</p></details>
-          <details><summary>What do I need to run it?</summary><p><code>QLOO_API_KEY</code>, <code>NEBIUS_API_KEY</code>, and <code>OPENAI_API_KEY</code> or a <code>MODEL_2_*</code> OpenAI-compatible endpoint in <code>.env.local</code>. Without them the app says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
-          <details><summary>Has it run end to end?</summary><p>Not yet against live keys from this repo. The Qloo parsing follows the documented <code>/v2/insights</code> shape and accepts its known variants; the first live audit’s raw payload is cached for checking.</p></details>
-        </div>
+        <article className="notebook notebook-ruled" aria-label="How the sommelier's notebook works">
+          <header><span>Sommelier’s notebook</span><span>rules, not a run</span></header>
+          <ol>
+            <li><b>Tools</b> live Qloo insights · propose copy · probe the segment · read the stats</li>
+            <li><b>Probe</b> placebo against fix on the segment’s next personas</li>
+            <li><b>Stop</b> when a copy’s lift interval clears zero, or tries, calls, tokens or dollars run out</li>
+            <li><b>Enforced</b> in code, not by the model; every attempt stays in the notebook</li>
+          </ol>
+        </article>
       </div>
+    </section>
+
+    <section className="backlabel" id="label" aria-labelledby="label-title">
+      <div className="sec-head">
+        <span className="sec-no">04</span>
+        <h2 id="label-title">Back label</h2>
+        <p>What TasteProbe measures, and what it does not.</p>
+      </div>
+      <div className="label-card">
+        <details open><summary>Where do the personas come from?</summary><p>Qloo’s <code>/v2/insights</code> returns taste tags with affinity to your venue, scoped to the city. Tags are grouped into segments by subtype, and each persona blends one anchor tag with two affinity-weighted tags from other segments. They are composites of taste tags, not real individuals or a representative panel.</p></details>
+        <details><summary>Does the assistant know who is being audited?</summary><p>Not in the audit. The baseline prompt holds only the persona’s tastes, the category and the city. A fix re-test deliberately adds a retrieved snippet naming you to two arms, a neutral placebo and the fix copy, so the reported lift (fix minus placebo) measures the copy rather than mere exposure to your name. Names are matched after normalising case, accents, articles, possessives and “&”.</p></details>
+        <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Lift is a paired bootstrap over personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
+        <details><summary>What does a fix change?</summary><p>Nothing on your site. The copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled. The baseline is re-asked in the same run, so model drift since the audit does not count as lift, and every attempt is kept.</p></details>
+        <details><summary>What do I need to run it?</summary><p><code>QLOO_API_KEY</code>, <code>NEBIUS_API_KEY</code>, and <code>OPENAI_API_KEY</code> or a <code>MODEL_2_*</code> OpenAI-compatible endpoint in <code>.env.local</code>. Without them the tasting room says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
+        <details><summary>Has it run end to end?</summary><p>Not yet against live keys from this repo. Every glass on this page above the tasting room is an example. The Qloo parsing follows the documented <code>/v2/insights</code> shape; the first live audit’s raw payload is cached for checking, and tool calling on Nebius is unverified until that run.</p></details>
+      </div>
+      <p className="label-foot"><a href={REPO}>Source on GitHub</a> · <a href={`${REPO}#how-the-numbers-are-made`}>How the numbers are made</a> · MIT</p>
     </section>
   </div>;
 }

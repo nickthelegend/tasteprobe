@@ -39,25 +39,7 @@ export function Heatmap({ audit, selected, onSelect }: { audit: Audit; selected?
         </tbody>
       </table>
     </div>
-    <div className="legend"><span>0%</span><i /><span>100% share of voice</span></div>
-  </>;
-}
-
-export function ForestPlot({ segments, selected, onSelect }: { segments: SegmentResult[]; selected?: string; onSelect: (id: string) => void }) {
-  const max = Math.min(1, Math.max(0.2, ...segments.map((segment) => segment.ci[1])) * 1.1);
-  const x = (value: number) => `${(value / max) * 100}%`;
-  return <>
-    <div className="forest" role="list">
-      {segments.map((segment) => <button role="listitem" key={segment.id} className={`forest-row ${segment.id === selected ? "selected" : ""}`} onClick={() => onSelect(segment.id)} aria-label={`${segment.name}: ${pct(segment.share)}, 95% CI ${ci(segment.ci)}`}>
-        <span>{segment.name}</span>
-        <span className="forest-track">
-          <span className="forest-ci" style={{ left: x(segment.ci[0]), width: `calc(${x(segment.ci[1] - segment.ci[0])} + 2px)` }} />
-          <span className="forest-point" style={{ left: x(segment.share) }} />
-        </span>
-        <b>{pct(segment.share)}</b>
-      </button>)}
-    </div>
-    <div className="axis"><span>0%</span><span>{pct(max / 2)}</span><span>{pct(max)}</span></div>
+    <div className="legend"><span>0%</span><i /><span>100% of answers recommend you</span></div>
   </>;
 }
 

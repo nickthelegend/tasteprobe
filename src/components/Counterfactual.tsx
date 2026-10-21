@@ -1,5 +1,6 @@
 import type { ArmSummary, Audit, Counterfactual } from "@/lib/types";
-import { ci, pct, signedPts } from "./format";
+import { FlightBoard } from "./Flight";
+import { pct, signedPts } from "./format";
 
 function verdict([low, high]: [number, number], delta: number) {
   if (low > 0) return <><strong>The copy itself lifted visibility.</strong> Fix beat the placebo by {signedPts(delta)}; the 95% paired interval ({signedPts(low)} to {signedPts(high)}) sits above zero.</>;
@@ -7,12 +8,8 @@ function verdict([low, high]: [number, number], delta: number) {
   return <><strong>Not distinguishable from the placebo.</strong> Fix minus placebo is {signedPts(delta)}, but the 95% paired interval ({signedPts(low)} to {signedPts(high)}) includes zero. Try more personas or different copy.</>;
 }
 
-function Arm({ label, kind, arm }: { label: string; kind: string; arm: ArmSummary }) {
-  return <div className={`cf-bar ${kind}`}>
-    <span>{label}</span>
-    <span className="bar"><i style={{ width: pct(arm.share) }} /></span>
-    <small><b>{pct(arm.share)}</b> · {arm.mentions}/{arm.responses} · {ci(arm.ci)}{arm.failed ? ` · ${arm.failed} failed` : ""}</small>
-  </div>;
+function armDetail(arm: ArmSummary) {
+  return `${arm.mentions}/${arm.responses}${arm.failed ? ` · ${arm.failed} failed` : ""}`;
 }
 
 export function attemptsOf(audit: Audit): Counterfactual[] {
@@ -44,18 +41,20 @@ export function CounterfactualPanel({ audit, segmentId, onSegment, running, read
   return <div className="cf-wrap">
     <div className="cf">
       <div className="cf-copy">
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Attempt {result.attempt} · {result.model} · {result.segment}</div>
+        <div className="eyebrow">Attempt {result.attempt} · {result.model} · {result.segment}</div>
         <blockquote>“{result.change}”</blockquote>
         {result.rationale && <p>{result.rationale}</p>}
         <p>Prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.</p>
         {controls}
       </div>
       <div className="cf-compare">
-        <Arm label="Baseline" kind="before" arm={result.arms.baseline} />
-        <Arm label="Placebo" kind="placebo" arm={result.arms.placebo} />
-        <Arm label="Fix" kind="after" arm={result.arms.fix} />
+        <FlightBoard compact size={72} items={[
+          { id: "baseline", name: "Baseline", share: result.arms.baseline.responses ? result.arms.baseline.share : null, interval: result.arms.baseline.ci, detail: armDetail(result.arms.baseline) },
+          { id: "placebo", name: "Placebo", share: result.arms.placebo.responses ? result.arms.placebo.share : null, interval: result.arms.placebo.ci, detail: armDetail(result.arms.placebo) },
+          { id: "fix", name: "Fix", share: result.arms.fix.responses ? result.arms.fix.share : null, interval: result.arms.fix.ci, detail: armDetail(result.arms.fix) },
+        ]} />
         <div className="verdict">{verdict(result.lift.fixVsPlacebo.ci, result.lift.fixVsPlacebo.delta)}</div>
-        <p className="footnote" style={{ marginTop: 0 }}>Name exposure alone (placebo − baseline): {signedPts(exposure.delta)}, 95% CI {signedPts(exposure.ci[0])} to {signedPts(exposure.ci[1])}. All three arms ran concurrently on the same {result.personas} personas; failed calls are excluded from each arm’s denominator and counted above.</p>
+        <p className="footnote">Name exposure alone (placebo − baseline): {signedPts(exposure.delta)}, 95% CI {signedPts(exposure.ci[0])} to {signedPts(exposure.ci[1])}. All three arms ran concurrently on the same {result.personas} personas; failed calls are excluded from each arm’s denominator and counted above.</p>
       </div>
     </div>
     {history.length > 1 && <div className="cf-history">
