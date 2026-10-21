@@ -4,11 +4,25 @@ import { parseQlooTags } from "./taste.mjs";
 import type { TasteTag, Usage } from "./types";
 
 export class ConfigError extends Error {}
+// Nemotron answered but its output could not be parsed (or was cut off at max_tokens). Counted
+// separately from call failures so dropped answers show up in the denominators.
+export class UnparseableError extends Error {}
 
 const QLOO_BASE_URL = () => process.env.QLOO_BASE_URL || "https://hackathon.api.qloo.com";
 const NEBIUS_BASE_URL = () => process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1";
 export const nebiusModel = () => process.env.NEBIUS_MODEL || "nvidia/Nemotron-3-Nano-30B-A3B";
-const REQUEST_TIMEOUT_MS = 90_000;
+const REQUEST_TIMEOUT_MS = 120_000;
+// Reasoning models spend tokens thinking before the JSON; 2048 truncated long answers.
+const nemotronMaxTokens = () => Number(process.env.NEBIUS_MAX_TOKENS) || 8192;
+
+// Names of the variables a live audit needs and that are not set.
+export function missingKeys() {
+  const missing: string[] = [];
+  if (!process.env.QLOO_API_KEY) missing.push("QLOO_API_KEY");
+  if (!process.env.NEBIUS_API_KEY) missing.push("NEBIUS_API_KEY");
+  if (!configuredModels().length) missing.push("OPENAI_API_KEY");
+  return missing;
+}
 
 export function requireKeys() {
   if (!process.env.QLOO_API_KEY) throw new ConfigError("Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.");
@@ -89,6 +103,13 @@ function configuredModels(): ChatModel[] {
   return models;
 }
 
+export function nebiusPrices() {
+  const input = Number(process.env.NEBIUS_INPUT_PRICE_PER_MILLION);
+  const output = Number(process.env.NEBIUS_OUTPUT_PRICE_PER_MILLION);
+  if (!process.env.NEBIUS_INPUT_PRICE_PER_MILLION || !process.env.NEBIUS_OUTPUT_PRICE_PER_MILLION || !Number.isFinite(input) || !Number.isFinite(output)) return null;
+  return { input, output };
+}
+
 export function getTestModels() {
   return configuredModels().map(({ name }) => name);
 }
@@ -119,33 +140,68 @@ function nebius() {
   return new OpenAI({ apiKey, baseURL: NEBIUS_BASE_URL(), timeout: REQUEST_TIMEOUT_MS, maxRetries: 2 });
 }
 
+// Optional reasoning toggle. NVIDIA's Nemotron 3 Nano card documents
+// chat_template_kwargs.enable_thinking for vLLM; Nebius documents reasoning_effort and accepts extra
+// body fields, but neither mapping onto Nemotron is confirmed on Nebius yet. Unset = send nothing.
+function thinkingParams(): Record<string, unknown> {
+  const mode = process.env.NEBIUS_THINKING?.toLowerCase();
+  if (mode === "on" || mode === "off") return { chat_template_kwargs: { enable_thinking: mode === "on" } };
+  return {};
+}
+
+function usageOf(completion: OpenAI.Chat.ChatCompletion): Usage {
+  return { inputTokens: completion.usage?.prompt_tokens ?? 0, outputTokens: completion.usage?.completion_tokens ?? 0 };
+}
+
 async function nemotron(messages: OpenAI.Chat.ChatCompletionMessageParam[], temperature: number) {
   const model = nebiusModel();
   try {
-    const completion = await nebius().chat.completions.create({ model, messages, temperature, max_tokens: 2048 });
-    const usage: Usage = { inputTokens: completion.usage?.prompt_tokens ?? 0, outputTokens: completion.usage?.completion_tokens ?? 0 };
-    return { model, text: completion.choices[0]?.message?.content ?? "", usage };
+    const completion = await nebius().chat.completions.create({ model, messages, temperature, max_tokens: nemotronMaxTokens(), ...thinkingParams() });
+    const choice = completion.choices[0];
+    return { model, text: choice?.message?.content ?? "", usage: usageOf(completion), finishReason: choice?.finish_reason ?? null };
   } catch (error) {
     if (error instanceof ConfigError) throw error;
     throw new Error(`Nebius ${model}: ${describe(error)}`);
   }
 }
 
+// One agent turn with OpenAI-style tool calling (Nebius documents `tools` and `tool_choice` on
+// chat completions). Returns the assistant message so the caller can execute its tool calls.
+export async function nemotronTurn(messages: OpenAI.Chat.ChatCompletionMessageParam[], tools: OpenAI.Chat.ChatCompletionTool[]) {
+  const model = nebiusModel();
+  try {
+    const completion = await nebius().chat.completions.create({ model, messages, tools, tool_choice: "auto", temperature: 0.4, max_tokens: nemotronMaxTokens(), ...thinkingParams() });
+    const choice = completion.choices[0];
+    const message = choice?.message ?? { role: "assistant" as const, content: "", refusal: null };
+    const reasoning = (message as unknown as { reasoning_content?: string }).reasoning_content;
+    return { model, message, usage: usageOf(completion), finishReason: choice?.finish_reason ?? null, reasoning: typeof reasoning === "string" ? reasoning : "" };
+  } catch (error) {
+    if (error instanceof ConfigError) throw error;
+    throw new Error(`Nebius ${model}: ${describe(error)}`);
+  }
+}
+
+export const EXTRACTION_SYSTEM_PROMPT = "You extract recommendations from an assistant's answer. List every distinct business or venue the answer recommends, using the name exactly as written, without addresses or branch notes. Ignore businesses mentioned only as comparisons. Reply with JSON only: {\"entities\":[\"Name\", ...]}.";
+
 export async function extractEntities(answer: string, category: string, city: string) {
-  const { text, usage, model } = await nemotron([
-    { role: "system", content: "You extract recommendations from an assistant's answer. List every distinct business or venue the answer recommends, using the name exactly as written, without addresses or branch notes. Ignore businesses mentioned only as comparisons. Reply with JSON only: {\"entities\":[\"Name\", ...]}." },
+  const { text, usage, model, finishReason } = await nemotron([
+    { role: "system", content: EXTRACTION_SYSTEM_PROMPT },
     { role: "user", content: `Category: ${category}\nCity: ${city}\n\nAnswer:\n${answer}` },
   ], 0);
-  const parsed = parseJsonObject(text);
-  const entities = Array.isArray(parsed.entities)
-    ? [...new Set(parsed.entities.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean))]
-    : [];
+  if (finishReason === "length") throw new UnparseableError(`Nemotron hit max_tokens (${nemotronMaxTokens()}) before finishing the extraction.`);
+  let parsed: Record<string, unknown>;
+  try { parsed = parseJsonObject(text); }
+  catch (error) { throw new UnparseableError(error instanceof Error ? error.message : String(error)); }
+  if (!Array.isArray(parsed.entities)) throw new UnparseableError(`Nemotron's JSON has no "entities" array: ${text.slice(0, 160)}`);
+  const entities = [...new Set(parsed.entities.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean))];
   return { model, entities, usage, raw: text };
 }
 
+export const COPY_RULES = "Phrase it as copy the business would publish, under 45 words, with no prices, awards or claims that would need verification.";
+
 export async function suggestContentChange(input: { brand: string; category: string; city: string; segment: string; tastes: string[]; competitors: string[] }) {
   const { text, usage, model } = await nemotron([
-    { role: "system", content: "You are a local-search strategist. Propose ONE specific, factual-sounding but non-fabricated content addition the business could publish on its website or listings so AI assistants connect it to the stated taste segment. Phrase it as copy the business would publish, under 45 words, with no prices, awards or claims that would need verification. Reply with JSON only: {\"change\":\"...\",\"rationale\":\"one sentence\"}." },
+    { role: "system", content: `You are a local-search strategist. Propose ONE specific, factual-sounding but non-fabricated content addition the business could publish on its website or listings so AI assistants connect it to the stated taste segment. ${COPY_RULES} Reply with JSON only: {"change":"...","rationale":"one sentence"}.` },
     { role: "user", content: JSON.stringify(input) },
   ], 0.3);
   const parsed = parseJsonObject(text);

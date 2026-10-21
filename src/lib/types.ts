@@ -18,7 +18,7 @@ export type LiftSummary = { delta: number; ci: [number, number] };
 export type Counterfactual = {
   id: string;
   attempt: number;
-  source: "fix" | "agent";
+  source: "fix";
   segment: string;
   personas: number;
   change: string;
@@ -29,6 +29,39 @@ export type Counterfactual = {
   model: string;
   createdAt: string;
 };
+export type AgentCandidateSummary = {
+  id: string;
+  copy: string;
+  rationale: string;
+  personas: number;
+  placeboShare: number | null;
+  fixShare: number | null;
+  lift: number | null;
+  liftCi: [number, number] | null;
+  failed: number;
+};
+export type AgentBudgetSummary = { tries: number; turns: number; assistantCalls: number; nemotronCalls: number; inputTokens: number; outputTokens: number; usd: number; priced: boolean };
+// One run of the tool-calling fix agent (placebo vs fix probes only; see src/lib/agent.ts).
+export type AgentRun = {
+  id: string;
+  segment: string;
+  model: string;
+  stopReason: string;
+  stopDetail: string;
+  best: AgentCandidateSummary | null;
+  candidates: AgentCandidateSummary[];
+  budget: AgentBudgetSummary;
+  limits: { maxTries: number; maxAssistantCalls: number; maxUsd: number | null; maxNemotronTokens: number; maxTurns: number };
+  steps: number;
+  createdAt: string;
+};
+export type AgentEvent =
+  | { type: "start"; runId: string; segment: string; model: string; limits: AgentRun["limits"] }
+  | { type: "step"; turn: number; text: string; reasoningChars: number; toolCalls: string[]; usage: Usage; costUsd: number | null; budget: AgentBudgetSummary }
+  | { type: "tool"; turn: number; name: string; args: Record<string, unknown>; ok: boolean; summary: string }
+  | { type: "stop"; reason: string; detail: string }
+  | { type: "done"; run: AgentRun }
+  | { type: "error"; message: string };
 export type Audit = {
   id: string;
   brand: string;
@@ -49,6 +82,7 @@ export type Audit = {
   estimatedExtractionCostUsd: number | null;
   durationMs: number;
   counterfactuals?: Counterfactual[];
+  agentRuns?: AgentRun[];
 };
 export type AuditEvent =
   | { type: "stage"; stage: "resolve" | "qloo" | "personas" | "query" | "stats"; message: string }

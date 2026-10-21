@@ -44,7 +44,7 @@ export function CounterfactualPanel({ audit, segmentId, onSegment, running, read
   return <div className="cf-wrap">
     <div className="cf">
       <div className="cf-copy">
-        <div className="eyebrow" style={{ marginBottom: 8 }}>Attempt {result.attempt} · {result.source === "agent" ? "agent loop" : "single fix"} · {result.model} · {result.segment}</div>
+        <div className="eyebrow" style={{ marginBottom: 8 }}>Attempt {result.attempt} · {result.model} · {result.segment}</div>
         <blockquote>“{result.change}”</blockquote>
         {result.rationale && <p>{result.rationale}</p>}
         <p>Prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.</p>

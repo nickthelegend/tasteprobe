@@ -1,4 +1,4 @@
-import { askAssistants, extractEntities } from "./providers";
+import { askAssistants, extractEntities, nebiusPrices, UnparseableError } from "./providers";
 import { matchesBrand } from "./taste.mjs";
 import type { Persona, Usage } from "./types";
 
@@ -13,7 +13,10 @@ export type ResponseRow = {
   extractionRaw: string;
   usage: Usage;
 };
-export type FailedRow = { personaId: string; segment: string; error: string };
+// assistant: the tested assistant's call failed. unparseable: Nemotron answered but its output was not
+// usable JSON (or was truncated). extraction: the Nemotron call itself failed.
+export type FailureKind = "assistant" | "unparseable" | "extraction";
+export type FailedRow = { personaId: string; segment: string; model?: string; kind: FailureKind; error: string };
 
 export async function pool<T, R>(values: T[], concurrency: number, task: (value: T, index: number) => Promise<R>): Promise<R[]> {
   const output = new Array<R>(values.length);
@@ -34,7 +37,7 @@ export async function probePersona(persona: Persona, prompt: string, brand: stri
   const answers = await askAssistants(prompt);
   await Promise.all(answers.map(async (result) => {
     if (!result.ok) {
-      failures.push({ personaId: persona.id, segment: persona.segment, error: result.error });
+      failures.push({ personaId: persona.id, segment: persona.segment, model: result.model, kind: "assistant", error: result.error });
       return;
     }
     try {
@@ -51,7 +54,7 @@ export async function probePersona(persona: Persona, prompt: string, brand: stri
         usage: extraction.usage,
       });
     } catch (error) {
-      failures.push({ personaId: persona.id, segment: persona.segment, error: error instanceof Error ? error.message : String(error) });
+      failures.push({ personaId: persona.id, segment: persona.segment, model: result.model, kind: error instanceof UnparseableError ? "unparseable" : "extraction", error: error instanceof Error ? error.message : String(error) });
     }
   }));
   return { rows, failures };
@@ -71,8 +74,6 @@ export function sumUsage(rows: { usage: Usage }[]): Usage {
 }
 
 export function estimateCost(usage: Usage) {
-  const inputRate = Number(process.env.NEBIUS_INPUT_PRICE_PER_MILLION);
-  const outputRate = Number(process.env.NEBIUS_OUTPUT_PRICE_PER_MILLION);
-  if (!process.env.NEBIUS_INPUT_PRICE_PER_MILLION || !Number.isFinite(inputRate) || !Number.isFinite(outputRate)) return null;
-  return (usage.inputTokens * inputRate + usage.outputTokens * outputRate) / 1_000_000;
+  const prices = nebiusPrices();
+  return prices ? (usage.inputTokens * prices.input + usage.outputTokens * prices.output) / 1_000_000 : null;
 }

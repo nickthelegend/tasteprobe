@@ -2,7 +2,9 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CompetitorBars, ForestPlot, Heatmap } from "@/components/Charts";
+import { AgentLoop } from "@/components/AgentLoop";
 import { CounterfactualPanel } from "@/components/Counterfactual";
+import { readNdjson } from "@/components/ndjson";
 import { maxSegmentsFor, MIN_PERSONAS_PER_SEGMENT } from "@/lib/taste.mjs";
 import { Evidence } from "@/components/Evidence";
 import { ci, pct } from "@/components/format";
@@ -21,21 +23,6 @@ const STAGES: { id: Stage; label: string }[] = [
   { id: "stats", label: "Share of voice with persona-adjusted 95% CIs" },
 ];
 type Run = { stage: Stage; message: string; place?: string; brand: string; personas: Persona[]; results: Record<string, PersonaResult>; rivals: string[]; done: number; total: number; mentions: number };
-
-async function readNdjson(response: Response, onEvent: (event: AuditEvent) => void) {
-  const reader = response.body!.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    buffer += decoder.decode(value, { stream: !done });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
-    for (const line of lines) if (line.trim()) onEvent(JSON.parse(line));
-    if (done) break;
-  }
-  if (buffer.trim()) onEvent(JSON.parse(buffer));
-}
 
 function missingConfig(status: Status | null) {
   if (!status) return [];
@@ -104,7 +91,7 @@ export default function Home() {
       const response = await fetch("/api/audits", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(form) });
       if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error ?? `Audit request failed (${response.status}).`);
       let finished = false;
-      await readNdjson(response, (message) => {
+      await readNdjson<AuditEvent>(response, (message) => {
         if (message.type === "stage") setRun((current) => current && { ...current, stage: message.stage, message: message.message });
         if (message.type === "place") setRun((current) => current && { ...current, brand: message.name, place: message.address ? `${message.name}, ${message.address}` : message.name });
         if (message.type === "answer") {
@@ -288,8 +275,13 @@ export default function Home() {
           </section>}
 
           <section className="card fix-card" id="fix">
-            <div className="card-head"><div><h3>Fix &amp; re-test</h3><p>Nemotron proposes copy for a weak segment; baseline, placebo and fix arms re-run live on the same personas.</p></div><span className="tag tag-live">placebo-controlled</span></div>
+            <div className="card-head"><div><h3>Fix &amp; re-test</h3><p>One fix: Nemotron proposes copy and baseline, placebo and fix arms re-run live on the same personas. Agent loop: Nemotron iterates with tools under a budget.</p></div><span className="tag tag-live">placebo-controlled</span></div>
             <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={ready} onRun={runFix} selectedAttempt={attemptId} onAttempt={setAttemptId} />
+            <AgentLoop audit={active} segmentId={segmentId} ready={ready && !fixing} onRun={(agentRun) => {
+              const updated: Audit = { ...active, agentRuns: [...(active.agentRuns ?? []), agentRun] };
+              setActive(updated);
+              setAudits((current) => current.map((item) => item.id === updated.id ? updated : item));
+            }} />
           </section>
 
           <div className="grid-2">
