@@ -17,7 +17,7 @@ const STAGES: { id: Stage; label: string }[] = [
   { id: "resolve", label: "Resolve the business in Qloo" },
   { id: "qloo", label: "Fetch Qloo taste affinities" },
   { id: "query", label: "Ask assistants as each persona, extract with Nemotron" },
-  { id: "stats", label: "Share of voice with bootstrap CIs" },
+  { id: "stats", label: "Share of voice with persona-adjusted 95% CIs" },
 ];
 type Run = { stage: Stage; message: string; place?: string; brand: string; personas: Persona[]; results: Record<string, PersonaResult>; rivals: string[]; done: number; total: number; mentions: number };
 
@@ -262,13 +262,13 @@ export default function Home() {
           </section>
 
           <section className="card" id="segments">
-            <div className="card-head"><div><h3>Taste segment × assistant</h3><p>Share of answers that recommend {active.brand}. Each cell shows mentions/answers and the 95% bootstrap CI.</p></div><span className="tag">heatmap</span></div>
+            <div className="card-head"><div><h3>Taste segment × assistant</h3><p>Share of answers that recommend {active.brand}. Each cell shows mentions/answers and the 95% Wilson interval, widened for persona clustering.</p></div><span className="tag">heatmap</span></div>
             <Heatmap audit={active} selected={segment?.id} onSelect={setSegmentId} />
           </section>
 
           <div className="grid-2">
             <section className="card">
-              <div className="card-head"><div><h3>Confidence by segment</h3><p>Point = observed share; band = 95% CI, resampled by persona.</p></div><span className="tag">bootstrap</span></div>
+              <div className="card-head"><div><h3>Confidence by segment</h3><p>Point = observed share; band = 95% Wilson interval on the persona-adjusted sample size.</p></div><span className="tag">wilson · deff</span></div>
               <ForestPlot segments={active.segments} selected={segment?.id} onSelect={setSegmentId} />
             </section>
             {segment && <section className="card">

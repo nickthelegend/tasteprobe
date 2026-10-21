@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { pool, probePersona, type FailedRow, type ResponseRow } from "@/lib/probe";
 import { ConfigError, requireKeys, suggestContentChange } from "@/lib/providers";
-import { bootstrapDifference, bootstrapInterval } from "@/lib/stats.mjs";
+import { pairedBootstrapDifference, shareInterval } from "@/lib/stats.mjs";
 import { findAudit, readRaw, saveAudit, writeRaw } from "@/lib/storage";
 import { counterfactualPrompt } from "@/lib/taste.mjs";
 
@@ -40,17 +40,17 @@ export async function POST(request: Request, context: { params: { id: string } }
     await writeRaw(audit.id, "counterfactual", { suggestion, segment: segment.name, rows, failures });
     if (!rows.length) throw new Error(`Every re-test call failed. First error: ${failures[0]?.error ?? "unknown"}`);
 
-    const before = beforeRows.map((row) => row.brand);
-    const after = rows.map((row) => row.brand);
+    const before = beforeRows.map((row) => ({ cluster: row.personaId, value: row.brand ? 1 : 0 }));
+    const after = rows.map((row) => ({ cluster: row.personaId, value: row.brand ? 1 : 0 }));
     audit.counterfactual = {
       change: suggestion.change,
       segment: segment.name,
-      before: before.filter(Boolean).length / before.length,
+      before: before.filter((row) => row.value).length / before.length,
       beforeResponses: before.length,
-      after: after.filter(Boolean).length / after.length,
+      after: after.filter((row) => row.value).length / after.length,
       afterResponses: after.length,
-      afterCi: bootstrapInterval(after),
-      deltaCi: bootstrapDifference(before, after),
+      afterCi: shareInterval(after),
+      deltaCi: pairedBootstrapDifference(before, after),
       model: suggestion.model,
       createdAt: new Date().toISOString(),
     };

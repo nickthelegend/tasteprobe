@@ -7,7 +7,7 @@ const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variab
 
 export const metadata: Metadata = {
   title: "TasteProbe — does AI recommend you to your own audience?",
-  description: "TasteProbe builds personas from a venue's real Qloo taste neighbourhood, asks live AI assistants for recommendations as each persona, and reports share of voice per taste segment with bootstrap confidence intervals. NVIDIA Nemotron on Nebius extracts every answer and writes the fix.",
+  description: "TasteProbe builds personas from a venue's real Qloo taste neighbourhood, asks live AI assistants for recommendations as each persona, and reports share of voice per taste segment with persona-adjusted confidence intervals. NVIDIA Nemotron on Nebius extracts every answer and writes the fix.",
   applicationName: "TasteProbe",
 };
 

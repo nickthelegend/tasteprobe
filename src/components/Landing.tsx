@@ -130,7 +130,7 @@ export function Landing() {
             <div><h3 className="lp-h-card">3 · Fix agent</h3><p>Nemotron on Nebius writes copy for the weakest segment. Every persona in it re-asks every assistant with that copy as retrieved context.</p></div>
             <ul className="lp-steps">
               <li><b>Before vs. after</b><span className="lp-tag lp-tag-accent">live</span></li>
-              <li><b>Lift with a 95% CI</b><span className="lp-tag lp-tag-accent">bootstrap</span></li>
+              <li><b>Lift with a 95% CI</b><span className="lp-tag lp-tag-accent">paired bootstrap</span></li>
               <li><b>Plain-language verdict</b><span className="lp-tag lp-tag-accent">plain</span></li>
             </ul>
           </article>
@@ -142,7 +142,7 @@ export function Landing() {
       <div className="lp-wrap lp-stats">
         <div className="lp-stat"><b>50</b><span>Qloo taste tags per venue, at most</span></div>
         <div className="lp-stat"><b>3</b><span>tags per persona: one anchor, two by affinity</span></div>
-        <div className="lp-stat"><b>95<em>%</em></b><span>persona-clustered bootstrap intervals</span></div>
+        <div className="lp-stat"><b>95<em>%</em></b><span>Wilson intervals, widened for persona clustering</span></div>
         <div className="lp-stat"><b>0</b><span>times the assistant sees your brand name</span></div>
       </div>
     </section>
@@ -156,7 +156,7 @@ export function Landing() {
         <div>
           <details open><summary>Where do the personas come from?</summary><p>Qloo’s <code>/v2/insights</code> returns taste tags with affinity to your venue, scoped to the city. Tags are grouped into segments by subtype, and each persona blends one anchor tag with two affinity-weighted tags from other segments. They are composites of taste tags, not real individuals or a representative panel.</p></details>
           <details><summary>Does the assistant know who is being audited?</summary><p>No. The prompt holds only the persona’s tastes, the category and the city. Nemotron extracts the venues each answer recommends, and names are matched after normalising case, accents, articles, possessives and “&”.</p></details>
-          <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% interval from a persona-clustered percentile bootstrap, because one persona’s answers across assistants are correlated. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
+          <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Zero mentions never collapses to a 0–0% interval. Lift is a paired bootstrap over personas, because both arms ask the same personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
           <details><summary>What does the fix agent change?</summary><p>Nothing on your site. It is a prompt-level counterfactual: the copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled.</p></details>
           <details><summary>What do I need to run it?</summary><p><code>QLOO_API_KEY</code>, <code>NEBIUS_API_KEY</code>, and <code>OPENAI_API_KEY</code> or a <code>MODEL_2_*</code> OpenAI-compatible endpoint in <code>.env.local</code>. Without them the app says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
           <details><summary>Has it run end to end?</summary><p>Not yet against live keys from this repo. The Qloo parsing follows the documented <code>/v2/insights</code> shape and accepts its known variants; the first live audit’s raw payload is cached for checking.</p></details>

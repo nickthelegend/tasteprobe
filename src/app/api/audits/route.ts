@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         await writeRaw(auditId, "responses", { rows, failures });
         if (!rows.length) throw new Error(`Every assistant call failed. First error: ${failures[0]?.error ?? "unknown"}`);
 
-        send({ type: "stage", stage: "stats", message: "Computing share of voice and bootstrap intervals" });
+        send({ type: "stage", stage: "stats", message: "Computing share of voice and 95% intervals" });
         const observations = toObservations(rows, place.name);
         const systems = [...new Set(rows.map((row) => row.model))].sort();
         const usage = sumUsage(rows);
