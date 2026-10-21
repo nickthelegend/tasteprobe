@@ -26,7 +26,7 @@ test("50 concurrent updates to one store all land, and no temp files are left be
   }
 });
 
-test("the unlocked read-modify-write pattern this replaces does lose updates", async () => {
+test("the unlocked read-modify-write pattern this replaces loses updates or corrupts the file", async () => {
   const dir = await scratch();
   try {
     const file = path.join(dir, "audits.json");
@@ -36,8 +36,10 @@ test("the unlocked read-modify-write pattern this replaces does lose updates", a
       audits.push({ id: `a${index}` });
       await writeFile(file, JSON.stringify(audits));
     }));
-    const stored = JSON.parse(await readFile(file, "utf8"));
-    assert.ok(stored.length < 20, `expected lost updates, got ${stored.length}`);
+    const text = await readFile(file, "utf8");
+    let intact = false;
+    try { intact = JSON.parse(text).length === 20; } catch { intact = false; } // interleaved writes can also leave invalid JSON
+    assert.equal(intact, false, "expected lost updates or a torn file without the lock");
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
