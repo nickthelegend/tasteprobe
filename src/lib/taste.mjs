@@ -94,7 +94,8 @@ export function parseQlooTags(payload) {
 }
 
 // Cross-domain entities from /v2/insights with filter.type=urn:entity:<type>. Documented shape:
-// results.entities[] with entity_id, name and query.affinity. Unverified until a live run.
+// results.entities[] with entity_id and name (docs.qloo.com/reference/insights-with-location-use-case);
+// query.affinity is read when present. Not yet seen from a live call.
 export const CROSS_DOMAIN_TYPES = ["artist", "brand", "movie", "book"];
 
 export function parseQlooEntities(payload) {
@@ -113,9 +114,9 @@ export function parseQlooEntities(payload) {
   return entities;
 }
 
-// filter.type=urn:demographics is not in Qloo's published filter.type list; community projects
-// report results.demographics[] items with query.age and query.gender maps of bucket -> score.
-// Scores are averaged over the returned items. Unverified until a live run.
+// filter.type=urn:demographics (docs.qloo.com/reference/demographics-use-case) returns
+// results.demographics[] items with query.age and query.gender maps of bucket -> affinity score.
+// Scores are averaged over the returned items. Not yet seen from a live call.
 export function parseQlooDemographics(payload) {
   const list = payload?.results?.demographics;
   if (!Array.isArray(list) || !list.length) return null;

@@ -1,5 +1,5 @@
 {
-  "_fixture": "Doc-shaped test fixture for /v2/insights?filter.type=urn:demographics, following the results.demographics[].query.{age,gender} shape reported by community projects (not in Qloo's published schema). Written by hand, not a recorded live response.",
+  "_fixture": "Doc-shaped test fixture for /v2/insights?filter.type=urn:demographics, following the results.demographics[].query.{age,gender} shape in docs.qloo.com/reference/demographics-use-case. Written by hand, not a recorded live response.",
   "success": true,
   "results": {
     "demographics": [

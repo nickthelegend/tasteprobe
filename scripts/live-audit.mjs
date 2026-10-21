@@ -12,6 +12,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { DEFAULT_NEBIUS_MODEL } from "../src/lib/nebius.mjs";
+import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "../src/lib/qloo.mjs";
 import { buildReport, renderReportHtml } from "../src/lib/report.mjs";
 
 function parseArgs(argv) {
@@ -66,11 +67,15 @@ async function call(label, url, init) {
 // is not served).
 async function preflight(brand) {
   const results = [];
-  const qlooBase = process.env.QLOO_BASE_URL || "https://hackathon.api.qloo.com";
+  const qlooBase = process.env.QLOO_BASE_URL || QLOO_HACKATHON_BASE_URL;
   const search = new URL("/search", qlooBase);
   search.search = new URLSearchParams({ query: brand, types: "urn:entity:place", take: "1" }).toString();
-  await call("Qloo /search", search, { headers: { "x-api-key": process.env.QLOO_API_KEY, accept: "application/json" } });
-  results.push(`Qloo ${new URL(qlooBase).host}: /search ok`);
+  let response;
+  try { response = await fetch(search, { headers: { "x-api-key": process.env.QLOO_API_KEY, accept: "application/json" }, signal: AbortSignal.timeout(30_000) }); }
+  catch (error) { throw new Error(`Qloo /search: network error (${error instanceof Error ? error.message : String(error)})`); }
+  // A 404 is Qloo's documented "No results": the key was accepted.
+  const found = readQlooResponse({ path: "/search", status: response.status, body: await response.text(), baseUrl: qlooBase });
+  results.push(`Qloo ${new URL(qlooBase).host}: /search ok${found.noResults ? ` (no listing matches "${brand}" yet; the audit will say so)` : ""}`);
 
   const nebiusBase = (process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1").replace(/\/$/, "");
   const wanted = process.env.NEBIUS_MODEL || DEFAULT_NEBIUS_MODEL;

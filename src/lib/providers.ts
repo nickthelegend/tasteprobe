@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { parseJsonObject } from "./json.mjs";
+import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "./qloo.mjs";
 import { DEFAULT_NEBIUS_MODEL, reasoningLabel, reasoningParams, reasoningText } from "./nebius.mjs";
 import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, parseQlooTags, pickPlace, type QlooEntity } from "./taste.mjs";
 import type { QlooSignals, TasteTag, Usage } from "./types";
@@ -9,7 +10,7 @@ export class ConfigError extends Error {}
 // separately from call failures so dropped answers show up in the denominators.
 export class UnparseableError extends Error {}
 
-const QLOO_BASE_URL = () => process.env.QLOO_BASE_URL || "https://hackathon.api.qloo.com";
+const QLOO_BASE_URL = () => process.env.QLOO_BASE_URL || QLOO_HACKATHON_BASE_URL;
 const NEBIUS_BASE_URL = () => process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1";
 export const nebiusModel = () => process.env.NEBIUS_MODEL || DEFAULT_NEBIUS_MODEL;
 const REQUEST_TIMEOUT_MS = 120_000;
@@ -41,9 +42,7 @@ async function qloo(path: string, params: Record<string, string>) {
     cache: "no-store",
     signal: AbortSignal.timeout(30_000),
   });
-  const body = await response.text();
-  if (!response.ok) throw new Error(`Qloo ${path} returned ${response.status}: ${body.slice(0, 300) || response.statusText}`);
-  return JSON.parse(body);
+  return readQlooResponse({ path, params, status: response.status, body: await response.text(), baseUrl: QLOO_BASE_URL() });
 }
 
 // Resolves the venue in its city. Never falls back to a namesake elsewhere: pickPlace throws with
@@ -84,8 +83,9 @@ export async function fetchTasteTags(entityId: string, city: string): Promise<{ 
 
 // Cross-domain taste: artists, brands, films and books with affinity to the venue (city-scoped),
 // plus the urn:demographics lean. Each call can fail on its own without failing the audit; the
-// error is recorded. Parameter names: filter.type, signal.interests.entities, signal.location.query,
-// take (docs.qloo.com/reference/parameters). urn:demographics is not in the published list.
+// error is recorded. Parameter names: filter.type, signal.interests.entities, signal.location.query
+// and take (max 50), all listed for artist, book, brand and movie in docs.qloo.com/reference/parameters.
+// filter.type=urn:demographics takes signal.interests.entities only (docs.qloo.com/reference/demographics-use-case).
 export async function fetchCrossDomainSignals(entityId: string, city: string) {
   const crossDomain: Record<string, QlooEntity[]> = {};
   const raw: unknown[] = [];
