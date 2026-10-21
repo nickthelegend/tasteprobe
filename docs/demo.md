@@ -15,13 +15,13 @@ Every number on screen must come from a live run. If any integration fails, show
 
 1. **Hook (15s).** "When someone with your customers' taste asks ChatGPT where to eat, do you come up?"
 2. **Input (15s).** Enter a real Mumbai restaurant, for example `The Bombay Canteen` / `modern Indian restaurant` / `Mumbai`, then click **Run audit**.
-3. **Qloo personas (30s).** While the run streams, point at the matched Qloo entity and the persona cards. Each one is a Qloo tag with its affinity score blended with two others. *This is the Qloo moat: the audience is the venue's real taste neighbourhood, not a made-up persona.*
-4. **Heatmap (30s).** Read the real result. Find the segment × assistant cell where the brand is weakest and say the number and its CI aloud. Click that segment.
-5. **Rivals and confidence (20s).** In the forest plot, note whether the weak segment's CI is separated from the others. In the rival bars, name who wins instead.
-6. **Evidence (15s).** Open one raw answer to show the actual assistant text and what Nemotron extracted.
-7. **Fix & re-test (40s).** Click **Generate fix & re-test**. Read the Nemotron copy, then the baseline / placebo / fix bars. The verdict is fix minus placebo: say why the placebo matters (naming the venue alone can lift mentions). If the CI includes zero, say so: it's an honest null result.
-8. **Agent loop (30s, optional).** Click **Run agent loop** with 2 copies. Narrate the streamed tool calls (qloo_insights, propose_copy, probe_segment, get_stats), the token and cost line per step, and the stop reason.
-9. **Nebius close (15s).** In the NVIDIA on Nebius panel, show the model ID, tokens and cost per answer.
+3. **Qloo personas (30s).** While the run streams, point at the matched Qloo entity and the tray of small glasses, one per persona, filling as answers arrive. Then open the persona cards under **Palates in this glass**. Each one is a Qloo tag with its affinity score blended with two others. *This is the Qloo moat: the audience is the venue's real taste neighbourhood, not a made-up persona.*
+4. **The flight and the tasting sheet (30s).** Read the real result on the flight board: one glass per taste segment, filled to the share of answers, with the 95% interval as dashed pour lines. In the tasting sheet, find the segment × assistant cell where the brand is weakest and say the number and its CI aloud. Click that segment.
+5. **Rivals and confidence (20s).** On the board, note whether the weak glass's pour lines overlap the others. In **Poured instead**, name who wins instead.
+6. **Tasting notes (15s).** Open one raw answer to show the actual assistant text and what Nemotron extracted.
+7. **Fix & re-test (40s).** Click **Generate fix & re-test**. Read the Nemotron copy, then the three glasses: baseline, placebo, fix. The verdict is fix minus placebo: say why the placebo matters (naming the venue alone can lift mentions). If the CI includes zero, say so: it's an honest null result.
+8. **Sommelier's notebook (30s, optional).** Click **Run agent loop** with 2 copies. Narrate the streamed tool calls (qloo_insights, propose_copy, probe_segment, get_stats), the token and cost line per step, and the stop reason.
+9. **Nebius close (15s).** In the **Who read the notes** panel, show the model ID, tokens and cost per answer.
 
 ## Cut lines if time or quota is short
 

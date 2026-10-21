@@ -32,4 +32,4 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 
 - Live Qloo, Nebius and assistant calls, including Nemotron tool calling and the thinking toggle.
 - The end-to-end agent loop against a real model. Its pure parts (stop rule, budget, selection) are covered above.
-- The UI. It was checked by hand at 375px for horizontal overflow on the fix, agent, heatmap and rival views.
+- The UI. The tasting-flight redesign was checked in Chrome at 1280px and 375px with no horizontal overflow on the landing, the Setup required and empty states, and (with a synthetic audit in a temporary data directory, never committed) the flight board, tasting sheet, re-pour, notebook and rival views.
