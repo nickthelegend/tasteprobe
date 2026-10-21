@@ -1,6 +1,7 @@
 import type { ArmSummary, LiftSummary, SegmentResult } from "./types";
 
 export type Observation = { segment: string; personaId?: string; brand: boolean; recommended: string[] };
+export type FailureLike = { segment: string; personaId?: string; kind: "assistant" | "unparseable" | "extraction" };
 
 export function seededRandom(seed?: number): () => number;
 export function bootstrapInterval(values: (boolean | number)[], iterations?: number, seed?: number): [number, number];
@@ -15,7 +16,7 @@ export function pairedBootstrapDifference(control: ClusterRow[], treatment: Clus
 export function unpairedBootstrapDifference(control: ClusterRow[], treatment: ClusterRow[], iterations?: number, seed?: number): [number, number];
 export function shareOf(rows: ClusterRow[]): number;
 export function slug(value: string): string;
-export function summarizeObservations(observations: Observation[]): SegmentResult[];
+export function summarizeObservations(observations: Observation[], failures?: FailureLike[]): SegmentResult[];
 
 type ArmRows = { rows: { personaId: string; brand: boolean }[]; failed: number };
 export function compareArms(input: { baseline: ArmRows; placebo: ArmRows; fix: ArmRows }): {

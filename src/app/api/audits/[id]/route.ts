@@ -5,7 +5,7 @@ import { findAudit, readRaw } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
-const trim = (rows: ResponseRow[] = []) => rows.map(({ personaId, segment, model, prompt, answer, entities, brand }) => ({ personaId, segment, model, prompt, answer, entities, brand }));
+const trim = (rows: ResponseRow[] = []) => rows.map(({ personaId, segment, model, prompt, answer, entities, brand, listEntities }) => ({ personaId, segment, model, prompt, answer, entities, brand, listEntities }));
 
 // Returns the audit plus the cached raw answers (?evidence=1) so every number can be traced to a response.
 // ?attempt=<id> picks a fix attempt; the latest one is returned by default.

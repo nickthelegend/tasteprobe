@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-export type EvidenceRow = { personaId: string; segment: string; model: string; prompt: string; answer: string; entities: string[]; brand: boolean };
+import { crossCheck, parseNumberedList } from "@/lib/extract.mjs";
+
+export type EvidenceRow = { personaId: string; segment: string; model: string; prompt: string; answer: string; entities: string[]; brand: boolean; listEntities?: string[] };
 
 type Attempt = { id: string; attempt: number; baseline: EvidenceRow[]; placebo: EvidenceRow[]; fix: EvidenceRow[] };
 type View = "audit" | "baseline" | "placebo" | "fix";
@@ -13,7 +15,7 @@ const VIEWS: { id: View; label: (attempt: number) => string }[] = [
   { id: "fix", label: (n) => `#${n} fix` },
 ];
 
-export function Evidence({ auditId, segment, attemptId }: { auditId: string; segment?: string; attemptId?: string }) {
+export function Evidence({ auditId, brand, segment, attemptId }: { auditId: string; brand: string; segment?: string; attemptId?: string }) {
   const [data, setData] = useState<{ responses: EvidenceRow[]; attempt: Attempt | null } | null>(null);
   const [error, setError] = useState("");
   const [view, setView] = useState<View>("audit");
@@ -51,6 +53,11 @@ export function Evidence({ auditId, segment, attemptId }: { auditId: string; seg
         </summary>
         <div className="body">
           <div className="prompt">{row.prompt}</div>
+          {(() => {
+            const check = crossCheck(row.entities, row.listEntities ?? parseNumberedList(row.answer), brand);
+            if (!check.listed || check.setAgrees) return null;
+            return <div className="xflag">List parser disagrees{check.brandAgrees ? "" : " on whether you were recommended"}{check.onlyInList.length ? ` · only in the list: ${check.onlyInList.join(", ")}` : ""}{check.onlyInExtraction.length ? ` · only from Nemotron: ${check.onlyInExtraction.join(", ")}` : ""}</div>;
+          })()}
           <pre>{row.answer}</pre>
         </div>
       </details>)}

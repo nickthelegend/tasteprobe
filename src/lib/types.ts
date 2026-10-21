@@ -6,6 +6,9 @@ export type SegmentResult = {
   name: string;
   personas: number;
   responses: number;
+  // responses + calls that produced no usable answer; failed is split by cause.
+  attempted: number;
+  failed: { assistant: number; unparseable: number; extraction: number };
   brandMentions: number;
   share: number;
   ci: [number, number];
@@ -77,6 +80,11 @@ export type Audit = {
   systems: string[];
   responseCount: number;
   failedResponses: number;
+  failedByKind?: { assistant: number; unparseable: number; extraction: number };
+  // Nemotron extraction vs a deterministic numbered-list parser, per assistant.
+  extractionCheck?: { model: string; answers: number; listed: number; brandDisagreements: number; setDisagreements: number; brandDisagreementRate: number | null; setDisagreementRate: number | null }[];
+  // Top rivals looked up in Qloo /search: verified = a matching place in the city.
+  rivalChecks?: { name: string; status: "verified" | "unverified"; qlooId?: string; detail?: string }[];
   extractionModel: string;
   extractionUsage: Usage;
   estimatedExtractionCostUsd: number | null;

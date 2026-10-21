@@ -1,4 +1,5 @@
 import { askAssistants, extractEntities, nebiusPrices, UnparseableError } from "./providers";
+import { parseNumberedList } from "./extract.mjs";
 import { matchesBrand } from "./taste.mjs";
 import type { Persona, Usage } from "./types";
 
@@ -10,6 +11,8 @@ export type ResponseRow = {
   answer: string;
   entities: string[];
   brand: boolean;
+  // Names read deterministically off the answer's numbered list, to cross-check Nemotron.
+  listEntities: string[];
   extractionRaw: string;
   usage: Usage;
 };
@@ -50,6 +53,7 @@ export async function probePersona(persona: Persona, prompt: string, brand: stri
         answer: result.answer,
         entities: extraction.entities,
         brand: extraction.entities.some((entity) => matchesBrand(entity, brand)),
+        listEntities: parseNumberedList(result.answer),
         extractionRaw: extraction.raw,
         usage: extraction.usage,
       });

@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { estimateCost, pool, probePersona, sumUsage, toObservations, type FailedRow, type ResponseRow } from "@/lib/probe";
-import { fetchTasteTags, nebiusModel, requireKeys, resolvePlace } from "@/lib/providers";
+import { summarizeCrossCheck } from "@/lib/extract.mjs";
+import { fetchTasteTags, nebiusModel, requireKeys, resolvePlace, verifyRival } from "@/lib/providers";
 import { summarizeObservations } from "@/lib/stats.mjs";
 import { readAudits, saveAudit, writeRaw } from "@/lib/storage";
 import { buildPersonas, matchesBrand, MIN_PERSONAS_PER_SEGMENT, personaPrompt } from "@/lib/taste.mjs";
@@ -76,6 +77,8 @@ export async function POST(request: Request) {
 
         send({ type: "stage", stage: "stats", message: "Computing share of voice and 95% intervals" });
         const observations = toObservations(rows, place.name);
+        const overallRivals = summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })))[0]?.competitors.map((item) => item.name) ?? [];
+        send({ type: "stage", stage: "stats", message: `Checking ${overallRivals.length} top rivals in Qloo /search` });
         const systems = [...new Set(rows.map((row) => row.model))].sort();
         const usage = sumUsage(rows);
         const audit: Audit = {
@@ -87,15 +90,22 @@ export async function POST(request: Request) {
           city: input.city,
           createdAt: new Date().toISOString(),
           personas,
-          overall: summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })))[0],
-          segments: summarizeObservations(observations),
+          overall: summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })), failures.map((row) => ({ ...row, segment: "All personas" })))[0],
+          segments: summarizeObservations(observations, failures),
           modelSegments: systems.map((model) => ({
             model,
-            segments: summarizeObservations(observations.filter((_, index) => rows[index].model === model)),
+            segments: summarizeObservations(observations.filter((_, index) => rows[index].model === model), failures.filter((row) => row.model === model)),
           })),
           systems,
           responseCount: rows.length,
           failedResponses: failures.length,
+          failedByKind: {
+            assistant: failures.filter((row) => row.kind === "assistant").length,
+            unparseable: failures.filter((row) => row.kind === "unparseable").length,
+            extraction: failures.filter((row) => row.kind === "extraction").length,
+          },
+          extractionCheck: summarizeCrossCheck(rows, place.name),
+          rivalChecks: await pool(overallRivals, 4, (name) => verifyRival(name, input.city)),
           extractionModel: nebiusModel(),
           extractionUsage: usage,
           estimatedExtractionCostUsd: estimateCost(usage),

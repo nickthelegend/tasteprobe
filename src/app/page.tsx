@@ -249,7 +249,7 @@ export default function Home() {
 
           <section className="kpis" aria-label="Audit totals">
             <div className="card kpi"><span className="label">Qloo personas</span><span className="value">{active.personas.length}</span><span className="sub">{active.segments.length} taste segments</span></div>
-            <div className="card kpi"><span className="label">Live answers</span><span className="value">{active.responseCount}</span><span className="sub">{active.systems.join(", ")}{active.failedResponses ? ` · ${active.failedResponses} failed calls excluded` : ""}</span></div>
+            <div className="card kpi"><span className="label">Live answers</span><span className="value">{active.responseCount}</span><span className="sub">{active.systems.join(", ")}{active.failedResponses ? ` · ${active.failedResponses} of ${active.responseCount + active.failedResponses} excluded${active.failedByKind ? ` (${active.failedByKind.assistant} call errors, ${active.failedByKind.unparseable} unparseable, ${active.failedByKind.extraction} extraction errors)` : ""}` : ""}</span></div>
             <div className="card kpi"><span className="label">Top rival</span><span className="value value-text">{active.overall.competitors[0]?.name ?? "—"}</span><span className="sub">{active.overall.competitors[0] ? `in ${pct(active.overall.competitors[0].share)} of answers` : "No competitors extracted"}</span></div>
           </section>
 
@@ -265,7 +265,7 @@ export default function Home() {
             </section>
             {segment && <section className="card">
               <div className="card-head"><div><h3>Who gets recommended instead</h3><p>{segment.name} · {segment.responses} answers</p></div><span className="tag">rivals</span></div>
-              <CompetitorBars brand={active.brand} segment={segment} />
+              <CompetitorBars brand={active.brand} segment={segment} checks={active.rivalChecks} />
             </section>}
           </div>
 
@@ -287,7 +287,7 @@ export default function Home() {
           <div className="grid-2">
             <section className="card" id="evidence">
               <div className="card-head"><div><h3>Raw evidence</h3><p>The actual answers behind {segment?.name ?? "this audit"}, with the venues Nemotron extracted.</p></div><span className="tag">cached</span></div>
-              <Evidence auditId={active.id} segment={segment?.name} attemptId={attemptId ?? active.counterfactuals?.[active.counterfactuals.length - 1]?.id} />
+              <Evidence auditId={active.id} brand={active.brand} segment={segment?.name} attemptId={attemptId ?? active.counterfactuals?.[active.counterfactuals.length - 1]?.id} />
             </section>
             <section className="card nebius-card">
               <div className="card-head"><div><h3>NVIDIA on Nebius</h3><p>An NVIDIA open model served on Nebius Token Factory parses every answer.</p></div><span className="tag">extraction</span></div>
@@ -299,6 +299,13 @@ export default function Home() {
               <p className="footnote">{active.estimatedExtractionCostUsd === null
                 ? "Set NEBIUS_INPUT_PRICE_PER_MILLION and NEBIUS_OUTPUT_PRICE_PER_MILLION to your Nebius rates to estimate cost from the real token usage above."
                 : `Estimated from reported token usage at your configured rates: $${(active.estimatedExtractionCostUsd / Math.max(1, active.responseCount)).toFixed(5)} per answer.`}</p>
+              {active.extractionCheck && active.extractionCheck.length > 0 && <div className="xcheck" aria-label="Extraction cross-check">
+                <span className="footnote" style={{ margin: 0 }}>Cross-check: Nemotron vs a deterministic numbered-list parser, over answers that contained a list.</span>
+                {active.extractionCheck.map((item) => <div key={item.model}>
+                  <span>{item.model}</span>
+                  <b>{item.brandDisagreementRate === null ? "no numbered lists" : `${pct(item.brandDisagreementRate)} disagree on you · ${pct(item.setDisagreementRate ?? 0)} on the venue list · n=${item.listed}`}</b>
+                </div>)}
+              </div>}
             </section>
           </div>
         </>}

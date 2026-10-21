@@ -35,6 +35,37 @@ export function matchesBrand(entity, brand) {
   return entityTokens.length >= 2 && containsSequence(brandTokens, entityTokens) && entityTokens.length / brandTokens.length >= 0.6;
 }
 
+function placeText(item) {
+  const properties = item?.properties ?? {};
+  return [properties.address, properties.geocode?.city, properties.geocode?.name, properties.geocode?.admin1_region]
+    .filter((value) => typeof value === "string").join(" ");
+}
+
+// True when a Qloo place's address or geocode names the city (word match after normalising).
+export function placeInCity(item, city) {
+  const needle = normalizeName(city);
+  return Boolean(needle) && ` ${normalizeName(placeText(item))} `.includes(` ${needle} `);
+}
+
+function describePlace(item) {
+  const where = item?.properties?.address ?? item?.properties?.geocode?.city ?? "no address";
+  return `${item?.name ?? "unnamed"} (${where})`;
+}
+
+// Picks the Qloo /search result for the venue. Only places in the requested city qualify; if none
+// does, this throws and lists what Qloo did find instead of auditing a namesake in another city.
+export function pickPlace(candidates, brand, city) {
+  const list = (Array.isArray(candidates) ? candidates : []).filter((item) => item && (item.entity_id ?? item.id));
+  if (!list.length) throw new Error(`Qloo found no place called “${brand}”. Try the exact listing name as it appears on maps.`);
+  const local = list.filter((item) => placeInCity(item, city));
+  const match = local.find((item) => matchesBrand(item.name ?? "", brand)) ?? local[0];
+  if (!match) {
+    const shown = list.slice(0, 5).map(describePlace).join("; ");
+    throw new Error(`Qloo has no “${brand}” in ${city}. It found ${list.length} listing${list.length === 1 ? "" : "s"} elsewhere: ${shown}. Check the city spelling or use the exact listing name.`);
+  }
+  return { id: String(match.entity_id ?? match.id), name: match.name ?? brand, address: match.properties?.address, cityMatched: true };
+}
+
 // "urn:tag:genre:restaurant" → "Restaurant genre"; unknown shapes fall back to a readable label.
 export function segmentLabel(subtype) {
   const parts = String(subtype ?? "").replace(/^urn:tag:/, "").split(":").filter(Boolean);

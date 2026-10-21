@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { parseJsonObject } from "./json.mjs";
-import { parseQlooTags } from "./taste.mjs";
+import { matchesBrand, parseQlooTags, pickPlace } from "./taste.mjs";
 import type { TasteTag, Usage } from "./types";
 
 export class ConfigError extends Error {}
@@ -45,24 +45,24 @@ async function qloo(path: string, params: Record<string, string>) {
   return JSON.parse(body);
 }
 
-type QlooPlace = { entity_id?: string; id?: string; name?: string; properties?: { address?: string; geocode?: { city?: string; name?: string } }; location?: unknown };
-
+// Resolves the venue in its city. Never falls back to a namesake elsewhere: pickPlace throws with
+// the candidate list when no result is in the requested city.
 export async function resolvePlace(brand: string, city: string) {
   const payload = await qloo("/search", { query: brand, types: "urn:entity:place", take: "15" });
-  const candidates: QlooPlace[] = payload.results ?? payload.entities ?? [];
-  const cityKey = city.toLocaleLowerCase();
-  const inCity = (item: QlooPlace) => `${item.properties?.address ?? ""} ${item.properties?.geocode?.city ?? ""} ${item.properties?.geocode?.name ?? ""}`
-    .toLocaleLowerCase().includes(cityKey);
-  const match = candidates.find(inCity) ?? candidates[0];
-  const id = match?.entity_id ?? match?.id;
-  if (!match || !id) throw new Error(`Qloo found no place called “${brand}”. Try the exact listing name as it appears on maps.`);
-  return {
-    id,
-    name: match.name ?? brand,
-    address: match.properties?.address,
-    cityMatched: inCity(match),
-    raw: payload,
-  };
+  return { ...pickPlace(payload.results ?? payload.entities ?? [], brand, city), raw: payload };
+}
+
+// Looks a recommended rival up in Qloo: "verified" means a place with a matching name in the city.
+export async function verifyRival(name: string, city: string): Promise<{ name: string; status: "verified" | "unverified"; qlooId?: string; detail?: string }> {
+  try {
+    const payload = await qloo("/search", { query: name, types: "urn:entity:place", take: "5" });
+    const place = pickPlace(payload.results ?? payload.entities ?? [], name, city);
+    return matchesBrand(place.name, name) || matchesBrand(name, place.name)
+      ? { name, status: "verified", qlooId: place.id }
+      : { name, status: "unverified", detail: `closest Qloo listing in ${city} is ${place.name}` };
+  } catch (error) {
+    return { name, status: "unverified", detail: error instanceof Error ? error.message.slice(0, 200) : String(error) };
+  }
 }
 
 export async function fetchTasteTags(entityId: string, city: string): Promise<{ tags: TasteTag[]; raw: unknown[] }> {

@@ -2,6 +2,8 @@ import type { Persona, TasteTag } from "./types";
 
 export function normalizeName(value: string): string;
 export function matchesBrand(entity: string, brand: string): boolean;
+export function placeInCity(item: unknown, city: string): boolean;
+export function pickPlace(candidates: unknown, brand: string, city: string): { id: string; name: string; address?: string; cityMatched: true };
 export function segmentLabel(subtype: string | undefined): string;
 export function parseQlooTags(payload: unknown): TasteTag[];
 export function groupTags(tags: TasteTag[], maxSegments?: number): { name: string; tags: TasteTag[] }[];

@@ -188,10 +188,21 @@ export function slug(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function summarizeObservations(observations) {
+function failureCounts(failures) {
+  const counts = { assistant: 0, unparseable: 0, extraction: 0 };
+  for (const failure of failures) counts[failure.kind in counts ? failure.kind : "extraction"] += 1;
+  return counts;
+}
+
+// `failures` are calls that produced no usable answer (assistant error, unparseable or failed
+// extraction). They are not in the share's denominator, but every segment reports them.
+export function summarizeObservations(observations, failures = []) {
   const groups = new Map();
   for (const observation of observations) groups.set(observation.segment, [...(groups.get(observation.segment) ?? []), observation]);
+  for (const failure of failures) if (!groups.has(failure.segment)) groups.set(failure.segment, []);
   return [...groups.entries()].map(([name, rows]) => {
+    const failed = failureCounts(failures.filter((failure) => failure.segment === name));
+    const dropped = failed.assistant + failed.unparseable + failed.extraction;
     const mentions = rows.filter((row) => row.brand).length;
     const counts = new Map();
     for (const row of rows) {
@@ -208,13 +219,15 @@ export function summarizeObservations(observations) {
     return {
       id: slug(name),
       name,
-      personas: new Set(rows.map((row) => row.personaId).filter(Boolean)).size || rows.length,
+      personas: new Set([...rows, ...failures.filter((failure) => failure.segment === name)].map((row) => row.personaId).filter(Boolean)).size || rows.length,
       responses: rows.length,
+      attempted: rows.length + dropped,
+      failed,
       brandMentions: mentions,
-      share: mentions / rows.length,
+      share: rows.length ? mentions / rows.length : 0,
       ci: shareInterval(rows.map((row) => ({ cluster: row.personaId, value: row.brand ? 1 : 0 }))),
       competitors: [...counts.values()].sort((a, b) => b.mentions - a.mentions || a.name.localeCompare(b.name)).slice(0, 5)
-        .map((competitor) => ({ ...competitor, share: competitor.mentions / rows.length })),
+        .map((competitor) => ({ ...competitor, share: rows.length ? competitor.mentions / rows.length : 0 })),
     };
   }).sort((a, b) => a.name.localeCompare(b.name));
 }
