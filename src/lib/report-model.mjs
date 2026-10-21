@@ -1,0 +1,127 @@
+// A stored audit reduced to what a reader needs: the flight (share per segment with its 95%
+// interval), the denominators and drops, the rival checks, every fix attempt with its placebo
+// arm, the agent runs and the settings needed to reproduce the run. Pure: no I/O, no keys.
+// Used by the printable report page (/audits/[id]/report) and the MCP get_report tool.
+
+const round = (value, digits = 4) => (typeof value === "number" && Number.isFinite(value) ? Number(value.toFixed(digits)) : null);
+const interval = (value) => (Array.isArray(value) && value.length === 2 ? [round(value[0]), round(value[1])] : null);
+
+function segment(item) {
+  const failed = item?.failed ?? { assistant: 0, unparseable: 0, extraction: 0 };
+  return {
+    id: String(item?.id ?? ""),
+    name: String(item?.name ?? ""),
+    personas: item?.personas ?? 0,
+    mentions: item?.brandMentions ?? 0,
+    answers: item?.responses ?? 0,
+    attempted: item?.attempted ?? item?.responses ?? 0,
+    dropped: { assistant: failed.assistant ?? 0, unparseable: failed.unparseable ?? 0, extraction: failed.extraction ?? 0 },
+    share: item?.responses ? round(item.share) : null,
+    ci: item?.responses ? interval(item.ci) : null,
+    rivals: (item?.competitors ?? []).slice(0, 5).map((rival) => ({ name: rival.name, mentions: rival.mentions, share: round(rival.share) })),
+  };
+}
+
+function arm(value) {
+  return value ? { share: round(value.share), mentions: value.mentions, answers: value.responses, failed: value.failed, ci: interval(value.ci) } : null;
+}
+
+function lift(value) {
+  return value ? { delta: round(value.delta), ci: interval(value.ci), clearsZero: Array.isArray(value.ci) && value.ci[0] > 0 } : null;
+}
+
+export function buildReportModel(audit) {
+  if (!audit || typeof audit !== "object" || !audit.id) throw new Error("buildReportModel needs a stored audit.");
+  const failedByKind = audit.failedByKind ?? { assistant: 0, unparseable: 0, extraction: 0 };
+  return {
+    id: audit.id,
+    venue: { brand: audit.brand, category: audit.category, city: audit.city, address: audit.qlooAddress ?? null, qlooEntityId: audit.qlooEntityId },
+    createdAt: audit.createdAt,
+    durationSeconds: Math.round((audit.durationMs ?? 0) / 1000),
+    personas: audit.personas?.length ?? 0,
+    assistants: audit.systems ?? [],
+    overall: segment(audit.overall),
+    segments: (audit.segments ?? []).map(segment),
+    byAssistant: (audit.modelSegments ?? []).map((entry) => ({ model: entry.model, segments: entry.segments.map(segment) })),
+    answers: {
+      usable: audit.responseCount ?? 0,
+      dropped: audit.failedResponses ?? 0,
+      attempted: (audit.responseCount ?? 0) + (audit.failedResponses ?? 0),
+      droppedByKind: { assistant: failedByKind.assistant ?? 0, unparseable: failedByKind.unparseable ?? 0, extraction: failedByKind.extraction ?? 0 },
+    },
+    rivalChecks: (audit.rivalChecks ?? []).map((check) => ({ name: check.name, status: check.status, detail: check.detail ?? null })),
+    extractionCheck: (audit.extractionCheck ?? []).map((check) => ({
+      model: check.model, listed: check.listed, brandDisagreementRate: round(check.brandDisagreementRate), setDisagreementRate: round(check.setDisagreementRate),
+    })),
+    qlooSignals: audit.qlooSignals
+      ? {
+        domains: audit.qlooSignals.domains.map((domain) => ({ type: domain.type, entities: domain.entities.slice(0, 5), error: domain.error ?? null })),
+        demographics: audit.qlooSignals.demographics,
+        demographicsError: audit.qlooSignals.demographicsError ?? null,
+      }
+      : null,
+    fixes: (audit.counterfactuals ?? []).map((attempt) => ({
+      attempt: attempt.attempt,
+      segment: attempt.segment,
+      personas: attempt.personas,
+      copy: attempt.change,
+      rationale: attempt.rationale,
+      placebo: attempt.placebo,
+      model: attempt.model,
+      createdAt: attempt.createdAt,
+      arms: { baseline: arm(attempt.arms?.baseline), placebo: arm(attempt.arms?.placebo), fix: arm(attempt.arms?.fix) },
+      lift: { fixVsPlacebo: lift(attempt.lift?.fixVsPlacebo), placeboVsBaseline: lift(attempt.lift?.placeboVsBaseline), fixVsBaseline: lift(attempt.lift?.fixVsBaseline) },
+    })),
+    agentRuns: (audit.agentRuns ?? []).map((run) => ({
+      segment: run.segment,
+      model: run.model,
+      stopReason: run.stopReason,
+      stopDetail: run.stopDetail,
+      candidates: run.candidates?.length ?? 0,
+      best: run.best ? { copy: run.best.copy, personas: run.best.personas, lift: round(run.best.lift), liftCi: interval(run.best.liftCi) } : null,
+      budget: run.budget,
+      createdAt: run.createdAt,
+    })),
+    extraction: {
+      model: audit.extractionModel,
+      inputTokens: audit.extractionUsage?.inputTokens ?? 0,
+      outputTokens: audit.extractionUsage?.outputTokens ?? 0,
+      estimatedCostUsd: round(audit.estimatedExtractionCostUsd, 6),
+    },
+    reproducibility: audit.meta
+      ? {
+        assistants: audit.meta.assistants,
+        assistantTemperature: audit.meta.assistantTemperature,
+        personaSeed: audit.meta.personaSeed,
+        liftBootstrapSeed: audit.meta.liftBootstrapSeed,
+        nemotronMaxTokens: audit.meta.nemotronMaxTokens,
+        nemotronThinking: audit.meta.nemotronThinking,
+        extractionSystemPrompt: audit.meta.extractionSystemPrompt,
+      }
+      : null,
+  };
+}
+
+// One line per audit for listings (MCP get_report without an id).
+export function summarizeAuditListing(audit) {
+  return { id: audit.id, brand: audit.brand, city: audit.city, createdAt: audit.createdAt, share: round(audit.overall?.share), answers: audit.responseCount ?? 0 };
+}
+
+const pct = (value) => (value === null || value === undefined ? "n/a" : `${Math.round(value * 100)}%`);
+const range = (ci) => (ci ? `${Math.round(ci[0] * 100)}–${Math.round(ci[1] * 100)}%` : "n/a");
+
+// A short plain-text reading of the model, for agents and terminals.
+export function reportText(model) {
+  const lines = [
+    `${model.venue.brand} (${model.venue.category}, ${model.venue.city}) · audit ${model.id} · ${model.createdAt}`,
+    `Whole flight: ${pct(model.overall.share)} of ${model.answers.usable} usable answers recommend it (95% ${range(model.overall.ci)}); ${model.answers.dropped} of ${model.answers.attempted} dropped (${model.answers.droppedByKind.assistant} call errors, ${model.answers.droppedByKind.unparseable} unparseable, ${model.answers.droppedByKind.extraction} extraction errors).`,
+    ...model.segments.map((item) => `- ${item.name}: ${pct(item.share)} (${item.mentions}/${item.answers}, 95% ${range(item.ci)}, ${item.personas} personas)${item.rivals[0] ? `; poured most instead: ${item.rivals[0].name}` : ""}`),
+  ];
+  for (const fix of model.fixes) {
+    const lift = fix.lift.fixVsPlacebo;
+    lines.push(`Fix attempt ${fix.attempt} on ${fix.segment}: fix − placebo ${lift ? `${lift.delta >= 0 ? "+" : "−"}${Math.abs(Math.round(lift.delta * 100))} pts (95% ${range(lift.ci)})${lift.clearsZero ? ", clears zero" : ""}` : "n/a"}.`);
+  }
+  for (const run of model.agentRuns) lines.push(`Agent run on ${run.segment}: stopped (${run.stopReason}) ${run.stopDetail}`);
+  lines.push(`Extraction: ${model.extraction.model} on Nebius Token Factory, ${model.extraction.inputTokens} in / ${model.extraction.outputTokens} out tokens.`);
+  return lines.join("\n");
+}

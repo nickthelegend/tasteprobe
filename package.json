@@ -10,9 +10,11 @@
     "test": "node --test test/*.test.mjs",
     "lint:no-mock": "node scripts/check-no-mock.mjs",
     "audit:live": "node scripts/live-audit.mjs",
+    "mcp": "node src/mcp/server.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
     "next": "14.2.31",
     "openai": "^4.104.0",
     "react": "^18.3.1",
