@@ -1,0 +1,12 @@
+# Never upload secrets, local data or build output to Railway (`railway up` uploads this directory).
+.env*
+!.env.example
+.data/
+.loom/
+.git/
+.github/
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
+CLAUDE.md
