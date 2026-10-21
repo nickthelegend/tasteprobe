@@ -7,7 +7,8 @@ Every number on screen must come from a live run. If any integration fails, show
 - [ ] `.env.local` has `QLOO_API_KEY`, `NEBIUS_API_KEY` and at least one assistant key. All three header pills are green.
 - [ ] The Nebius pill shows the NVIDIA model ID, and its tooltip says the model is in the catalog.
 - [ ] Set `NEBIUS_INPUT_PRICE_PER_MILLION` and `NEBIUS_OUTPUT_PRICE_PER_MILLION` to your current Nebius rates so the cost panel shows a figure.
-- [ ] Do one dry run with 12 personas to confirm Qloo resolves the venue (check the "Matched in Qloo" line).
+- [ ] Run `npm run audit:live -- --brand ... --city ...` once: the preflight checks every key, and the report in `.data/reports/` is the source for every number you say.
+- [ ] Do one dry run with 16 personas to confirm Qloo resolves the venue (check the "Matched in Qloo" line).
 - [ ] For the recorded run, use 24–48 personas × 2–3 assistants. Each answer costs one assistant call plus one Nemotron call.
 
 ## Run of show
@@ -18,16 +19,17 @@ Every number on screen must come from a live run. If any integration fails, show
 4. **Heatmap (30s).** Read the real result. Find the segment × assistant cell where the brand is weakest and say the number and its CI aloud. Click that segment.
 5. **Rivals and confidence (20s).** In the forest plot, note whether the weak segment's CI is separated from the others. In the rival bars, name who wins instead.
 6. **Evidence (15s).** Open one raw answer to show the actual assistant text and what Nemotron extracted.
-7. **Fix agent (40s).** Click **Generate fix & re-test**. Read the Nemotron copy, then the before → after bars and the lift CI verdict. If the CI includes zero, say so: it's an honest null result.
-8. **Nebius close (15s).** In the NVIDIA on Nebius panel, show the model ID, tokens and cost per answer.
+7. **Fix & re-test (40s).** Click **Generate fix & re-test**. Read the Nemotron copy, then the baseline / placebo / fix bars. The verdict is fix minus placebo: say why the placebo matters (naming the venue alone can lift mentions). If the CI includes zero, say so: it's an honest null result.
+8. **Agent loop (30s, optional).** Click **Run agent loop** with 2 copies. Narrate the streamed tool calls (qloo_insights, propose_copy, probe_segment, get_stats), the token and cost line per step, and the stop reason.
+9. **Nebius close (15s).** In the NVIDIA on Nebius panel, show the model ID, tokens and cost per answer.
 
 ## Cut lines if time or quota is short
 
-1. Drop to 12 personas × 2 assistants.
+1. Drop to 16 personas × 2 assistants.
 2. Skip the fix re-test on camera and show a completed one from the saved audit history (it is still real cached data).
 3. Never cut: live Qloo personas and live assistant answers.
 
 ## Talking points by sponsor
 
-- **Qloo:** `/search` plus `/v2/insights` (`urn:tag`, `signal.interests.entities`, `signal.location.query`). The personas, segments and fix-agent targeting all come from Qloo affinities.
+- **Qloo:** `/search` plus `/v2/insights` (`urn:tag`, `signal.interests.entities`, `signal.location.query`). Cross-domain `urn:entity:*` and `urn:demographics` signals too. The personas, segments and the agent's `qloo_insights` tool all come from Qloo.
 - **Nebius × NVIDIA:** a Nemotron open model on Nebius Token Factory does every extraction and writes the fix. Mention the cost per audit.
