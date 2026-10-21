@@ -301,7 +301,9 @@ code { font: .86em var(--mono); letter-spacing: 0; background: var(--surface-2);
 .cell small { font-size: 12px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .cell.empty { background: var(--surface-2); color: var(--muted); }
 .cell small.cell-drop { color: var(--amber); }
-.rival-check { font-style: normal; font-size: 11.5px; margin-left: 8px; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
+.bar-row .bar-name { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; }
+.bar-row .bar-name .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.rival-check { flex: none; font-style: normal; font-size: 11.5px; padding: 2px 8px; border-radius: 99px; background: var(--surface-2); color: var(--muted); }
 .rival-check.ok { background: rgba(127, 227, 174, .14); color: var(--ok); }
 .xcheck { display: grid; gap: 6px; margin-top: 14px; font-size: 13.5px; color: var(--ink-2); }
 .xcheck div { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px 12px; border-radius: 12px; background: var(--bg); }
@@ -326,7 +328,7 @@ code { font: .86em var(--mono); letter-spacing: 0; background: var(--surface-2);
 .bars { display: grid; gap: 12px; }
 .bar-row { display: grid; grid-template-columns: minmax(0, 1fr) 90px 44px; gap: 10px; align-items: center; font-size: 14.5px; }
 .bar-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.bar-row.is-brand span { color: var(--accent); font-weight: 500; }
+.bar-row.is-brand .nm { color: var(--accent); font-weight: 500; }
 .bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
 .bar i { display: block; height: 100%; border-radius: 99px; background: var(--warm); }
 .is-brand .bar i { background: var(--accent); }
@@ -548,6 +550,8 @@ code { font: .86em var(--mono); letter-spacing: 0; background: var(--surface-2);
   .cf-bar { grid-template-columns: 50px 1fr; }
   .cf-bar small { grid-column: 1 / -1; }
   .cf-history button { grid-template-columns: minmax(0, 1fr); }
+  .bar-row .bar-name { flex-wrap: wrap; gap: 2px 8px; }
+  .bar-row .bar-name .nm { flex: 1 1 100%; }
   .cf-controls .field { min-width: 0; max-width: none; }
   .cf-controls .btn { width: 100%; }
   .evidence summary { grid-template-columns: minmax(0, 1fr) auto; }

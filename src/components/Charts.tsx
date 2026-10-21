@@ -72,7 +72,10 @@ export function CompetitorBars({ brand, segment, checks }: { brand: string; segm
   const max = Math.max(1, ...rows.map((row) => row.mentions));
   return <div className="bars">
     {rows.map((row) => <div className={`bar-row ${row.brand ? "is-brand" : ""}`} key={row.name}>
-      <span title={row.brand ? row.name : `${row.name}${lookup.get(row.name.toLowerCase())?.detail ? ` · ${lookup.get(row.name.toLowerCase())?.detail}` : ""}`}>{row.name}{row.brand ? " (you)" : ""}{!row.brand && checks && <i className={`rival-check ${lookup.get(row.name.toLowerCase())?.status === "verified" ? "ok" : ""}`}>{lookup.get(row.name.toLowerCase())?.status === "verified" ? "verified in Qloo" : lookup.has(row.name.toLowerCase()) ? "unverified" : "not checked"}</i>}</span>
+      <span className="bar-name" title={row.brand ? row.name : `${row.name}${lookup.get(row.name.toLowerCase())?.detail ? ` · ${lookup.get(row.name.toLowerCase())?.detail}` : ""}`}>
+        <span className="nm">{row.name}{row.brand ? " (you)" : ""}</span>
+        {!row.brand && checks && <i className={`rival-check ${lookup.get(row.name.toLowerCase())?.status === "verified" ? "ok" : ""}`}>{lookup.get(row.name.toLowerCase())?.status === "verified" ? "verified in Qloo" : lookup.has(row.name.toLowerCase()) ? "unverified" : "not checked"}</i>}
+      </span>
       <span className="bar"><i style={{ width: `${(row.mentions / max) * 100}%` }} /></span>
       <b>{pct(row.share)}</b>
     </div>)}
