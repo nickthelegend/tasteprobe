@@ -139,7 +139,9 @@ function percentileInterval(samples) {
 
 // Lift (treatment − control) where both arms asked the SAME personas. Personas are resampled once
 // per iteration and both arms use that same draw, so persona-level taste cancels out of the lift.
-export function pairedBootstrapDifference(control, treatment, iterations = 2000, seed = 41) {
+export const LIFT_BOOTSTRAP_SEED = 41;
+
+export function pairedBootstrapDifference(control, treatment, iterations = 2000, seed = LIFT_BOOTSTRAP_SEED) {
   const left = clusterIndex(control);
   const right = clusterIndex(treatment);
   const personas = [...new Set([...left.keys(), ...right.keys()])];

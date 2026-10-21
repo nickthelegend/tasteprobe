@@ -99,6 +99,16 @@ export type Audit = {
   extractionUsage: Usage;
   estimatedExtractionCostUsd: number | null;
   durationMs: number;
+  // What a reviewer needs to reproduce the run: models, seeds and fixed prompts.
+  meta?: {
+    assistants: { name: string; model: string; host: string }[];
+    assistantTemperature: number;
+    personaSeed: number;
+    liftBootstrapSeed: number;
+    extractionSystemPrompt: string;
+    nemotronMaxTokens: number;
+    nemotronThinking: string;
+  };
   counterfactuals?: Counterfactual[];
   agentRuns?: AgentRun[];
 };

@@ -3,9 +3,9 @@ import {
   affordablePersonas, budgetExhausted, candidateStats, chargeBudget, createBudget, nextPersonas, parseToolArguments,
   selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, type AgentBudget, type AgentLimits, type Candidate, type StopReason,
 } from "./agent-core.mjs";
-import { runArms } from "./experiment";
-import { sumUsage, type FailedRow, type ResponseRow } from "./probe";
-import { COPY_RULES, fetchTasteTags, getTestModels, nebiusModel, nebiusPrices, nemotronTurn } from "./providers";
+import { runArms } from "./experiment.ts";
+import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
+import { COPY_RULES, fetchTasteTags, getTestModels, nebiusModel, nebiusPrices, nemotronTurn } from "./providers.ts";
 import { placeboCopy, segmentLabel } from "./taste.mjs";
 import type { AgentCandidateSummary, AgentEvent, AgentRun, Audit, SegmentResult } from "./types";
 

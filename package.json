@@ -2,12 +2,14 @@
   "name": "tasteprobe",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "test": "node --test test/*.test.mjs",
     "lint:no-mock": "node scripts/check-no-mock.mjs",
+    "audit:live": "node scripts/live-audit.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -152,10 +152,21 @@ function describe(error: unknown) {
   return error instanceof Error ? error.message : String(error);
 }
 
+export const ASSISTANT_TEMPERATURE = 0.7;
+
+// Model IDs and hosts of the assistants under test (never keys), recorded with each audit.
+export function assistantsMeta() {
+  return configuredModels().map(({ name, model, client }) => ({ name, model, host: new URL(client.baseURL).host }));
+}
+
+export function nemotronSettings() {
+  return { maxTokens: nemotronMaxTokens(), thinking: process.env.NEBIUS_THINKING?.toLowerCase() === "on" || process.env.NEBIUS_THINKING?.toLowerCase() === "off" ? process.env.NEBIUS_THINKING.toLowerCase() : "model default" };
+}
+
 export async function askAssistants(prompt: string) {
   return Promise.all(configuredModels().map(async ({ client, model, name }) => {
     try {
-      const completion = await client.chat.completions.create({ model, messages: [{ role: "user", content: prompt }], temperature: 0.7 });
+      const completion = await client.chat.completions.create({ model, messages: [{ role: "user", content: prompt }], temperature: ASSISTANT_TEMPERATURE });
       return { model: name, ok: true as const, answer: completion.choices[0]?.message?.content ?? "" };
     } catch (error) {
       return { model: name, ok: false as const, error: `${name}: ${describe(error)}` };

@@ -1,4 +1,4 @@
-import { askAssistants, extractEntities, nebiusPrices, UnparseableError } from "./providers";
+import { askAssistants, extractEntities, nebiusPrices, UnparseableError } from "./providers.ts";
 import { parseNumberedList } from "./extract.mjs";
 import { matchesBrand } from "./taste.mjs";
 import type { Persona, Usage } from "./types";

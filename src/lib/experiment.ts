@@ -1,4 +1,4 @@
-import { pool, probePersona, type FailedRow, type ResponseRow } from "./probe";
+import { pool, probePersona, type FailedRow, type ResponseRow } from "./probe.ts";
 import { compareArms } from "./stats.mjs";
 import { counterfactualPrompt, personaPrompt, placeboCopy } from "./taste.mjs";
 import type { Persona } from "./types";

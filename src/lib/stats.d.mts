@@ -9,6 +9,7 @@ export function clusteredBootstrapInterval(rows: { cluster?: string; value: numb
 export function bootstrapDifference(before: (boolean | number)[], after: (boolean | number)[], iterations?: number, seed?: number): [number, number];
 export type ClusterRow = { cluster?: string; value: number };
 export const Z_95: number;
+export const LIFT_BOOTSTRAP_SEED: number;
 export function wilsonInterval(successes: number, n: number, z?: number): [number, number];
 export function designEffect(rows: ClusterRow[]): { deff: number; clusters: number; responses: number; effectiveN: number };
 export function shareInterval(rows: ClusterRow[], z?: number): [number, number];
