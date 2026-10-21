@@ -1,0 +1,12 @@
+# Never send secrets, local data or build output into the image build context.
+.env*
+!.env.example
+.data/
+.loom/
+.git/
+.github/
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
+CLAUDE.md
