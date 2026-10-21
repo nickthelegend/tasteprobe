@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Outfit } from "next/font/google";
+import { Overpass_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-outfit", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });
+const mono = Overpass_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: "TasteProbe — does AI recommend you to your own audience?",
