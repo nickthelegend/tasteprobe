@@ -10,10 +10,15 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 | `test/taste.test.mjs` | 11 | Brand matching. Segment labels. Qloo tag parsing. Deterministic personas. At least 8 personas per segment. Baseline prompt never names the brand. Placebo injected exactly like the fix. Cross-domain entity and demographics parsing. Cross-domain persona blending. |
 | `test/agent.test.mjs` | 9 | Agent limits. Budget accounting and every exhaustion reason. Probe trimming to the call budget. Copy rules. Tool-argument parsing. Candidate stats. Best-candidate selection. Stop rule. |
 | `test/extract.test.mjs` | 7 | `pickPlace` takes the in-city listing, never falls back to another city and lists candidates. City word matching. Numbered-list parser. Cross-check and per-assistant disagreement rate. Failed and unparseable counts per segment. |
+| `test/mcp.test.mjs` | 7 | The MCP server over real stdio (SDK client, clean environment, temp data dir), 1 suite + 6 cases. Tool list and schemas. `run_audit` and `run_fix` with no keys return `Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY` before any call. Invalid input rejected (missing brand, 3 personas, non-UUID ids). `get_report` with an empty store, a stored audit (synthetic fixture) and an unknown id. |
+| `test/nebius.test.mjs` | 6 | Default model is the catalog ID. Unset reasoning variables send nothing. `NEBIUS_THINKING` and `NEBIUS_REASONING_EFFORT` mapping. Invalid values throw. Reasoning read from `reasoning_content`, then `reasoning`. |
+| `test/qloo.test.mjs` | 6 | 200 parsed. `/search` 404 reads as no results and ends in the readable "no place" error. 404 elsewhere stays an error. 401 names the hackathon host. 403 names the refused `filter.type`. Non-JSON body. |
+| `test/report-page.test.mjs` | 5 | Printable report rendered with `react-dom/server` from the synthetic fixture: glasses and labels, denominators and drop causes, placebo arm and lift, rival stamps, Qloo signal errors, reproducibility line. Stored copy is escaped. No-fix message. Both empty states. |
 | `test/storage.test.mjs` | 4 | 50 concurrent store updates all land with no temp files left. The old unlocked pattern loses updates or tears the file. A failing update does not break the queue. The lock serialises tasks. |
 | `test/live-audit.test.mjs` | 4 | The CLI with no keys prints `Setup required: VAR` and exits 1 before any API call. Argument errors. Replay from cached responses with a banner and SHA-256 hashes (synthetic run in a temp dir). Report recomputation detects a mismatch. |
+| `test/report-model.test.mjs` | 3 | Report model keeps shares, intervals and every denominator. A segment with no usable answers has no share instead of 0%. Text summary and listing. |
 | `test/json.test.mjs` | 2 | Tolerant JSON parsing of reasoning-model output. |
-| **Total** | **50** | |
+| **Total** | **77** | |
 
 ## Other checks
 
@@ -26,10 +31,12 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 
 ## Fixtures
 
-`test/fixtures/*.json` are hand-written to the documented Qloo shapes, and each file says so. They are not recorded live responses and are never imported by app code. Synthetic runs in `test/live-audit.test.mjs` exist only in a temp directory during the test.
+`test/fixtures/qloo-*.json` are hand-written to the documented Qloo shapes, and each file says so. `test/fixtures/audit-synthetic.json` is a made-up stored audit (venue "Fixture Venue (synthetic)", city "Testville") for the report and MCP tests; its `_fixture` field says it is not a live run. None of them are recorded live responses, and app code never imports them (`lint:no-mock` checks). Synthetic runs in `test/live-audit.test.mjs` and `test/mcp.test.mjs` exist only in a temp directory during the test.
 
 ## Not covered by automated tests (needs keys)
 
 - Live Qloo, Nebius and assistant calls, including Nemotron tool calling and the thinking toggle.
 - The end-to-end agent loop against a real model. Its pure parts (stop rule, budget, selection) are covered above.
+- `run_audit` and `run_fix` over MCP with keys (same pipeline as the CLI).
+- The printable report page was checked in the in-app browser at 1280px and 375px, with no horizontal overflow, against `next start` and a temporary data directory holding the synthetic fixture (deleted afterwards). Both empty states were checked too: no audits, and an unknown id.
 - The UI. The tasting-flight redesign was checked in Chrome at 1280px and 375px with no horizontal overflow on the landing, the Setup required and empty states, and (with a synthetic audit in a temporary data directory, never committed) the flight board, tasting sheet, re-pour, notebook and rival views.

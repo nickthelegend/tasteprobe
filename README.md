@@ -2,9 +2,9 @@
 
 **Do AI assistants recommend you to your own audience?** TasteProbe builds personas from a venue's real Qloo taste neighbourhood, asks live AI assistants for recommendations as each persona, has an NVIDIA Nemotron model on Nebius extract what they recommended, and reports share of voice per taste segment with 95% intervals. It then tests fix copy against a placebo, either as one attempt or through a Nemotron tool-calling agent loop.
 
-> **Status: not yet run end to end against live keys.** No Qloo, Nebius or assistant keys were available while building, so every live path ends at "Setup required: VAR" (HTTP 503 in the app, exit code 1 in the CLI). Nothing is simulated. See [What is unverified](#what-is-unverified-until-the-first-live-run).
+> **Status: not yet run end to end against live keys.** No Qloo, Nebius or assistant keys were available while building, so every live path ends at "Setup required: VAR" (HTTP 503 in the app, a tool error over MCP, exit code 1 in the CLI). Nothing is simulated. What the docs confirm and what still needs a live call is listed in [API facts: confirmed vs unverified](#api-facts-confirmed-vs-unverified).
 >
-> Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
+> Hosted demo: _not deployed yet; needs Nick: hosting_ (Qloo requires an externally hosted demo). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
 
 ## Architecture
 
@@ -42,6 +42,10 @@ flowchart LR
 | Agent loop (tool calling) and its pure stop/budget logic | `src/lib/agent.ts`, `src/lib/agent-core.mjs`, `src/app/api/audits/[id]/agent/route.ts` |
 | Locked, atomic JSON store | `src/lib/filestore.mjs`, `src/lib/storage.ts` |
 | Live CLI, report and replay | `scripts/live-audit.mjs`, `src/lib/report.mjs` |
+| Qloo response handling (404 = no results, 401/403 messages) | `src/lib/qloo.mjs` |
+| Nebius model ID and reasoning settings | `src/lib/nebius.mjs` |
+| MCP server (`run_audit`, `run_fix`, `get_report`) | `src/mcp/server.mjs`, `src/lib/fix.ts`, `src/lib/report-model.mjs` |
+| Printable report | `src/app/audits/[id]/report/page.tsx`, `src/lib/print-report.mjs` |
 | Dashboard | `src/app/page.tsx`, `src/components/*` |
 
 ## Setup
@@ -57,11 +61,12 @@ npm run dev                  # http://localhost:3000
 | Variable | Required | Purpose |
 |---|---|---|
 | `QLOO_API_KEY` | yes | Qloo taste graph. `QLOO_BASE_URL` defaults to the hackathon host; set `https://api.qloo.com` for production keys. |
-| `NEBIUS_API_KEY` | yes | Nebius Token Factory. `NEBIUS_MODEL` must be an NVIDIA model your key serves (default `nvidia/Nemotron-3-Nano-30B-A3B`). |
+| `NEBIUS_API_KEY` | yes | Nebius Token Factory. `NEBIUS_MODEL` must be an NVIDIA model your key serves (default `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`). |
 | `OPENAI_API_KEY` or `MODEL_2_*` | at least one | The assistants being audited. `MODEL_2_*` and `MODEL_3_*` take any OpenAI-compatible endpoint. |
 | `NEBIUS_INPUT_PRICE_PER_MILLION`, `NEBIUS_OUTPUT_PRICE_PER_MILLION` | no | Your Nebius rates. Used for cost estimates and the agent's dollar cap (without them the cap is reported as unenforced). |
 | `NEBIUS_MAX_TOKENS` | no | Nemotron `max_tokens` (default 8192, so reasoning is not cut off). |
-| `NEBIUS_THINKING` | no | `on` / `off` sends `chat_template_kwargs.enable_thinking`. Unset sends nothing. See below. |
+| `NEBIUS_REASONING_EFFORT` | no | Sends Nebius's documented `reasoning_effort` (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). Unset sends nothing. |
+| `NEBIUS_THINKING` | no | `on` / `off` sends `chat_template_kwargs.enable_thinking` (from NVIDIA's model card, not the Nebius docs). Unset sends nothing. An invalid value of either is a setup error. |
 
 Keys are read only on the server. If one is missing, the header pill turns red, a **Setup required** panel names the variable, the Run buttons stay disabled, and the API answers `503` (the agent route returns `{"error":"setup_required","missing":[...]}`).
 
@@ -76,6 +81,26 @@ npm run audit:live -- --replay <run id>
 2. **Run.** The same pipeline as the web app, with progress on stdout.
 3. **Report.** `.data/reports/<id>.json` and `.html` record model IDs and hosts, temperature, Nemotron `max_tokens` and thinking setting, the persona and bootstrap seeds, the extraction prompt, every persona prompt, failure rates by cause and the SHA-256 of every raw file.
 4. **Replay.** `--replay <id>` recomputes the numbers from the cached responses (no API calls), checks the raw-file hashes against the live report, and writes `<id>.replay.html` under a banner: "Replay of run <id> recorded <time>".
+
+## MCP server
+
+`npm run mcp` starts a stdio [Model Context Protocol](https://modelcontextprotocol.io) server (`src/mcp/server.mjs`), so any MCP client or agent can use TasteProbe as a tool. Run it from the repo root so it finds `.env.local` and `.data/`.
+
+| Tool | Input | What it does | Keys |
+|---|---|---|---|
+| `run_audit` | `brand`, `city`, `category?`, `personas?` (8–200) | The full live audit (same pipeline as the web app and CLI). Sends MCP progress notifications per persona when the client asks for them. | Qloo, Nebius, assistant |
+| `run_fix` | `audit_id`, `segment?` | One placebo-controlled fix attempt on a stored audit (weakest segment by default) | Qloo, Nebius, assistant |
+| `get_report` | `audit_id?` | A stored audit as a report (text plus structured JSON), or the list of stored audits | none |
+
+Without keys, `run_audit` and `run_fix` return a tool error, `Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY. ...`, before any API call. Inputs are validated (audit ids must be UUIDs). Example client config:
+
+```json
+{ "mcpServers": { "tasteprobe": { "command": "npm", "args": ["run", "-s", "mcp"], "cwd": "/path/to/tasteprobe" } } }
+```
+
+## Printable report
+
+`/audits/<id>/report` renders one stored audit as a printable page in the same tasting-flight style: the flight, the tasting sheet with every denominator, the rivals checked in Qloo, every re-pour with its placebo arm, agent runs, Qloo signals and the settings needed to reproduce the run. **Print or save as PDF** uses the browser's print dialog. With no stored audits the page says so and shows nothing as an example. The dashboard links to it from each audit.
 
 ## How the numbers are made
 
@@ -93,32 +118,73 @@ npm run audit:live -- --replay <run id>
    The headline lift is **fix − placebo**, a paired bootstrap over personas because both arms share them. Placebo − baseline is shown as the name-exposure effect. Every attempt is kept in `counterfactuals[]` and shown as a history.
 8. **Agent loop.** Nemotron gets four tools: `qloo_insights` (live), `propose_copy` (rules enforced in code), `probe_segment(candidate_id, n)` (placebo vs fix on the next n personas) and `get_stats`. It plans, proposes, probes and revises. **The code decides when to stop**: as soon as a copy probed on at least 8 personas has a lift CI entirely above zero, or when the copy tries, assistant calls, Nemotron tokens, dollar cap or turns run out. Steps stream as NDJSON with tokens and cost. The run summary and the full trace (messages and every probe answer) are saved. The stop rule, budget accounting and best-candidate selection are pure functions with their own tests.
 
-## Sponsor technology
+## NVIDIA Nemotron on Nebius Token Factory
 
-- **Qloo (Qloo Agentic Hackathon):**
-  - `/search` resolves the venue in its city and checks the rivals assistants recommend.
-  - `/v2/insights` with `urn:tag` builds the personas.
-  - `/v2/insights` with `urn:entity:artist|brand|movie|book` and `urn:demographics` adds cross-domain taste.
-  - The agent reads Qloo live through its `qloo_insights` tool.
-- **NVIDIA on Nebius (Nebius x NVIDIA):** a Nemotron open model on Nebius Token Factory does every extraction, writes fix copy and drives the tool-calling agent loop. Token usage and estimated cost are shown per audit and per agent step.
+Every model call that TasteProbe itself makes goes to an NVIDIA open model on Nebius Token Factory. The assistants under test are separate: they are the systems being audited.
 
-## What is unverified until the first live run
+| Where | What Nemotron does | Call |
+|---|---|---|
+| `extractEntities` in `src/lib/providers.ts` | Reads **every** assistant answer and returns the venues it recommends as JSON (temperature 0). Truncated or non-JSON output is counted as unparseable. | `POST /v1/chat/completions` |
+| `suggestContentChange` in `src/lib/providers.ts` | Writes the fix copy for a taste segment, under the copy rules | `POST /v1/chat/completions` |
+| `nemotronTurn` in `src/lib/providers.ts`, loop in `src/lib/agent.ts` | Drives the agent: plans, calls `qloo_insights`, `propose_copy`, `probe_segment` and `get_stats`, and revises. The code enforces the stop rule and budget. | `POST /v1/chat/completions` with `tools` and `tool_choice: "auto"` |
+| `checkNebiusModel` (status pill) and the CLI preflight | Confirms the configured model is in the key's catalog before a run | `GET /v1/models` |
 
-- **Qloo response shapes.** Parsing follows docs.qloo.com and accepts known variants. `urn:demographics` is not in Qloo's published `filter.type` list; its parser follows the shape community projects report. Each cross-domain call fails on its own and its error is stored.
-- **Nemotron tool calling on Nebius.** Nebius documents OpenAI-style `tools` / `tool_choice` on chat completions. Whether the configured Nemotron build honours them there is only confirmed by a live call. A model that ignores tools ends the loop with `agent_finished`.
-- **Thinking toggle.** NVIDIA's Nemotron 3 Nano card documents `chat_template_kwargs.enable_thinking`. Nebius documents `reasoning_effort` and accepts extra body fields. Neither mapping is confirmed on Nebius, so `NEBIUS_THINKING` is opt-in and unset by default. Reasoning length is read from `reasoning_content` or `<think>` blocks when present.
-- **Rival verification.** "Verified in Qloo" means `/search` returned a place in the city whose name matches the rival.
-- **Nebius prices.** These are not hard-coded. Set your own rates.
+- **Model.** Default `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`: the Token Factory catalog lists tool calling and reasoning as available, a 262K context and a public endpoint. Nano handles the high-volume extraction calls (one per answer), which fits the Best Apps and Agents track's advice: Nano or Super for fast everyday calls, Ultra for serious reasoning. `NEBIUS_MODEL=nvidia/nemotron-3-super-120b-a12b` or `nvidia/Nemotron-3-Ultra-550b-a55b` switches every call, and the catalog check rejects an ID the key can't use. Splitting extraction and agent across two sizes is not built.
+- **Client.** The OpenAI SDK pointed at `https://api.tokenfactory.nebius.com/v1` (`NEBIUS_BASE_URL`), `max_tokens` 8192 so reasoning isn't cut off mid-JSON, and optional `reasoning_effort` / `enable_thinking` (see Setup).
+- **Accounting.** Token usage from every Nemotron response is summed per audit and per agent step. At your configured per-million rates it gives a cost per answer and the agent's dollar cap.
+- **What Token Factory changes for this design:** all Nemotron sizes sit behind one OpenAI-compatible endpoint, so extraction, copywriting and the tool-calling agent share one client, and changing model size is one variable. There is no GPU to provision. Per-token pricing makes "cost per audited answer" something the app can compute and cap. **Not yet measured:** latency, throughput and tool-call reliability on Token Factory. They need the first keyed run.
+- **Other Nebius services:** none used yet: no Serverless Endpoints or Jobs, and no Tavily call. A hosted demo on Nebius compute is possible but not set up.
+
+## Qloo
+
+- `/search` (`types=urn:entity:place`) resolves the venue in its own city and checks the rivals assistants recommend. A 404 is Qloo's documented "No results" and stops the audit with a readable message.
+- `/v2/insights` with `filter.type=urn:tag`, `signal.interests.entities` and `signal.location.query` builds the personas (Taste Analysis).
+- `/v2/insights` with `filter.type=urn:entity:artist|brand|movie|book` adds cross-domain taste, and `filter.type=urn:demographics` adds the audience lean.
+- The agent reads Qloo live through its `qloo_insights` tool. The MCP server exposes the whole Qloo-grounded audit to other agents.
+- Raw Qloo payloads are cached server-side under `.data/` (git-ignored). Qloo's FAQ forbids putting Qloo response data in a public repo.
+
+## API facts: confirmed vs unverified
+
+Checked against the live docs on **2026-10-21**, without keys. "Confirmed" means the docs say so; nothing below has been seen in a live response yet.
+
+| Fact | Status | Source |
+|---|---|---|
+| Hackathon keys only work on `https://hackathon.api.qloo.com` (401 elsewhere); header `X-Api-Key` | Confirmed; this is the default `QLOO_BASE_URL` | [Hackathon developer guide](https://docs.qloo.com/reference/qloo-llm-hackathon-developer-guide) |
+| `/v2/insights` is GET with query parameters; `/recs` and `/recommendations` are not supported | Confirmed; we use GET `/v2/insights` and `/search` only | same |
+| `filter.type=urn:tag` with `signal.interests.entities` and `signal.location.query`; response `results.tags[]` with `tag_id`, `name`, `subtype` | Confirmed | [Taste Analysis](https://docs.qloo.com/reference/taste-analysis) |
+| `filter.type=urn:demographics` with `signal.interests.entities`; response `results.demographics[].query.{age,gender}` | Confirmed. The code comment that called this a community-reported shape was corrected. | [Demographic Insights](https://docs.qloo.com/reference/demographics-use-case) |
+| `signal.location.query` works for artist, book, brand, movie and place; `filter.location.query` only for destination and place | Confirmed; we use `signal.location.query` throughout | [Parameter Reference](https://docs.qloo.com/reference/parameters), [Location-Based Insights](https://docs.qloo.com/reference/insights-with-location-use-case) |
+| `take` max 50 | Confirmed (we ask for 50 tags, 10 entities, 15 search results) | Parameter Reference |
+| `/search` takes `query`, `types` (`urn:entity:place` is valid), `take`; 404 means "No results" | Confirmed; 404 handling fixed in code | [Search Entities](https://docs.qloo.com/reference/get-search) |
+| `urn:tag` and `urn:demographics` on the **hackathon** host | **Unverified.** The guide's supported `filter.type` list names only `urn:entity:*` types and says an unsupported type returns 403. The personas depend on `urn:tag`. A 403 now names the refused type. | developer guide |
+| Tag affinity in `query.affinity`; place `properties.address` / `geocode` used for the city match | **Unverified.** The doc examples show neither for these calls. Without affinity, tags are weighted by `query.popularity` if present, otherwise evenly. Without an address or geocode, the city match fails with the list of what Qloo found. | — |
+| Nebius base URL `https://api.tokenfactory.nebius.com/v1/`, OpenAI-compatible | Confirmed | [Quickstart](https://docs.tokenfactory.nebius.com/quickstart) |
+| `tools` and `tool_choice` (`auto`, `none`, `required`, named) on chat completions | Confirmed | [Function calling](https://docs.tokenfactory.nebius.com/ai-models-inference/function-calling), [chat completion reference](https://docs.tokenfactory.nebius.com/api-reference/inference/create-chat-completion) |
+| Model ID `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`, tool calling and reasoning available | Confirmed on the catalog page. The old default `nvidia/Nemotron-3-Nano-30B-A3B` answers "Model not found" there, so the default was fixed. | [Catalog entry](https://tokenfactory.nebius.com/models/catalog/text2text/nvidia%2FNVIDIA-Nemotron-3-Nano-30B-A3B) |
+| Other Nemotron IDs: `nvidia/nemotron-3-super-120b-a12b`, `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/Nemotron-3_5-Lightning` | Confirmed on catalog pages (note the inconsistent casing) | catalog; [Aug 2026 deprecations](https://docs.tokenfactory.nebius.com/august-2026-deprecation-notice) |
+| `reasoning_effort` (`none` … `max`) request field; `reasoning_content` and `reasoning` response fields | Confirmed in the schema; `NEBIUS_REASONING_EFFORT` added, both response fields read | chat completion reference |
+| `chat_template_kwargs.enable_thinking` | **Unverified on Nebius.** Documented by NVIDIA for vLLM; the Nebius docs don't mention it. Opt-in only. | [NVIDIA model card](https://huggingface.co/nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8) |
+| Nemotron honours tool calls on Nebius; reasoning arrives in `reasoning_content` vs `<think>` | **Unverified** until a keyed call. Both reasoning forms are handled; a model that ignores tools ends the loop with `agent_finished`. | — |
+| Nebius prices | Not hard-coded; set your own rates | — |
+
+## Hackathons
+
+| Event | Deadline (official rules) | Entry | Status |
+|---|---|---|---|
+| [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/rules) | **Oct 30, 2026, 10:00 am PT = 17:00 UTC** | Best Apps and Agents Track | Code ready. Needs keys for a runtime Token Factory call, a demo URL, and a YouTube video under 3 minutes |
+| [Qloo Agentic Hackathon](https://qloo.devpost.com/rules) | **Oct 30, 2026, 11:45 pm ET = Oct 31, 03:45 UTC** | Agentic tool (Nemotron tool-calling agent + MCP server) | Code ready. Needs keys and **needs Nick: hosting**: Qloo requires a demo hosted and published externally; local-only entries don't qualify |
+
+Form drafts, tool feedback and checklists: [HACKATHON_SUBMISSION_FORM.md](HACKATHON_SUBMISSION_FORM.md).
 
 ## Tests
 
-`npm test` runs 50 tests. The table and what each file covers are in [TESTING.md](TESTING.md). The full check:
+`npm test` runs 77 tests (Node's runner counts the MCP stdio suite's parent test too). The table and what each file covers are in [TESTING.md](TESTING.md). The full check:
 
 ```sh
 npm test && npm run typecheck && npm run lint:no-mock && npm run build
 ```
 
-CI (`.github/workflows/ci.yml`) runs all four on Node 22. The fixtures in `test/fixtures` are hand-written to the documented shapes, used only by tests, and labelled as such. `lint:no-mock` fails if `src/` imports them.
+CI (`.github/workflows/ci.yml`) runs all four on Node 22. The fixtures in `test/fixtures` are hand-written, used only by tests, and labelled as such. The Qloo ones follow the documented shapes; `audit-synthetic.json` is a made-up stored audit for the report and MCP tests. `lint:no-mock` fails if `src/` imports them.
 
 ## Limitations
 
