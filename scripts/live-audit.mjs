@@ -11,6 +11,7 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { DEFAULT_NEBIUS_MODEL } from "../src/lib/nebius.mjs";
 import { buildReport, renderReportHtml } from "../src/lib/report.mjs";
 
 function parseArgs(argv) {
@@ -72,7 +73,7 @@ async function preflight(brand) {
   results.push(`Qloo ${new URL(qlooBase).host}: /search ok`);
 
   const nebiusBase = (process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1").replace(/\/$/, "");
-  const wanted = process.env.NEBIUS_MODEL || "nvidia/Nemotron-3-Nano-30B-A3B";
+  const wanted = process.env.NEBIUS_MODEL || DEFAULT_NEBIUS_MODEL;
   const catalog = await call("Nebius /models", `${nebiusBase}/models`, { headers: { authorization: `Bearer ${process.env.NEBIUS_API_KEY}` } });
   const ids = Array.isArray(catalog?.data) ? catalog.data.map((item) => item.id) : [];
   if (!ids.includes(wanted)) throw new Error(`Nebius: ${wanted} is not in this key's catalog. NVIDIA models listed: ${ids.filter((id) => id.toLowerCase().startsWith("nvidia/")).join(", ") || "none"}`);

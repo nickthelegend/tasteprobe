@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { parseJsonObject } from "./json.mjs";
+import { DEFAULT_NEBIUS_MODEL, reasoningLabel, reasoningParams, reasoningText } from "./nebius.mjs";
 import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, parseQlooTags, pickPlace, type QlooEntity } from "./taste.mjs";
 import type { QlooSignals, TasteTag, Usage } from "./types";
 
@@ -10,7 +11,7 @@ export class UnparseableError extends Error {}
 
 const QLOO_BASE_URL = () => process.env.QLOO_BASE_URL || "https://hackathon.api.qloo.com";
 const NEBIUS_BASE_URL = () => process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1";
-export const nebiusModel = () => process.env.NEBIUS_MODEL || "nvidia/Nemotron-3-Nano-30B-A3B";
+export const nebiusModel = () => process.env.NEBIUS_MODEL || DEFAULT_NEBIUS_MODEL;
 const REQUEST_TIMEOUT_MS = 120_000;
 // Reasoning models spend tokens thinking before the JSON; 2048 truncated long answers.
 const nemotronMaxTokens = () => Number(process.env.NEBIUS_MAX_TOKENS) || 8192;
@@ -160,7 +161,7 @@ export function assistantsMeta() {
 }
 
 export function nemotronSettings() {
-  return { maxTokens: nemotronMaxTokens(), thinking: process.env.NEBIUS_THINKING?.toLowerCase() === "on" || process.env.NEBIUS_THINKING?.toLowerCase() === "off" ? process.env.NEBIUS_THINKING.toLowerCase() : "model default" };
+  return { maxTokens: nemotronMaxTokens(), thinking: thinkingSetting() };
 }
 
 export async function askAssistants(prompt: string) {
@@ -180,13 +181,16 @@ function nebius() {
   return new OpenAI({ apiKey, baseURL: NEBIUS_BASE_URL(), timeout: REQUEST_TIMEOUT_MS, maxRetries: 2 });
 }
 
-// Optional reasoning toggle. NVIDIA's Nemotron 3 Nano card documents
-// chat_template_kwargs.enable_thinking for vLLM; Nebius documents reasoning_effort and accepts extra
-// body fields, but neither mapping onto Nemotron is confirmed on Nebius yet. Unset = send nothing.
+// Optional reasoning settings (see src/lib/nebius.mjs for what each one is based on). Unset sends
+// nothing; an invalid value is a setup error, never silently dropped.
 function thinkingParams(): Record<string, unknown> {
-  const mode = process.env.NEBIUS_THINKING?.toLowerCase();
-  if (mode === "on" || mode === "off") return { chat_template_kwargs: { enable_thinking: mode === "on" } };
-  return {};
+  try { return reasoningParams(process.env); }
+  catch (error) { throw new ConfigError(error instanceof Error ? error.message : String(error)); }
+}
+
+function thinkingSetting() {
+  try { return reasoningLabel(process.env); }
+  catch (error) { return `invalid: ${error instanceof Error ? error.message : String(error)}`; }
 }
 
 function usageOf(completion: OpenAI.Chat.ChatCompletion): Usage {
@@ -213,8 +217,7 @@ export async function nemotronTurn(messages: OpenAI.Chat.ChatCompletionMessagePa
     const completion = await nebius().chat.completions.create({ model, messages, tools, tool_choice: "auto", temperature: 0.4, max_tokens: nemotronMaxTokens(), ...thinkingParams() });
     const choice = completion.choices[0];
     const message = choice?.message ?? { role: "assistant" as const, content: "", refusal: null };
-    const reasoning = (message as unknown as { reasoning_content?: string }).reasoning_content;
-    return { model, message, usage: usageOf(completion), finishReason: choice?.finish_reason ?? null, reasoning: typeof reasoning === "string" ? reasoning : "" };
+    return { model, message, usage: usageOf(completion), finishReason: choice?.finish_reason ?? null, reasoning: reasoningText(message) };
   } catch (error) {
     if (error instanceof ConfigError) throw error;
     throw new Error(`Nebius ${model}: ${describe(error)}`);
