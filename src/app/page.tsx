@@ -236,6 +236,7 @@ export default function Home() {
             <p className="kicker">{new Date(active.createdAt).toLocaleString()} · {Math.round(active.durationMs / 1000)}s · Qloo <code>{active.qlooEntityId}</code></p>
             <h3 id="result-title">{active.brand}</h3>
             <p>{active.category} · {active.city}{active.qlooAddress ? ` · ${active.qlooAddress}` : ""}</p>
+            <a className="tp-btn tp-btn-line report-link" href={`/audits/${active.id}/report`}>Printable report</a>
           </div>
           <div className="result-overall">
             <Glass share={active.overall.share} interval={active.overall.ci} size={58} label={`All segments: ${pct(active.overall.share)}, 95% interval ${ci(active.overall.ci)}`} />
