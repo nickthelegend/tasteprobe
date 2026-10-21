@@ -1,0 +1,13 @@
+{
+  "_fixture": "Doc-shaped test fixture for /v2/insights?filter.type=urn:entity:artist (results.entities[] with entity_id, name, query.affinity per docs.qloo.com). Written by hand, not a recorded live response.",
+  "success": true,
+  "results": {
+    "entities": [
+      { "entity_id": "ART-1", "name": "Prateek Kuhad", "types": ["urn:entity:artist"], "query": { "affinity": 0.82 } },
+      { "entity_id": "ART-2", "name": "Nucleya", "types": ["urn:entity:artist"], "query": { "affinity": 0.74 } },
+      { "entity_id": "ART-1", "name": "Prateek Kuhad", "types": ["urn:entity:artist"], "query": { "affinity": 0.82 } },
+      { "entity_id": "ART-3", "name": "When Chai Met Toast", "affinity": 0.61 },
+      { "name": "Missing id is dropped" }
+    ]
+  }
+}

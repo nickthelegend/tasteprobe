@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { estimateCost, pool, probePersona, sumUsage, toObservations, type FailedRow, type ResponseRow } from "@/lib/probe";
 import { summarizeCrossCheck } from "@/lib/extract.mjs";
-import { fetchTasteTags, nebiusModel, requireKeys, resolvePlace, verifyRival } from "@/lib/providers";
+import { fetchCrossDomainSignals, fetchTasteTags, nebiusModel, requireKeys, resolvePlace, verifyRival } from "@/lib/providers";
 import { summarizeObservations } from "@/lib/stats.mjs";
 import { readAudits, saveAudit, writeRaw } from "@/lib/storage";
-import { buildPersonas, matchesBrand, MIN_PERSONAS_PER_SEGMENT, personaPrompt } from "@/lib/taste.mjs";
+import { buildPersonas, matchesBrand, MIN_PERSONAS_PER_SEGMENT, PERSONA_SEED, personaPrompt } from "@/lib/taste.mjs";
 import type { Audit, AuditEvent } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -45,12 +45,12 @@ export async function POST(request: Request) {
         send({ type: "place", name: place.name, entityId: place.id, address: place.address });
 
         send({ type: "stage", stage: "qloo", message: `Fetching taste affinities for ${place.name} in ${input.city}` });
-        const taste = await fetchTasteTags(place.id, input.city);
-        const personas = buildPersonas(taste.tags, input.personaCount);
+        const [taste, cross] = await Promise.all([fetchTasteTags(place.id, input.city), fetchCrossDomainSignals(place.id, input.city)]);
+        const personas = buildPersonas(taste.tags, input.personaCount, PERSONA_SEED, cross.crossDomain);
         send({ type: "personas", personas });
 
         const auditId = crypto.randomUUID();
-        await writeRaw(auditId, "qloo", { search: place.raw, insights: taste.raw });
+        await writeRaw(auditId, "qloo", { search: place.raw, insights: taste.raw, crossDomain: cross.raw });
 
         send({ type: "stage", stage: "query", message: `Asking assistants as ${personas.length} Qloo personas` });
         const rows: ResponseRow[] = [];
@@ -90,6 +90,7 @@ export async function POST(request: Request) {
           city: input.city,
           createdAt: new Date().toISOString(),
           personas,
+          qlooSignals: cross.signals,
           overall: summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })), failures.map((row) => ({ ...row, segment: "All personas" })))[0],
           segments: summarizeObservations(observations, failures),
           modelSegments: systems.map((model) => ({

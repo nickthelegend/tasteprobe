@@ -1,0 +1,10 @@
+{
+  "_fixture": "Doc-shaped test fixture for /v2/insights?filter.type=urn:demographics, following the results.demographics[].query.{age,gender} shape reported by community projects (not in Qloo's published schema). Written by hand, not a recorded live response.",
+  "success": true,
+  "results": {
+    "demographics": [
+      { "entity_id": "A1", "query": { "age": { "24_and_younger": 0.1, "25_to_29": 0.4, "30_to_34": 0.3 }, "gender": { "male": -0.1, "female": 0.2 } } },
+      { "entity_id": "A2", "query": { "age": { "24_and_younger": 0.3, "25_to_29": 0.2, "30_to_34": 0.1 }, "gender": { "male": 0.1, "female": 0.0 } } }
+    ]
+  }
+}

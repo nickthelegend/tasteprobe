@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { parseJsonObject } from "./json.mjs";
-import { matchesBrand, parseQlooTags, pickPlace } from "./taste.mjs";
-import type { TasteTag, Usage } from "./types";
+import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, parseQlooTags, pickPlace, type QlooEntity } from "./taste.mjs";
+import type { QlooSignals, TasteTag, Usage } from "./types";
 
 export class ConfigError extends Error {}
 // Nemotron answered but its output could not be parsed (or was cut off at max_tokens). Counted
@@ -79,6 +79,35 @@ export async function fetchTasteTags(entityId: string, city: string): Promise<{ 
   }
   if (!tags.length) throw new Error("Qloo returned no taste tags for this place. Check the place name or try a better-known listing.");
   return { tags, raw };
+}
+
+// Cross-domain taste: artists, brands, films and books with affinity to the venue (city-scoped),
+// plus the urn:demographics lean. Each call can fail on its own without failing the audit; the
+// error is recorded. Parameter names: filter.type, signal.interests.entities, signal.location.query,
+// take (docs.qloo.com/reference/parameters). urn:demographics is not in the published list.
+export async function fetchCrossDomainSignals(entityId: string, city: string) {
+  const crossDomain: Record<string, QlooEntity[]> = {};
+  const raw: unknown[] = [];
+  const signals: QlooSignals = { domains: [], demographics: null };
+  await Promise.all(CROSS_DOMAIN_TYPES.map(async (type) => {
+    try {
+      const payload = await qloo("/v2/insights", { "filter.type": `urn:entity:${type}`, "signal.interests.entities": entityId, "signal.location.query": city, take: "10" });
+      raw.push({ type, payload });
+      crossDomain[type] = parseQlooEntities(payload);
+      signals.domains.push({ type, entities: crossDomain[type].map((item) => item.name) });
+    } catch (error) {
+      signals.domains.push({ type, entities: [], error: error instanceof Error ? error.message.slice(0, 200) : String(error) });
+    }
+  }));
+  try {
+    const payload = await qloo("/v2/insights", { "filter.type": "urn:demographics", "signal.interests.entities": entityId });
+    raw.push({ type: "demographics", payload });
+    signals.demographics = parseQlooDemographics(payload);
+  } catch (error) {
+    signals.demographicsError = error instanceof Error ? error.message.slice(0, 200) : String(error);
+  }
+  signals.domains.sort((a, b) => CROSS_DOMAIN_TYPES.indexOf(a.type) - CROSS_DOMAIN_TYPES.indexOf(b.type));
+  return { crossDomain, signals, raw };
 }
 
 type ChatModel = { id: string; name: string; model: string; client: OpenAI };

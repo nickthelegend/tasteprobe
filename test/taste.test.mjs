@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { buildPersonas, counterfactualPrompt, matchesBrand, maxSegmentsFor, parseQlooTags, personaPrompt, placeboCopy, segmentLabel } from "../src/lib/taste.mjs";
+import { buildPersonas, counterfactualPrompt, matchesBrand, maxSegmentsFor, parseQlooDemographics, parseQlooEntities, parseQlooTags, personaPrompt, placeboCopy, segmentLabel } from "../src/lib/taste.mjs";
 
 // Doc-shaped fixture (follows the documented /v2/insights tag shape), not a recorded live response.
 const insights = JSON.parse(readFileSync(new URL("./fixtures/qloo-tag-insights.json", import.meta.url), "utf8"));
@@ -85,4 +85,42 @@ test("placebo copy names the brand neutrally and is injected exactly like the fi
   const placeboPrompt = counterfactualPrompt(persona, "modern Indian restaurant", "Mumbai", "The Bombay Canteen", placebo);
   const shared = (text) => text.slice(0, text.lastIndexOf(": "));
   assert.equal(shared(fixPrompt), shared(placeboPrompt));
+});
+
+// Doc-shaped fixtures (hand-written to the documented / community-reported shapes, not live data).
+const artists = JSON.parse(readFileSync(new URL("./fixtures/qloo-entity-insights.json", import.meta.url), "utf8"));
+const demographics = JSON.parse(readFileSync(new URL("./fixtures/qloo-demographics.json", import.meta.url), "utf8"));
+
+test("parses cross-domain entity insights, deduplicates and keeps affinity", () => {
+  const entities = parseQlooEntities(artists);
+  assert.deepEqual(entities.map((item) => item.name), ["Prateek Kuhad", "Nucleya", "When Chai Met Toast"]);
+  assert.equal(entities[0].affinity, 0.82);
+  assert.equal(entities[2].affinity, 0.61);
+  assert.deepEqual(parseQlooEntities({ results: {} }), []);
+});
+
+test("parses urn:demographics into averaged age and gender leans", () => {
+  const parsed = parseQlooDemographics(demographics);
+  assert.equal(parsed.age[0].bucket, "25_to_29");
+  assert.ok(Math.abs(parsed.age[0].score - 0.3) < 1e-9);
+  assert.equal(parsed.gender[0].bucket, "female");
+  assert.equal(parseQlooDemographics({ results: { demographics: [] } }), null);
+  assert.equal(parseQlooDemographics({}), null);
+});
+
+test("cross-domain signals are blended into personas and prompts without leaking the brand", () => {
+  const tags = parseQlooTags(insights);
+  const plain = buildPersonas(tags, 16);
+  const blended = buildPersonas(tags, 16, 7, { artist: parseQlooEntities(artists), movie: [{ id: "M1", name: "The Lunchbox", affinity: 0.7 }] });
+  assert.equal(plain[0].crossDomain, undefined);
+  assert.deepEqual(blended.map((persona) => persona.segment), plain.map((persona) => persona.segment));
+  for (const persona of blended) {
+    assert.equal(persona.crossDomain.length, 2);
+    assert.notEqual(persona.crossDomain[0].type, persona.crossDomain[1].type);
+  }
+  const prompt = personaPrompt(blended[0], "restaurant", "Mumbai");
+  assert.match(prompt, /Outside of food and drink I love/);
+  assert.match(prompt, new RegExp(blended[0].crossDomain[0].name));
+  assert.doesNotMatch(prompt, /Bombay Canteen/);
+  assert.doesNotMatch(personaPrompt(plain[0], "restaurant", "Mumbai"), /Outside of food/);
 });

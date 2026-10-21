@@ -1,5 +1,14 @@
 export type TasteTag = { id: string; name: string; affinity?: number; subtype: string };
-export type Persona = { id: string; segment: string; segmentId: string; affinities: TasteTag[] };
+export type CrossDomainSignal = { type: string; id: string; name: string; affinity?: number };
+export type Persona = { id: string; segment: string; segmentId: string; affinities: TasteTag[]; crossDomain?: CrossDomainSignal[] };
+export type QlooDemographics = { age: { bucket: string; score: number }[]; gender: { bucket: string; score: number }[] };
+// Cross-domain Qloo signals. Parameter names follow docs.qloo.com; response parsing is
+// unverified until the first live run, and each call's error is kept instead of failing the audit.
+export type QlooSignals = {
+  domains: { type: string; entities: string[]; error?: string }[];
+  demographics: QlooDemographics | null;
+  demographicsError?: string;
+};
 export type Competitor = { name: string; mentions: number; share: number };
 export type SegmentResult = {
   id: string;
@@ -74,6 +83,7 @@ export type Audit = {
   city: string;
   createdAt: string;
   personas: Persona[];
+  qlooSignals?: QlooSignals;
   overall: SegmentResult;
   segments: SegmentResult[];
   modelSegments: { model: string; segments: SegmentResult[] }[];

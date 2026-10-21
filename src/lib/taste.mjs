@@ -93,6 +93,48 @@ export function parseQlooTags(payload) {
   return tags;
 }
 
+// Cross-domain entities from /v2/insights with filter.type=urn:entity:<type>. Documented shape:
+// results.entities[] with entity_id, name and query.affinity. Unverified until a live run.
+export const CROSS_DOMAIN_TYPES = ["artist", "brand", "movie", "book"];
+
+export function parseQlooEntities(payload) {
+  const list = payload?.results?.entities ?? payload?.entities ?? [];
+  if (!Array.isArray(list)) return [];
+  const seen = new Set();
+  const entities = [];
+  for (const item of list) {
+    const id = item?.entity_id ?? item?.id;
+    const name = typeof item?.name === "string" ? item.name.trim() : "";
+    if (!id || !name || seen.has(id)) continue;
+    seen.add(id);
+    const affinity = [item?.query?.affinity, item?.affinity].find((value) => typeof value === "number");
+    entities.push({ id: String(id), name, affinity });
+  }
+  return entities;
+}
+
+// filter.type=urn:demographics is not in Qloo's published filter.type list; community projects
+// report results.demographics[] items with query.age and query.gender maps of bucket -> score.
+// Scores are averaged over the returned items. Unverified until a live run.
+export function parseQlooDemographics(payload) {
+  const list = payload?.results?.demographics;
+  if (!Array.isArray(list) || !list.length) return null;
+  const average = (field) => {
+    const totals = new Map();
+    let items = 0;
+    for (const item of list) {
+      const map = item?.query?.[field];
+      if (!map || typeof map !== "object") continue;
+      items++;
+      for (const [bucket, score] of Object.entries(map)) if (typeof score === "number") totals.set(bucket, (totals.get(bucket) ?? 0) + score);
+    }
+    return items ? [...totals.entries()].map(([bucket, score]) => ({ bucket, score: score / items })).sort((a, b) => b.score - a.score) : [];
+  };
+  const age = average("age");
+  const gender = average("gender");
+  return age.length || gender.length ? { age, gender } : null;
+}
+
 export function groupTags(tags, maxSegments = 6) {
   const groups = new Map();
   for (const tag of tags) {
@@ -128,7 +170,9 @@ export function maxSegmentsFor(personaCount) {
 // Each persona is anchored on one Qloo tag (its segment) and blended with up to two other tags,
 // sampled by affinity from the remaining segments, so profiles read like people rather than single tags.
 // Personas rotate through the segments, so every segment gets floor(count / segments) or one more.
-export function buildPersonas(tags, count, seed = PERSONA_SEED) {
+// `crossDomain` (optional) maps an entity type ("artist", "movie", ...) to Qloo entities with
+// affinity to the venue; each persona then also names one or two of them, picked by affinity.
+export function buildPersonas(tags, count, seed = PERSONA_SEED, crossDomain = {}) {
   const segments = groupTags(tags, maxSegmentsFor(count));
   if (!segments.length) return [];
   const random = seededRandom(seed);
@@ -143,21 +187,34 @@ export function buildPersonas(tags, count, seed = PERSONA_SEED) {
       const pick = weightedPick(pool.filter((tag) => !secondary.includes(tag)), random);
       secondary.push(pick);
     }
+    const domains = CROSS_DOMAIN_TYPES.filter((type) => crossDomain[type]?.length);
+    const extras = [];
+    for (let offset = 0; offset < Math.min(2, domains.length); offset++) {
+      const type = domains[(index + offset) % domains.length];
+      const pick = weightedPick(crossDomain[type], random);
+      extras.push({ type, id: pick.id, name: pick.name, affinity: pick.affinity });
+    }
     personas.push({
       id: `p${String(index + 1).padStart(3, "0")}`,
       segment: segment.name,
       segmentId: slug(segment.name),
       affinities: [primary, ...secondary],
+      ...(extras.length ? { crossDomain: extras } : {}),
     });
   }
   return personas;
 }
 
+const DOMAIN_WORDS = { artist: "the music of", brand: "the brand", movie: "the film", book: "the book" };
+
 // The tested assistant never sees the target brand: naming it would bias the measurement.
 export function personaPrompt(persona, category, city) {
   const [primary, ...rest] = persona.affinities.map((tag) => tag.name);
   const extra = rest.length ? `, and I also like ${rest.join(" and ")}` : "";
-  return `I live in ${city}. I'm really into ${primary}${extra}. Recommend up to 5 ${category} places in ${city} that fit my taste. Give a numbered list with each place's name and one sentence on why it suits me.`;
+  const outside = persona.crossDomain?.length
+    ? ` Outside of food and drink I love ${persona.crossDomain.map((item) => `${DOMAIN_WORDS[item.type] ?? ""} ${item.name}`.trim()).join(" and ")}.`
+    : "";
+  return `I live in ${city}. I'm really into ${primary}${extra}.${outside} Recommend up to 5 ${category} places in ${city} that fit my taste. Give a numbered list with each place's name and one sentence on why it suits me.`;
 }
 
 // Placebo arm: a neutral sentence that names the brand but says nothing about taste. It is injected

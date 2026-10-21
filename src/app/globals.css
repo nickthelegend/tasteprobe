@@ -341,6 +341,7 @@ code { font: .86em var(--mono); letter-spacing: 0; background: var(--surface-2);
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); display: inline-flex; gap: 6px; align-items: baseline; max-width: 100%; }
 .chip.primary { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.chip.cross { background: var(--warm-soft); color: var(--warm); }
 .chip em { font-style: normal; font-size: 11.5px; opacity: .75; font-variant-numeric: tabular-nums; }
 @keyframes rise { from { opacity: 0; transform: translateY(4px); } }
 

@@ -272,6 +272,13 @@ export default function Home() {
           {segment && <section className="card">
             <div className="card-head"><div><h3>Qloo taste graph: {segment.name}</h3><p>Each persona is anchored on one Qloo tag (highlighted) and blended with two affinity-weighted tags. The numbers are Qloo affinity scores.</p></div><span className="tag">qloo</span></div>
             <PersonaGrid personas={active.personas.filter((persona) => persona.segment === segment.name)} />
+            {active.qlooSignals && <p className="footnote">
+              <span className="tag" style={{ height: 22, fontSize: 12, marginRight: 8 }}>unverified until first live run</span>
+              Cross-domain Qloo signals (lilac chips): {active.qlooSignals.domains.map((domain) => `${domain.type} ${domain.error ? "failed" : `${domain.entities.length}`}`).join(" · ")}
+              {active.qlooSignals.demographics
+                ? ` · audience lean: ${active.qlooSignals.demographics.age.slice(0, 2).map((item) => item.bucket.replace(/_/g, " ")).join(", ") || "no age data"}${active.qlooSignals.demographics.gender[0] ? `, ${active.qlooSignals.demographics.gender[0].bucket}` : ""}`
+                : ` · demographics ${active.qlooSignals.demographicsError ? "failed" : "empty"}`}
+            </p>}
           </section>}
 
           <section className="card fix-card" id="fix">

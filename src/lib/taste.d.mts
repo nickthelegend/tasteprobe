@@ -1,4 +1,4 @@
-import type { Persona, TasteTag } from "./types";
+import type { Persona, QlooDemographics, TasteTag } from "./types";
 
 export function normalizeName(value: string): string;
 export function matchesBrand(entity: string, brand: string): boolean;
@@ -12,6 +12,10 @@ export const MAX_SEGMENTS: number;
 export const PERSONA_SEED: number;
 export function maxSegmentsFor(personaCount: number): number;
 export function placeboCopy(brand: string, category: string, city: string): string;
-export function buildPersonas(tags: TasteTag[], count: number, seed?: number): Persona[];
+export const CROSS_DOMAIN_TYPES: string[];
+export type QlooEntity = { id: string; name: string; affinity?: number };
+export function parseQlooEntities(payload: unknown): QlooEntity[];
+export function parseQlooDemographics(payload: unknown): QlooDemographics | null;
+export function buildPersonas(tags: TasteTag[], count: number, seed?: number, crossDomain?: Record<string, QlooEntity[]>): Persona[];
 export function personaPrompt(persona: Persona, category: string, city: string): string;
 export function counterfactualPrompt(persona: Persona, category: string, city: string, brand: string, change: string): string;
