@@ -4,7 +4,7 @@
 
 > **Status: not yet run end to end against live keys.** No Qloo, Nebius or assistant keys were available while building, so every live path ends at "Setup required: VAR" (HTTP 503 in the app, a tool error over MCP, exit code 1 in the CLI). Nothing is simulated. What the docs confirm and what still needs a live call is listed in [API facts: confirmed vs unverified](#api-facts-confirmed-vs-unverified).
 >
-> Hosted demo: _not deployed yet; needs Nick: hosting_ (Qloo requires an externally hosted demo). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
+> Hosted demo: _not deployed yet; needs Nick: hosting_ (Qloo requires an externally hosted demo). The production `Dockerfile` and `railway.json` are ready: one-time setup, then `railway up --detach` ([docs/hosting.md](docs/hosting.md)). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
 
 ## Architecture
 

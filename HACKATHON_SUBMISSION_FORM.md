@@ -42,6 +42,7 @@ Rules read on 2026-10-21 from the official rules pages linked below. If a page c
 ## Hosting (needs Nick: hosting; nothing has been deployed)
 
 Both events need a URL. Qloo needs one hosted externally.
+- **Ready to deploy (Railway):** `Dockerfile` (Next standalone, non-root, no secrets baked in), `railway.json` and `docs/hosting.md`. After the one-time setup in that doc (project, `/data` volume, `RAILWAY_RUN_UID=0`, keys set by name, `railway domain`), Nick runs `railway up --detach`. Use a spend-capped Nebius key: the public Run button spends it. `/data` holds the raw Qloo payloads and must stay a private volume. Built and served locally without Docker: `/` shows Setup required, `POST /api/audits` answers 503.
 - **What the host needs:** Node 22.18+, `npm run build && npm start`, and server env `QLOO_API_KEY`, `NEBIUS_API_KEY`, `OPENAI_API_KEY` (or `MODEL_2_*`) and the Nebius price rates. `TASTEPROBE_DATA_DIR` must sit on a persistent volume. Requests can run for about 5 minutes (the audit streams NDJSON), so plain serverless functions with short timeouts won't work. A container host (Railway, Fly, Render) or a Nebius Serverless Endpoint fits.
 - **Cost guard:** a public Run button lets judges spend the keys. Agree a budget, and keep persona counts low for the public demo.
 - **Cheaper fallback that still counts as a hosted, functional demo:** host the app with one real audit already in the store. Judges can open the flight and the printable report (`/audits/<id>/report`) without spending credits, and run a small audit themselves.
