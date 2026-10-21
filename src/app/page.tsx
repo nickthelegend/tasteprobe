@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { CompetitorBars, ForestPlot, Heatmap } from "@/components/Charts";
 import { CounterfactualPanel } from "@/components/Counterfactual";
+import { maxSegmentsFor, MIN_PERSONAS_PER_SEGMENT } from "@/lib/taste.mjs";
 import { Evidence } from "@/components/Evidence";
 import { ci, pct } from "@/components/format";
 import { PersonaGrid } from "@/components/Personas";
@@ -46,7 +47,8 @@ function missingConfig(status: Status | null) {
 }
 
 function weakestSegmentId(audit: Audit) {
-  const named = audit.counterfactual && audit.segments.find((item) => item.name === audit.counterfactual?.segment);
+  const last = audit.counterfactuals?.[audit.counterfactuals.length - 1];
+  const named = last && audit.segments.find((item) => item.name === last.segment);
   return named?.id ?? [...audit.segments].sort((a, b) => a.share - b.share)[0]?.id ?? "";
 }
 
@@ -71,12 +73,14 @@ export default function Home() {
   const [form, setForm] = useState({ brand: "", category: "restaurant", city: "", personaCount: 24 });
   const [segmentId, setSegmentId] = useState("");
   const [fixing, setFixing] = useState(false);
+  const [attemptId, setAttemptId] = useState<string | undefined>();
   // Per-persona outcomes from this session's live streams, so the map of a just-finished audit stays lit.
   const [liveResults, setLiveResults] = useState<Record<string, Record<string, PersonaResult>>>({});
 
   function select(audit: Audit) {
     setActive(audit);
     setSegmentId(weakestSegmentId(audit));
+    setAttemptId(undefined);
   }
 
   useEffect(() => {
@@ -134,8 +138,9 @@ export default function Home() {
       const response = await fetch(`/api/audits/${active.id}/fix`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ segment: segmentId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Counterfactual re-test failed.");
-      const updated = { ...active, counterfactual: payload };
+      const updated: Audit = { ...active, counterfactuals: [...(active.counterfactuals ?? []), payload] };
       setActive(updated);
+      setAttemptId(payload.id);
       setAudits((current) => current.map((item) => item.id === updated.id ? updated : item));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Counterfactual re-test failed.");
@@ -159,7 +164,7 @@ export default function Home() {
           <nav className="app-links" aria-label="App sections">
             <a href="#audit">Audit</a>
             {(run || active) && <a href="#map">Taste map</a>}
-            {showResults && <><a href="#segments">Segments</a><a href="#fix">Fix agent</a><a href="#evidence">Evidence</a></>}
+            {showResults && <><a href="#segments">Segments</a><a href="#fix">Fix</a><a href="#evidence">Evidence</a></>}
           </nav>
           <div className="status-pills" aria-label="Connections">
             <span className="pill"><i className={dotClass(status?.qloo)} />Qloo {status ? (status.qloo ? "connected" : "key missing") : "…"}</span>
@@ -210,12 +215,12 @@ export default function Home() {
             <label className="field"><span>City</span><input required minLength={2} value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} placeholder="e.g. Mumbai" /></label>
             <label className="field"><span>Personas</span>
               <select value={form.personaCount} onChange={(event) => setForm({ ...form, personaCount: Number(event.target.value) })}>
-                {[12, 24, 48, 100, 200].map((count) => <option key={count} value={count}>{count}</option>)}
+                {[16, 24, 48, 100, 200].map((count) => <option key={count} value={count}>{count}</option>)}
               </select>
             </label>
             <button className="btn btn-primary" type="submit" disabled={!ready || run !== null}>{run ? <><span className="spinner" /> Running</> : "Run audit"}</button>
           </form>
-          <p className="form-note">Each persona asks every tested assistant once: {form.personaCount} personas × {status?.systems.length || 0} {(status?.systems.length || 0) === 1 ? "assistant" : "assistants"} = {answersPerRun} live answers, each parsed by Nemotron.{(status?.systems.length || 0) === 0 ? " Configure an assistant to enable audits." : " Start small for demos."}</p>
+          <p className="form-note">Each persona asks every tested assistant once: {form.personaCount} personas × {status?.systems.length || 0} {(status?.systems.length || 0) === 1 ? "assistant" : "assistants"} = {answersPerRun} live answers, each parsed by Nemotron. At least {MIN_PERSONAS_PER_SEGMENT} personas per taste segment, so {form.personaCount} personas allow up to {maxSegmentsFor(form.personaCount)} {maxSegmentsFor(form.personaCount) === 1 ? "segment" : "segments"}.{(status?.systems.length || 0) === 0 ? " Configure an assistant to enable audits." : " Start small for demos."}</p>
         </section>
 
         {run && <section className="card progress-card map-card" id="map" aria-live="polite">
@@ -283,14 +288,14 @@ export default function Home() {
           </section>}
 
           <section className="card fix-card" id="fix">
-            <div className="card-head"><div><h3>Fix agent</h3><p>Proposes content for a weak segment and re-tests it live.</p></div><span className="tag tag-live">counterfactual</span></div>
-            <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={ready} onRun={runFix} />
+            <div className="card-head"><div><h3>Fix &amp; re-test</h3><p>Nemotron proposes copy for a weak segment; baseline, placebo and fix arms re-run live on the same personas.</p></div><span className="tag tag-live">placebo-controlled</span></div>
+            <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={ready} onRun={runFix} selectedAttempt={attemptId} onAttempt={setAttemptId} />
           </section>
 
           <div className="grid-2">
             <section className="card" id="evidence">
               <div className="card-head"><div><h3>Raw evidence</h3><p>The actual answers behind {segment?.name ?? "this audit"}, with the venues Nemotron extracted.</p></div><span className="tag">cached</span></div>
-              <Evidence auditId={active.id} segment={segment?.name} refreshKey={active.counterfactual?.createdAt ?? ""} />
+              <Evidence auditId={active.id} segment={segment?.name} attemptId={attemptId ?? active.counterfactuals?.[active.counterfactuals.length - 1]?.id} />
             </section>
             <section className="card nebius-card">
               <div className="card-head"><div><h3>NVIDIA on Nebius</h3><p>An NVIDIA open model served on Nebius Token Factory parses every answer.</p></div><span className="tag">extraction</span></div>

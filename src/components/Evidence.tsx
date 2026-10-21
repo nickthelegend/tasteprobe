@@ -4,15 +4,24 @@ import { useEffect, useState } from "react";
 
 export type EvidenceRow = { personaId: string; segment: string; model: string; prompt: string; answer: string; entities: string[]; brand: boolean };
 
-export function Evidence({ auditId, segment, refreshKey }: { auditId: string; segment?: string; refreshKey: string }) {
-  const [data, setData] = useState<{ responses: EvidenceRow[]; counterfactual: EvidenceRow[] } | null>(null);
+type Attempt = { id: string; attempt: number; baseline: EvidenceRow[]; placebo: EvidenceRow[]; fix: EvidenceRow[] };
+type View = "audit" | "baseline" | "placebo" | "fix";
+const VIEWS: { id: View; label: (attempt: number) => string }[] = [
+  { id: "audit", label: () => "Audit" },
+  { id: "baseline", label: (n) => `#${n} baseline re-run` },
+  { id: "placebo", label: (n) => `#${n} placebo` },
+  { id: "fix", label: (n) => `#${n} fix` },
+];
+
+export function Evidence({ auditId, segment, attemptId }: { auditId: string; segment?: string; attemptId?: string }) {
+  const [data, setData] = useState<{ responses: EvidenceRow[]; attempt: Attempt | null } | null>(null);
   const [error, setError] = useState("");
-  const [view, setView] = useState<"baseline" | "counterfactual">("baseline");
+  const [view, setView] = useState<View>("audit");
 
   useEffect(() => {
     let cancelled = false;
     setData(null); setError("");
-    fetch(`/api/audits/${auditId}?evidence=1`)
+    fetch(`/api/audits/${auditId}?evidence=1${attemptId ? `&attempt=${encodeURIComponent(attemptId)}` : ""}`)
       .then(async (response) => {
         const payload = await response.json();
         if (!response.ok) throw new Error(payload.error ?? "Could not load cached responses.");
@@ -20,17 +29,18 @@ export function Evidence({ auditId, segment, refreshKey }: { auditId: string; se
       })
       .catch((caught) => { if (!cancelled) setError(caught instanceof Error ? caught.message : "Could not load cached responses."); });
     return () => { cancelled = true; };
-  }, [auditId, refreshKey]);
+  }, [auditId, attemptId]);
 
   if (error) return <p className="footnote">{error}</p>;
   if (!data) return <p className="footnote">Loading cached responses…</p>;
-  const source = view === "baseline" ? data.responses : data.counterfactual;
-  const rows = source.filter((row) => !segment || row.segment === segment);
+  const attempt = data.attempt;
+  const current: View = attempt ? view : "audit";
+  const source = current === "audit" || !attempt ? data.responses : attempt[current];
+  const rows = current === "audit" ? source.filter((row) => !segment || row.segment === segment) : source;
 
   return <>
-    {data.counterfactual.length > 0 && <div className="cf-controls" style={{ marginBottom: 12 }}>
-      <button className="btn btn-ghost" aria-pressed={view === "baseline"} onClick={() => setView("baseline")} style={view === "baseline" ? { borderColor: "var(--accent)" } : undefined}>Baseline</button>
-      <button className="btn btn-ghost" aria-pressed={view === "counterfactual"} onClick={() => setView("counterfactual")} style={view === "counterfactual" ? { borderColor: "var(--accent)" } : undefined}>Counterfactual re-test</button>
+    {attempt && <div className="cf-controls" style={{ marginBottom: 12 }}>
+      {VIEWS.map((item) => <button key={item.id} className="btn btn-ghost" aria-pressed={current === item.id} onClick={() => setView(item.id)} style={current === item.id ? { borderColor: "var(--accent)" } : undefined}>{item.label(attempt.attempt)}</button>)}
     </div>}
     {rows.length ? <div className="evidence">
       {rows.slice(0, 30).map((row, index) => <details key={`${row.personaId}-${row.model}-${index}`}>

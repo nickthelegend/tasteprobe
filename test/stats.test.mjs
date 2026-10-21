@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  bootstrapDifference, bootstrapInterval, clusteredBootstrapInterval, designEffect, pairedBootstrapDifference,
+  bootstrapDifference, bootstrapInterval, clusteredBootstrapInterval, compareArms, designEffect, pairedBootstrapDifference,
   seededRandom, shareInterval, summarizeObservations, unpairedBootstrapDifference, wilsonInterval,
 } from "../src/lib/stats.mjs";
 
@@ -158,4 +158,20 @@ test("summarizes share, unique personas, responses and competitor rank", () => {
   const food = result.find((row) => row.name === "Food explorers").ci;
   assert.equal(food[0], 0);
   assert.ok(food[1] > 0.5, "one answer with no mention is not evidence of a 0% share");
+});
+
+test("compareArms reports baseline, placebo and fix with failures, and lift as fix minus placebo", () => {
+  const rows = (hits) => Array.from({ length: 16 }, (_, index) => ({ personaId: `p${index}`, brand: index < hits }));
+  const result = compareArms({
+    baseline: { rows: rows(1), failed: 2 },
+    placebo: { rows: rows(5), failed: 0 },
+    fix: { rows: rows(13), failed: 1 },
+  });
+  assert.equal(result.arms.baseline.share, 1 / 16);
+  assert.equal(result.arms.baseline.failed, 2);
+  assert.equal(result.arms.fix.mentions, 13);
+  assert.equal(result.lift.fixVsPlacebo.delta, 8 / 16);
+  assert.equal(result.lift.placeboVsBaseline.delta, 4 / 16);
+  assert.ok(result.lift.fixVsPlacebo.ci[0] > 0);
+  assert.ok(result.arms.placebo.ci[0] < 5 / 16 && result.arms.placebo.ci[1] > 5 / 16);
 });

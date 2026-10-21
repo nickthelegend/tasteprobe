@@ -27,6 +27,18 @@ export async function saveAudit(audit: Audit) {
   await writeFile(storePath(), JSON.stringify(audits, null, 2), { mode: 0o600 });
 }
 
+// Re-reads the store and applies `mutate` to the current copy of the audit, so long-running work
+// (a fix re-test) never writes back a stale snapshot over changes made meanwhile.
+export async function updateAudit(id: string, mutate: (audit: Audit) => void) {
+  const audits = await readAudits();
+  const audit = audits.find((item) => item.id === id);
+  if (!audit) throw new Error("Audit not found.");
+  mutate(audit);
+  await mkdir(dataDir(), { recursive: true });
+  await writeFile(storePath(), JSON.stringify(audits, null, 2), { mode: 0o600 });
+  return audit;
+}
+
 export async function writeRaw(auditId: string, name: string, value: unknown) {
   await mkdir(rawDir(auditId), { recursive: true });
   await writeFile(path.join(rawDir(auditId), `${name}.json`), JSON.stringify(value, null, 2), { mode: 0o600 });

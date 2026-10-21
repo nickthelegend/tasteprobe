@@ -1,4 +1,4 @@
-import type { SegmentResult } from "./types";
+import type { ArmSummary, LiftSummary, SegmentResult } from "./types";
 
 export type Observation = { segment: string; personaId?: string; brand: boolean; recommended: string[] };
 
@@ -16,3 +16,9 @@ export function unpairedBootstrapDifference(control: ClusterRow[], treatment: Cl
 export function shareOf(rows: ClusterRow[]): number;
 export function slug(value: string): string;
 export function summarizeObservations(observations: Observation[]): SegmentResult[];
+
+type ArmRows = { rows: { personaId: string; brand: boolean }[]; failed: number };
+export function compareArms(input: { baseline: ArmRows; placebo: ArmRows; fix: ArmRows }): {
+  arms: { baseline: ArmSummary; placebo: ArmSummary; fix: ArmSummary };
+  lift: { fixVsPlacebo: LiftSummary; fixVsBaseline: LiftSummary; placeboVsBaseline: LiftSummary };
+};

@@ -4,7 +4,7 @@ import { estimateCost, pool, probePersona, sumUsage, toObservations, type Failed
 import { fetchTasteTags, nebiusModel, requireKeys, resolvePlace } from "@/lib/providers";
 import { summarizeObservations } from "@/lib/stats.mjs";
 import { readAudits, saveAudit, writeRaw } from "@/lib/storage";
-import { buildPersonas, matchesBrand, personaPrompt } from "@/lib/taste.mjs";
+import { buildPersonas, matchesBrand, MIN_PERSONAS_PER_SEGMENT, personaPrompt } from "@/lib/taste.mjs";
 import type { Audit, AuditEvent } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +14,7 @@ const requestSchema = z.object({
   brand: z.string().trim().min(2, "Enter the business name.").max(100),
   category: z.string().trim().min(2, "Enter a category.").max(80),
   city: z.string().trim().min(2, "Enter a city.").max(80),
-  personaCount: z.number().int().min(4).max(200).default(24),
+  personaCount: z.number().int().min(MIN_PERSONAS_PER_SEGMENT, `Use at least ${MIN_PERSONAS_PER_SEGMENT} personas (one segment needs ${MIN_PERSONAS_PER_SEGMENT}).`).max(200).default(24),
 });
 
 export async function GET() {

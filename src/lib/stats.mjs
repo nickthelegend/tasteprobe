@@ -218,3 +218,32 @@ export function summarizeObservations(observations) {
     };
   }).sort((a, b) => a.name.localeCompare(b.name));
 }
+
+const asCluster = (rows) => rows.map((row) => ({ cluster: row.personaId, value: row.brand ? 1 : 0 }));
+
+function armSummary(rows, failed) {
+  const clustered = asCluster(rows);
+  const mentions = rows.filter((row) => row.brand).length;
+  return { share: shareOf(clustered), mentions, responses: rows.length, failed, ci: shareInterval(clustered) };
+}
+
+function lift(control, treatment) {
+  return { delta: shareOf(asCluster(treatment)) - shareOf(asCluster(control)), ci: pairedBootstrapDifference(asCluster(control), asCluster(treatment)) };
+}
+
+// Three arms asked by the same personas in the same run: baseline (no snippet), placebo (neutral
+// snippet naming the brand) and fix (the proposed copy). The headline lift is fix − placebo.
+export function compareArms({ baseline, placebo, fix }) {
+  return {
+    arms: {
+      baseline: armSummary(baseline.rows, baseline.failed),
+      placebo: armSummary(placebo.rows, placebo.failed),
+      fix: armSummary(fix.rows, fix.failed),
+    },
+    lift: {
+      fixVsPlacebo: lift(placebo.rows, fix.rows),
+      fixVsBaseline: lift(baseline.rows, fix.rows),
+      placeboVsBaseline: lift(baseline.rows, placebo.rows),
+    },
+  };
+}

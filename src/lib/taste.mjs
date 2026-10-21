@@ -84,10 +84,21 @@ function weightedPick(candidates, random) {
   return candidates[candidates.length - 1];
 }
 
+export const MIN_PERSONAS_PER_SEGMENT = 8;
+export const MAX_SEGMENTS = 6;
+export const PERSONA_SEED = 7;
+
+// A segment needs at least 8 personas for its interval to mean anything, so N personas allow at
+// most floor(N / 8) segments (and never more than 6).
+export function maxSegmentsFor(personaCount) {
+  return Math.max(1, Math.min(MAX_SEGMENTS, Math.floor(personaCount / MIN_PERSONAS_PER_SEGMENT)));
+}
+
 // Each persona is anchored on one Qloo tag (its segment) and blended with up to two other tags,
 // sampled by affinity from the remaining segments, so profiles read like people rather than single tags.
-export function buildPersonas(tags, count, seed = 7) {
-  const segments = groupTags(tags);
+// Personas rotate through the segments, so every segment gets floor(count / segments) or one more.
+export function buildPersonas(tags, count, seed = PERSONA_SEED) {
+  const segments = groupTags(tags, maxSegmentsFor(count));
   if (!segments.length) return [];
   const random = seededRandom(seed);
   const personas = [];
@@ -116,6 +127,12 @@ export function personaPrompt(persona, category, city) {
   const [primary, ...rest] = persona.affinities.map((tag) => tag.name);
   const extra = rest.length ? `, and I also like ${rest.join(" and ")}` : "";
   return `I live in ${city}. I'm really into ${primary}${extra}. Recommend up to 5 ${category} places in ${city} that fit my taste. Give a numbered list with each place's name and one sentence on why it suits me.`;
+}
+
+// Placebo arm: a neutral sentence that names the brand but says nothing about taste. It is injected
+// exactly like the fix copy, so fix − placebo isolates the copy from mere exposure to the name.
+export function placeboCopy(brand, category, city) {
+  return `${brand} is a ${category} in ${city}.`;
 }
 
 export function counterfactualPrompt(persona, category, city, brand, change) {

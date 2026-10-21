@@ -92,7 +92,7 @@ export function Landing() {
           </div>
         </div>
         <div className="lp-intro-copy">
-          <p><b>The assistant never sees your name.</b> It sees only a persona’s tastes, the category and the city, so every mention is earned.</p>
+          <p><b>The baseline prompt never names you.</b> It holds only a persona’s tastes, the category and the city, so every baseline mention is earned.</p>
           <p><b>Every number traces to a cached response.</b> Raw Qloo payloads, assistant answers and Nemotron extractions are kept with each audit.</p>
         </div>
       </div>
@@ -113,10 +113,10 @@ export function Landing() {
                 <span><small>City</small>e.g. Mumbai</span>
               </div>
               <div className="lp-chips" aria-label="Persona counts you can choose">
-                {[12, 24, 48, 100, 200].map((count) => <span key={count} className={count === 24 ? "on" : ""}>{count}</span>)}
+                {[16, 24, 48, 100, 200].map((count) => <span key={count} className={count === 24 ? "on" : ""}>{count}</span>)}
               </div>
             </div>
-            <div><h3 className="lp-h-card">1 · Audit</h3><p>Name a venue, its category and city. Qloo resolves it and returns up to 50 taste tags with affinity, scoped to the city. Each persona anchors on one tag and adds two more.</p></div>
+            <div><h3 className="lp-h-card">1 · Audit</h3><p>Name a venue, its category and city. Qloo resolves it and returns up to 50 taste tags with affinity, scoped to the city. Each persona anchors on one tag and adds two more; every taste segment gets at least 8 personas.</p></div>
           </article>
           <article className="lp-card lp-c-tint-2">
             <div><h3 className="lp-h-card">2 · Taste map</h3><p>Each dot is one persona, grouped into taste segments by Qloo tag subtype. Dots light up as live answers stream in.</p></div>
@@ -127,10 +127,10 @@ export function Landing() {
             </div>
           </article>
           <article className="lp-card lp-c-deep">
-            <div><h3 className="lp-h-card">3 · Fix agent</h3><p>Nemotron on Nebius writes copy for the weakest segment. Every persona in it re-asks every assistant with that copy as retrieved context.</p></div>
+            <div><h3 className="lp-h-card">3 · Fix &amp; re-test</h3><p>Nemotron on Nebius writes copy for the weakest segment. Every persona in it re-asks every assistant three ways at once: no snippet, a neutral placebo naming you, and the fix copy.</p></div>
             <ul className="lp-steps">
-              <li><b>Before vs. after</b><span className="lp-tag lp-tag-accent">live</span></li>
-              <li><b>Lift with a 95% CI</b><span className="lp-tag lp-tag-accent">paired bootstrap</span></li>
+              <li><b>Baseline · placebo · fix</b><span className="lp-tag lp-tag-accent">live</span></li>
+              <li><b>Fix − placebo, 95% CI</b><span className="lp-tag lp-tag-accent">paired bootstrap</span></li>
               <li><b>Plain-language verdict</b><span className="lp-tag lp-tag-accent">plain</span></li>
             </ul>
           </article>
@@ -143,7 +143,7 @@ export function Landing() {
         <div className="lp-stat"><b>50</b><span>Qloo taste tags per venue, at most</span></div>
         <div className="lp-stat"><b>3</b><span>tags per persona: one anchor, two by affinity</span></div>
         <div className="lp-stat"><b>95<em>%</em></b><span>Wilson intervals, widened for persona clustering</span></div>
-        <div className="lp-stat"><b>0</b><span>times the assistant sees your brand name</span></div>
+        <div className="lp-stat"><b>0</b><span>times the baseline prompt names your brand</span></div>
       </div>
     </section>
 
@@ -155,9 +155,9 @@ export function Landing() {
         </div>
         <div>
           <details open><summary>Where do the personas come from?</summary><p>Qloo’s <code>/v2/insights</code> returns taste tags with affinity to your venue, scoped to the city. Tags are grouped into segments by subtype, and each persona blends one anchor tag with two affinity-weighted tags from other segments. They are composites of taste tags, not real individuals or a representative panel.</p></details>
-          <details><summary>Does the assistant know who is being audited?</summary><p>No. The prompt holds only the persona’s tastes, the category and the city. Nemotron extracts the venues each answer recommends, and names are matched after normalising case, accents, articles, possessives and “&”.</p></details>
+          <details><summary>Does the assistant know who is being audited?</summary><p>Not in the audit. The baseline prompt holds only the persona’s tastes, the category and the city. A fix re-test deliberately adds a retrieved snippet naming you to two arms, a neutral placebo and the fix copy, so the reported lift (fix minus placebo) measures the copy rather than mere exposure to your name. Nemotron extracts the venues each answer recommends, and names are matched after normalising case, accents, articles, possessives and “&”.</p></details>
           <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Zero mentions never collapses to a 0–0% interval. Lift is a paired bootstrap over personas, because both arms ask the same personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
-          <details><summary>What does the fix agent change?</summary><p>Nothing on your site. It is a prompt-level counterfactual: the copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled.</p></details>
+          <details><summary>What does a fix change?</summary><p>Nothing on your site. It is a prompt-level counterfactual: the copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled. The baseline is re-asked in the same run, so model drift since the audit does not count as lift, and every attempt is kept.</p></details>
           <details><summary>What do I need to run it?</summary><p><code>QLOO_API_KEY</code>, <code>NEBIUS_API_KEY</code>, and <code>OPENAI_API_KEY</code> or a <code>MODEL_2_*</code> OpenAI-compatible endpoint in <code>.env.local</code>. Without them the app says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
           <details><summary>Has it run end to end?</summary><p>Not yet against live keys from this repo. The Qloo parsing follows the documented <code>/v2/insights</code> shape and accepts its known variants; the first live audit’s raw payload is cached for checking.</p></details>
         </div>

@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { buildPersonas, counterfactualPrompt, matchesBrand, parseQlooTags, personaPrompt, segmentLabel } from "../src/lib/taste.mjs";
+import { buildPersonas, counterfactualPrompt, matchesBrand, maxSegmentsFor, parseQlooTags, personaPrompt, placeboCopy, segmentLabel } from "../src/lib/taste.mjs";
 
+// Doc-shaped fixture (follows the documented /v2/insights tag shape), not a recorded live response.
 const insights = JSON.parse(readFileSync(new URL("./fixtures/qloo-tag-insights.json", import.meta.url), "utf8"));
 
 test("brand matching tolerates articles, punctuation, accents and branch suffixes", () => {
@@ -37,9 +38,9 @@ test("parses Qloo tag insights, deduplicates and keeps affinity", () => {
 
 test("builds deterministic personas that rotate segments and blend tags", () => {
   const tags = parseQlooTags(insights);
-  const personas = buildPersonas(tags, 12);
-  assert.equal(personas.length, 12);
-  assert.deepEqual(personas, buildPersonas(tags, 12));
+  const personas = buildPersonas(tags, 24);
+  assert.equal(personas.length, 24);
+  assert.deepEqual(personas, buildPersonas(tags, 24));
   const segments = new Set(personas.map((persona) => persona.segment));
   assert.equal(segments.size, 3);
   for (const persona of personas) {
@@ -48,6 +49,21 @@ test("builds deterministic personas that rotate segments and blend tags", () => 
     assert.equal(persona.affinities[0].subtype && segmentLabel(persona.affinities[0].subtype), persona.segment);
   }
   assert.deepEqual(buildPersonas([], 10), []);
+});
+
+test("every taste segment gets at least 8 personas: segments are capped at floor(personas / 8)", () => {
+  assert.equal(maxSegmentsFor(8), 1);
+  assert.equal(maxSegmentsFor(12), 1);
+  assert.equal(maxSegmentsFor(16), 2);
+  assert.equal(maxSegmentsFor(24), 3);
+  assert.equal(maxSegmentsFor(200), 6);
+  const tags = parseQlooTags(insights);
+  for (const count of [8, 12, 16, 23, 24, 48]) {
+    const sizes = new Map();
+    for (const persona of buildPersonas(tags, count)) sizes.set(persona.segment, (sizes.get(persona.segment) ?? 0) + 1);
+    assert.ok(sizes.size <= maxSegmentsFor(count), `${count} personas made ${sizes.size} segments`);
+    for (const [segment, size] of sizes) assert.ok(size >= 8, `${count} personas: ${segment} has only ${size}`);
+  }
 });
 
 test("persona prompt never leaks the target brand; counterfactual adds the change as context", () => {
@@ -59,4 +75,14 @@ test("persona prompt never leaks the target brand; counterfactual adds the chang
   const counterfactual = counterfactualPrompt(persona, "modern Indian restaurant", "Mumbai", "The Bombay Canteen", "Live jazz on Thursdays.");
   assert.ok(counterfactual.startsWith(prompt));
   assert.match(counterfactual, /The Bombay Canteen: Live jazz on Thursdays\./);
+});
+
+test("placebo copy names the brand neutrally and is injected exactly like the fix copy", () => {
+  const [persona] = buildPersonas(parseQlooTags(insights), 8);
+  const placebo = placeboCopy("The Bombay Canteen", "modern Indian restaurant", "Mumbai");
+  assert.equal(placebo, "The Bombay Canteen is a modern Indian restaurant in Mumbai.");
+  const fixPrompt = counterfactualPrompt(persona, "modern Indian restaurant", "Mumbai", "The Bombay Canteen", "Live jazz on Thursdays.");
+  const placeboPrompt = counterfactualPrompt(persona, "modern Indian restaurant", "Mumbai", "The Bombay Canteen", placebo);
+  const shared = (text) => text.slice(0, text.lastIndexOf(": "));
+  assert.equal(shared(fixPrompt), shared(placeboPrompt));
 });

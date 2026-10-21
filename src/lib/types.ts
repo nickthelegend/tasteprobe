@@ -12,15 +12,20 @@ export type SegmentResult = {
   competitors: Competitor[];
 };
 export type Usage = { inputTokens: number; outputTokens: number };
+export type ArmSummary = { share: number; mentions: number; responses: number; failed: number; ci: [number, number] };
+export type LiftSummary = { delta: number; ci: [number, number] };
+// One fix attempt: baseline, placebo and fix arms run concurrently on the same personas.
 export type Counterfactual = {
-  change: string;
+  id: string;
+  attempt: number;
+  source: "fix" | "agent";
   segment: string;
-  before: number;
-  beforeResponses: number;
-  after: number;
-  afterResponses: number;
-  afterCi: [number, number];
-  deltaCi: [number, number];
+  personas: number;
+  change: string;
+  rationale: string;
+  placebo: string;
+  arms: { baseline: ArmSummary; placebo: ArmSummary; fix: ArmSummary };
+  lift: { fixVsPlacebo: LiftSummary; fixVsBaseline: LiftSummary; placeboVsBaseline: LiftSummary };
   model: string;
   createdAt: string;
 };
@@ -43,7 +48,7 @@ export type Audit = {
   extractionUsage: Usage;
   estimatedExtractionCostUsd: number | null;
   durationMs: number;
-  counterfactual?: Counterfactual;
+  counterfactuals?: Counterfactual[];
 };
 export type AuditEvent =
   | { type: "stage"; stage: "resolve" | "qloo" | "personas" | "query" | "stats"; message: string }
