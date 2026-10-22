@@ -41,6 +41,14 @@ export function crossCheck(entities, list, brand, city) {
   return { listed: true, brandAgrees: listBrand === extractedBrand, setAgrees: !onlyInList.length && !onlyInExtraction.length, onlyInList, onlyInExtraction };
 }
 
+// The per-answer flag the evidence panel shows: null when the list parser agrees with Nemotron (or
+// the answer has no list). Uses the same matcher, city included, as row.brand and extractionCheck.
+export function answerCheckNote(entities, list, brand, city) {
+  const check = crossCheck(entities, list, brand, city);
+  if (!check.listed || check.setAgrees) return null;
+  return `List parser disagrees${check.brandAgrees ? "" : " on whether you were recommended"}${check.onlyInList.length ? ` · only in the list: ${check.onlyInList.join(", ")}` : ""}${check.onlyInExtraction.length ? ` · only from Nemotron: ${check.onlyInExtraction.join(", ")}` : ""}`;
+}
+
 // Per assistant: how often the deterministic parser and Nemotron disagree, over answers that had a list.
 export function summarizeCrossCheck(rows, brand, city) {
   const byModel = new Map();

@@ -185,6 +185,22 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     await expect(page.locator(".persona-source")).toHaveText("Personas from Qloo urn:tag taste tags.");
   });
 
+  test("tasting notes page through every cached answer, 30 at a time", async ({ page }) => {
+    await page.goto("/#room");
+    const notes = page.locator("#notes");
+    await expect(page.locator("#room").getByRole("heading", { level: 3, name: FEATURED_NAME, exact: true })).toBeVisible();
+    const answers = notes.locator(".evidence > details");
+    await expect(answers).toHaveCount(30);
+    await expect(notes.locator(".evidence-more .footnote")).toHaveText("Showing 30 of 45 answers.");
+    await notes.getByRole("button", { name: "Show 15 more" }).click();
+    await expect(answers).toHaveCount(45);
+    await expect(notes.locator(".evidence-more .footnote")).toHaveText("Showing 45 of 45 answers.");
+    await expect(notes.getByRole("button", { name: /^Show \d+ more$/ })).toHaveCount(0);
+    await expect(answers.last().locator(".who")).toHaveText("P4 · assistant-a");
+    await expect(answers.last().locator("pre")).toHaveText(/^Synthetic answer 45 \(test fixture, not a live response\)\./);
+    await expectNoHorizontalScroll(page);
+  });
+
   test("the featured audit's printable report renders, with its persona source", async ({ page }) => {
     await page.goto(`/audits/${FEATURED}/report`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(FEATURED_NAME);

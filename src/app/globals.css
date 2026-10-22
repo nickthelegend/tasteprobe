@@ -390,6 +390,8 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .reader-stats div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
 .reader-stats dt { color: var(--muted); }
 .reader-stats dd { margin: 0; font-weight: 500; text-align: right; overflow-wrap: anywhere; min-width: 0; }
+.evidence-more { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 10px; }
+.evidence-more .btn { height: 38px; padding: 0 14px; font-size: 13.5px; border-radius: 999px; }
 .xcheck { display: grid; gap: 6px; margin-top: 12px; font-size: 13.5px; }
 .xcheck div { display: grid; gap: 2px; }
 .xcheck b { font-weight: 500; }

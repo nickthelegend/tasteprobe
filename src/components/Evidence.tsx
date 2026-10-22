@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { crossCheck, parseNumberedList } from "@/lib/extract.mjs";
+import { answerCheckNote, parseNumberedList } from "@/lib/extract.mjs";
 
 export type EvidenceRow = { personaId: string; segment: string; model: string; prompt: string; answer: string; entities: string[]; brand: boolean; listEntities?: string[] };
 
@@ -15,10 +15,15 @@ const VIEWS: { id: View; label: (attempt: number) => string }[] = [
   { id: "fix", label: (n) => `#${n} fix` },
 ];
 
-export function Evidence({ auditId, brand, segment, attemptId }: { auditId: string; brand: string; segment?: string; attemptId?: string }) {
+// Answers shown at once; "Show more" adds another page, so every cached answer can be read.
+const PAGE = 30;
+
+export function Evidence({ auditId, brand, city, segment, attemptId }: { auditId: string; brand: string; city: string; segment?: string; attemptId?: string }) {
   const [data, setData] = useState<{ responses: EvidenceRow[]; attempt: Attempt | null } | null>(null);
   const [error, setError] = useState("");
   const [view, setView] = useState<View>("audit");
+  const [shown, setShown] = useState(PAGE);
+  useEffect(() => setShown(PAGE), [auditId, attemptId, segment, view]);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,7 +50,7 @@ export function Evidence({ auditId, brand, segment, attemptId }: { auditId: stri
       {VIEWS.map((item) => <button key={item.id} className="btn btn-ghost" aria-pressed={current === item.id} onClick={() => setView(item.id)}>{item.label(attempt.attempt)}</button>)}
     </div>}
     {rows.length ? <div className="evidence">
-      {rows.slice(0, 30).map((row, index) => <details key={`${row.personaId}-${row.model}-${index}`}>
+      {rows.slice(0, shown).map((row, index) => <details key={`${row.personaId}-${row.model}-${index}`}>
         <summary>
           <span className="who">{row.personaId.toUpperCase()} · {row.model}</span>
           <span className="ents">{row.entities.join(" · ") || "No venues extracted"}</span>
@@ -54,14 +59,16 @@ export function Evidence({ auditId, brand, segment, attemptId }: { auditId: stri
         <div className="body">
           <div className="prompt">{row.prompt}</div>
           {(() => {
-            const check = crossCheck(row.entities, row.listEntities ?? parseNumberedList(row.answer), brand);
-            if (!check.listed || check.setAgrees) return null;
-            return <div className="xflag">List parser disagrees{check.brandAgrees ? "" : " on whether you were recommended"}{check.onlyInList.length ? ` · only in the list: ${check.onlyInList.join(", ")}` : ""}{check.onlyInExtraction.length ? ` · only from Nemotron: ${check.onlyInExtraction.join(", ")}` : ""}</div>;
+            const note = answerCheckNote(row.entities, row.listEntities ?? parseNumberedList(row.answer), brand, city);
+            return note ? <div className="xflag">{note}</div> : null;
           })()}
           <pre>{row.answer}</pre>
         </div>
       </details>)}
-      {rows.length > 30 && <p className="footnote">Showing 30 of {rows.length}. All responses are cached in the server’s audit store (<code>raw/{auditId}</code>).</p>}
+      {rows.length > PAGE && <div className="evidence-more">
+        <p className="footnote">Showing {Math.min(shown, rows.length)} of {rows.length} answers.</p>
+        {shown < rows.length && <button type="button" className="btn btn-ghost" onClick={() => setShown((current) => current + PAGE)}>Show {Math.min(PAGE, rows.length - shown)} more</button>}
+      </div>}
     </div> : <p className="footnote">No cached responses for this segment.</p>}
   </>;
 }

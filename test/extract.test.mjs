@@ -103,3 +103,13 @@ test("segment summaries count failed and unparseable answers outside the denomin
   assert.equal(empty.share, 0);
   assert.deepEqual(empty.ci, [0, 1]);
 });
+
+test("the evidence panel's per-answer flag uses the city like the server: 'Trishna' and 'Trishna Mumbai' agree in Mumbai", async () => {
+  const { answerCheckNote } = await import("../src/lib/extract.mjs");
+  assert.equal(crossCheck(["Trishna"], ["Trishna Mumbai"], "Trishna", "Mumbai").brandAgrees, true);
+  assert.equal(crossCheck(["Trishna"], ["Trishna Mumbai"], "Trishna").brandAgrees, false);
+  const note = answerCheckNote(["Trishna"], ["Trishna Mumbai"], "Trishna", "Mumbai");
+  assert.ok(note === null || !note.includes("on whether you were recommended"), String(note));
+  assert.equal(answerCheckNote(["Trishna", "Bastian"], ["Trishna", "Bastian"], "Trishna", "Mumbai"), null);
+  assert.equal(answerCheckNote(["Bastian"], ["Trishna", "Bastian"], "Trishna", "Mumbai"), "List parser disagrees on whether you were recommended · only in the list: Trishna");
+});

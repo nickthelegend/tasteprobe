@@ -22,4 +22,14 @@ const copies = Array.from({ length: 13 }, (_, index) => ({
 await mkdir(dir, { recursive: true, mode: 0o700 });
 // Newest first, as the store keeps them; the featured fixture is the oldest.
 await writeFile(path.join(dir, "audits.json"), JSON.stringify([...copies, fixture], null, 2), { mode: 0o600 });
+// SYNTHETIC cached answers for the featured audit's "Place keyword" segment (45, more than one page
+// of the evidence panel) so paging can be checked. Every answer says it is a test fixture.
+const rows = Array.from({ length: 45 }, (_, index) => ({
+  personaId: `p${index % 8}`, segment: "Place keyword", model: index % 2 ? "assistant-b" : "assistant-a",
+  prompt: "Synthetic persona prompt (test fixture).",
+  answer: `Synthetic answer ${index + 1} (test fixture, not a live response).\n1. Rival One (synthetic)`,
+  entities: ["Rival One (synthetic)"], brand: false, listEntities: ["Rival One (synthetic)"],
+}));
+await mkdir(path.join(dir, "raw", fixture.id), { recursive: true, mode: 0o700 });
+await writeFile(path.join(dir, "raw", fixture.id, "responses.json"), JSON.stringify({ complete: true, rows, failures: [] }, null, 2), { mode: 0o600 });
 console.log(`seeded ${copies.length + 1} synthetic audits into ${dir}`);

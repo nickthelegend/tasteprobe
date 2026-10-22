@@ -5,4 +5,5 @@ export type CrossCheckSummary = {
 };
 export function parseNumberedList(answer: string): string[];
 export function crossCheck(entities: string[], list: string[], brand: string, city?: string): CrossCheck;
+export function answerCheckNote(entities: string[], list: string[], brand: string, city?: string): string | null;
 export function summarizeCrossCheck(rows: { model: string; answer: string; entities: string[]; listEntities?: string[] }[], brand: string, city?: string): CrossCheckSummary[];

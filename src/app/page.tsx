@@ -429,7 +429,7 @@ export default function Home() {
         <div className="split split-wide">
           <section className="panel" id="notes">
             <div className="panel-head"><div><h3>Tasting notes</h3><p>The actual answers behind {segment?.name ?? "this flight"}, with the venues Nemotron extracted.</p></div><span className="stamp">cached</span></div>
-            <Evidence auditId={active.id} brand={active.brand} segment={segment?.name} attemptId={attemptId ?? active.counterfactuals?.[active.counterfactuals.length - 1]?.id} />
+            <Evidence auditId={active.id} brand={active.brand} city={active.city} segment={segment?.name} attemptId={attemptId ?? active.counterfactuals?.[active.counterfactuals.length - 1]?.id} />
           </section>
           <section className="panel reader">
             <div className="panel-head"><div><h3>Who read the notes</h3><p>An NVIDIA open model on Nebius Token Factory parses every answer.</p></div></div>
