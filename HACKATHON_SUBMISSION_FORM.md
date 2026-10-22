@@ -54,17 +54,17 @@ TasteProbe
 Do AI assistants recommend you to your own audience? A placebo-controlled audit grounded in Qloo taste data.
 
 ## What it does
-- **Personas from Qloo.** TasteProbe resolves a venue in Qloo, in its own city only. Qloo's taste tags (or, where the key refuses `urn:tag`, its artist, brand, film, book, TV, podcast and place affinities), cross-domain and demographic signals become personas, with at least 8 per taste segment. Each audit records which source it used.
+- **Personas from Qloo.** TasteProbe resolves a venue in Qloo, in its own city only. On the hackathon key, Qloo's artist, brand, film, book, TV, podcast and place affinities for the venue become personas, one taste segment per entity type, with at least 8 per segment (with a production key that serves `urn:tag`, taste tags plus cross-domain signals do). Each audit records which source it used.
 - **Live audit.** Each persona asks live AI assistants for recommendations. The prompt names neither the venue nor anything else that would identify it.
 - **Extraction.** NVIDIA Nemotron on Nebius Token Factory extracts what each answer recommends. A deterministic list parser cross-checks every answer.
 - **Share of voice.** Reported per taste segment and per assistant, with 95% Wilson intervals widened for persona clustering. Dropped and unparseable answers are counted, not hidden.
 - **Fix.** Fix copy is tested against a placebo on the same personas, with the baseline re-run in the same window. The reported lift is fix minus placebo, so it measures the copy and not mere exposure to the name.
-- **Agent loop.** A Nemotron tool-calling loop (Qloo insights for the venue or a rival, propose copy, probe vs placebo, read stats) iterates under a budget. Its intervals only screen: a copy that clears zero gets one confirmation probe on personas the search never used, and only that can declare a win. The code enforces this.
+- **Agent loop.** A Nemotron tool-calling loop (Qloo insights for the venue or a rival, propose copy, probe vs placebo, read stats) iterates under a budget. Its intervals only screen: a copy that clears zero gets one confirmation probe (held-out personas from 16 per segment; below that, a fresh re-ask of the same personas, reported as re-confirmed), and only that can declare a win. The code enforces this.
 - **For other agents and for print.** An MCP server exposes `run_audit`, `run_fix`, `get_report` and `qloo_taste_profile`, and `/audits/<id>/report` is a printable report of any stored audit.
 
 ## How we built it
 - Next.js 15 app with streaming NDJSON APIs, a CLI (`npm run audit:live`) and a stdio MCP server (`npm run mcp`), all on the same pipeline.
-- Qloo `/search` and `/v2/insights` with `urn:entity:*` types on the hackathon host (`urn:tag` and `urn:demographics` are tried, and a 403 switches the personas to entity segments or is recorded on the audit). No live call has run yet; update this after the first one. Nebius Token Factory through the OpenAI-compatible API: chat completions with `tools` for the agent, JSON extraction for every answer, and `/v1/models` to check the key's catalog. Assistants under test go through any OpenAI-compatible endpoint.
+- Qloo `/search` and `/v2/insights` with `urn:entity:*` types on the hackathon host, one taste segment per type (`urn:tag` is tried first for production keys, and its 403 switches the personas to entity segments; a refused `urn:demographics` is recorded on the audit). No live call has run yet; after the first one, state which `personaSource` the featured audit used. Nebius Token Factory through the OpenAI-compatible API: chat completions with `tools` for the agent, JSON extraction for every answer, and `/v1/models` to check the key's catalog. Assistants under test go through any OpenAI-compatible endpoint.
 - Statistics in plain JS with seeded tests:
   - Wilson interval on a Kish effective sample size;
   - paired persona bootstrap for lift;

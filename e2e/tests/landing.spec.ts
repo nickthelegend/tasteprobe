@@ -28,8 +28,18 @@ test.describe("landing: the tasting sheet", () => {
     await expect(hero.getByRole("img", { name: /^Music taste: 58% of answers recommend the venue, 95% interval/ })).toBeVisible();
     // Every surface that shows made-up levels carries the stamp: hero, glass anatomy, re-pour.
     await expect(page.locator(".board-stamp", { hasText: EXAMPLE })).toHaveCount(3);
-    await hero.scrollIntoViewIfNeeded();
-    await page.screenshot({ path: test.info().outputPath("02-example-flight.png"), animations: "disabled" });
+    // The README hero image (docs/screenshots/landing-example-flight.png) is this shot: it must hold
+    // the whole headline and the whole board, not start mid-headline.
+    const section = await page.locator("section.hero").boundingBox();
+    const headline = await page.getByRole("heading", { level: 1 }).boundingBox();
+    const board = await hero.boundingBox();
+    expect(section && headline && board).toBeTruthy();
+    // A side margin (clamped to the page) so the headline does not touch the edge.
+    const pad = Math.min(40, section!.x);
+    const clip = { x: section!.x - pad, y: section!.y, width: section!.width + 2 * pad, height: board!.y + board!.height + 32 - section!.y };
+    expect(headline!.y).toBeGreaterThanOrEqual(clip.y);
+    expect(board!.y + board!.height).toBeLessThanOrEqual(section!.y + section!.height + 1);
+    await page.screenshot({ path: test.info().outputPath("02-example-flight.png"), clip, fullPage: true, animations: "disabled" });
   });
 
   test("wine-list steps: seven numbered courses with their sponsor tags", async ({ page }) => {

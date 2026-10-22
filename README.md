@@ -6,20 +6,27 @@
 >
 > Hosted demo: _not deployed yet_ (Qloo requires an externally hosted demo). The production `Dockerfile` and `railway.json` are ready, and the paid routes sit behind a spend guard (run token, persona and agent caps, quotas): one-time setup, then `railway up --detach` ([docs/hosting.md](docs/hosting.md)). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
 
+## Try it in 2 minutes
+
+1. **Hosted demo:** _not deployed yet_ (it needs the Qloo and Nebius keys; the URL goes here once it is live).
+2. **The featured audit:** the hosted demo opens on one real audit pinned with `TASTEPROBE_FEATURED_AUDIT_ID`, so you see a real flight without spending credits. None exists until the first live run.
+3. **The printable report:** any stored audit prints at `/audits/<id>/report`.
+4. **No keys needed:** after `npm ci`, `npm test` runs the unit suite; `npm run build && npm run e2e:stack && npm run test:e2e` runs the browser suite in Chrome ([TESTING.md](TESTING.md)).
+
 | The landing (every glass above the tasting room is stamped as an example) | The tasting room without keys |
 |---|---|
 | ![Landing hero: a flight of four glasses stamped "Example, not a real audit"](docs/screenshots/landing-example-flight.png) | ![Tasting room: Setup required names QLOO_API_KEY, NEBIUS_API_KEY and an assistant key; the flight is empty](docs/screenshots/setup-required.png) |
 
-Both screenshots are from the Playwright E2E run in Chrome at 1280 px (`e2e/tests/landing.spec.ts`, `e2e/tests/room.spec.ts`), with no keys set.
+Both screenshots are from the Playwright E2E run in Chrome at 1280 px (`e2e/tests/landing.spec.ts` on the standalone build, cropped to the hero; `e2e/tests/room.spec.ts`), with no keys set.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
   I[Business + category + city] --> S[Qloo /search<br/>place in that city only]
-  S --> T[Qloo /v2/insights<br/>urn:tag, or urn:entity per type on a 403]
+  S --> T[Qloo /v2/insights<br/>urn:entity per type on the hackathon key<br/>urn:tag with a production key]
   S --> X[Qloo /v2/insights<br/>artist · brand · movie · book · demographics]
-  T --> P[Persona builder<br/>anchor tag + 2 by affinity<br/>>= 8 personas per segment]
+  T --> P[Persona builder<br/>anchor entity or tag + 2 by affinity<br/>>= 8 personas per segment]
   X --> P
   P --> A[Assistants under test<br/>OpenAI + any OpenAI-compatible]
   A --> N[Nemotron on Nebius<br/>entity extraction]
@@ -118,7 +125,7 @@ Without keys, `run_audit` and `run_fix` return a tool error, `Setup required: QL
 ## How the numbers are made
 
 1. **Venue.** Qloo `/search` must return a place whose address or geocode names the requested city. If none does, the audit stops and lists what Qloo found elsewhere. That place must also match the venue's name: if the in-city listings are all other venues, the audit stops and lists them. It never audits a namesake in another city or a different venue in the same one.
-2. **Personas.** Qloo `/v2/insights` (`filter.type=urn:tag`, `signal.interests.entities`, `signal.location.query`) returns up to 50 taste tags with affinity, and tags are grouped into segments by subtype. If the city returns fewer than 6 tags, the venue's global neighbourhood (the same call without `signal.location.query`) is added; every tag keeps its scope (`city` or `global`) and the audit records `tagScope`, which the dashboard and both reports show as "N of M tags come from Qloo's global neighbourhood". **The hackathon host may refuse `urn:tag`:** the Qloo Agentic Hackathon Developer Guide lists only `urn:entity:*` types as supported and says other types answer 403. On a 403 for `urn:tag`, the personas are built from `urn:entity` affinities instead: one `/v2/insights` call per type (`artist`, `brand`, `movie`, `book`, `tv_show`, `podcast`, and `place` with the venue itself removed), all city-scoped on the venue, and each type becomes one taste segment ("Music taste", "Film taste", ...). Which path ran is stored on the audit as `personaSource` (`urn:tag` or `urn:entity`) and shown in the dashboard, the printable report and the CLI report. `npm run audit:live` checks it before spending anything: its preflight makes one 1-tag `urn:tag` call on the resolved place and prints whether the key gets `urn:tag`. Either way, **every segment gets at least 8 personas**: N personas allow at most floor(N/8) segments (max 6). Each persona anchors on one tag or entity, taken in affinity order, and adds two from other segments, sampled by affinity with seed 7. With `urn:tag` personas, a persona also names one or two artists, brands, films or books with affinity to the venue where Qloo returns them.
+2. **Personas.** **On the hackathon key (the path judges will see):** the Qloo Agentic Hackathon Developer Guide lists only `urn:entity:*` types as supported and says other types answer 403, so the personas come from `urn:entity` affinities: one `/v2/insights` call per type (`filter.type=urn:entity:artist`, `brand`, `movie`, `book`, `tv_show`, `podcast`, and `place` with the venue itself removed; `signal.interests.entities` and `signal.location.query`), all city-scoped on the venue, and each type becomes one taste segment ("Music taste", "Film taste", ...). **With a production key** that serves `urn:tag`, `/v2/insights` (`filter.type=urn:tag`) returns up to 50 taste tags with affinity, grouped into segments by subtype; if the city returns fewer than 6 tags, the venue's global neighbourhood (the same call without `signal.location.query`) is added, every tag keeps its scope (`city` or `global`) and the audit records `tagScope` ("N of M tags come from Qloo's global neighbourhood"). The code tries `urn:tag` first and switches to the entity path on its 403. Which path ran is stored on the audit as `personaSource` (`urn:entity` or `urn:tag`) and shown in the dashboard, the printable report and the CLI report; no live run has happened yet, so which one the hackathon key actually gets is still to be recorded. `npm run audit:live` checks it before spending anything: its preflight makes one 1-tag `urn:tag` call on the resolved place and prints whether the key gets `urn:tag`. Either way, **every segment gets at least 8 personas**: N personas allow at most floor(N/8) segments (max 6). Each persona anchors on one tag or entity, taken in affinity order, and adds two from other segments, sampled by affinity with seed 7. With `urn:tag` personas, a persona also names one or two artists, brands, films or books with affinity to the venue where Qloo returns them.
 3. **Prompts.** The **baseline** prompt holds only the persona's tastes, the category and the city. It never names the venue.
 4. **Extraction.** Nemotron returns the venues each answer recommends as JSON. Output that is truncated at `max_tokens`, has no JSON or has no `entities` array is counted as **unparseable**. It is never silently turned into "not recommended". A deterministic numbered-list parser reads the same answer, and the audit reports how often the two disagree, per assistant.
 5. **Matching the venue.** An extracted name counts as the venue after normalising case, Latin accents, possessives, "&" and punctuation in any script (so `すきやばし次郎` matches itself). A brand with two or more distinctive words matches inside a longer name ("The Bombay Canteen, Lower Parel"). A brand with one distinctive word ("The Table", "Trishna") must be the whole name, give or take articles, a branch note after a comma, parenthesis or dash, and the city's name, so "Table Talk" and "Kitchen Table" are counted as rivals, not as the venue. Names are not yet re-resolved in Qloo `/search` to confirm an ambiguous match.
@@ -158,8 +165,9 @@ Every model call that TasteProbe itself makes goes to an NVIDIA open model on Ne
 ## Qloo
 
 - `/search` (`types=urn:entity:place`) resolves the venue in its own city and checks the rivals assistants recommend. A 404 is Qloo's documented "No results" and stops the audit with a readable message.
-- `/v2/insights` with `filter.type=urn:tag`, `signal.interests.entities` and `signal.location.query` builds the personas (Taste Analysis). If the key answers 403 for `urn:tag` (the hackathon guide lists it as unsupported), the personas come from `urn:entity:artist|brand|movie|book|tv_show|podcast|place` affinities instead, and the audit records `personaSource: "urn:entity"`.
-- `/v2/insights` with `filter.type=urn:entity:artist|brand|movie|book` adds cross-domain taste, and `filter.type=urn:demographics` adds the audience lean.
+- `/v2/insights` with `filter.type=urn:entity:artist|brand|movie|book|tv_show|podcast|place`, `signal.interests.entities` and `signal.location.query` builds the personas on the hackathon key, one taste segment per entity type, and the audit records `personaSource: "urn:entity"`. The hackathon guide lists only `urn:entity:*` types; `urn:tag` is tried first and answers 403 there.
+- With a production key that serves it, `/v2/insights` with `filter.type=urn:tag` builds the personas from taste tags instead (Taste Analysis, `personaSource: "urn:tag"`), and `urn:entity:artist|brand|movie|book` adds cross-domain taste to them.
+- `filter.type=urn:demographics` adds the audience lean (recorded as an error and skipped if the key refuses it).
 - The agent reads Qloo live through its `qloo_insights` tool. With no arguments it returns the segment's own persona signals. With `filter_type` (an `urn:entity:*` type; `urn:tag` only off the hackathon host), `entity` (`venue` or the Qloo id of a rival the audit verified with `/search`) and `location`, it returns that entity's taste neighbourhood, so the agent can compare the venue with a rival that wins the segment and aim the copy at the difference. Each distinct call is made once per run, logged in the notebook, and its raw payload kept in the server-side trace.
 - The MCP server exposes the whole Qloo-grounded audit to other agents, plus `qloo_taste_profile` for direct Qloo reads.
 - Raw Qloo payloads are cached server-side under `.data/` (git-ignored). Qloo's FAQ forbids putting Qloo response data in a public repo.
