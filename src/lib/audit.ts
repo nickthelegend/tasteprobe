@@ -24,6 +24,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
   // With urn:entity personas the cross-domain types are already the segments, so they are not blended in twice.
   const personas = buildPersonas(taste.tags, input.personaCount, PERSONA_SEED, taste.source === "urn:tag" ? cross.crossDomain : {});
   send({ type: "personas", personas });
+  if (taste.tagScope.global) send({ type: "stage", stage: "qloo", message: `Qloo had only ${taste.tagScope.city} city-scoped tags for ${input.city}; ${taste.tagScope.global} more come from the venue's global taste neighbourhood` });
 
   const auditId = crypto.randomUUID();
   await writeRaw(auditId, "qloo", { search: place.raw, personaSource: taste.source, insights: taste.raw, crossDomain: cross.raw });
@@ -73,6 +74,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
     personas,
     origin,
     personaSource: taste.source,
+    tagScope: taste.tagScope,
     ...(taste.tagRefusal ? { personaSourceNote: taste.tagRefusal } : {}),
     qlooSignals: cross.signals,
     overall: summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })), failures.map((row) => ({ ...row, segment: "All personas" })))[0],

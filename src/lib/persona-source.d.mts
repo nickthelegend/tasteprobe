@@ -9,6 +9,8 @@ export type PersonaSignals = {
   raw: unknown[];
   entityResults: Record<string, { entities: QlooEntity[]; error?: string }> | null;
   tagRefusal: string | null;
+  // How many persona signals are city-scoped and how many came from Qloo's global neighbourhood.
+  tagScope: { city: number; global: number };
 };
 export const PERSONA_ENTITY_TYPES: string[];
 export const HACKATHON_ENTITY_TYPES: string[];

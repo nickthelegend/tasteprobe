@@ -33,6 +33,13 @@ function lift(value) {
 // Older audits have no personaSource; they were built from urn:tag before the fallback existed.
 export const personaSourceOf = (audit) => (audit?.personaSource === "urn:entity" ? "urn:entity" : "urn:tag");
 
+// "9 of 12 tags come from Qloo's global neighbourhood (the city had 3, fewer than 6)" when any did.
+export function tagScopeText(scope) {
+  if (!scope?.global) return "";
+  const total = scope.city + scope.global;
+  return `${scope.global} of ${total} ${scope.global === 1 ? "tag comes" : "tags come"} from Qloo's global neighbourhood (the city had ${scope.city}, fewer than 6)`;
+}
+
 export function personaSourceText(source) {
   return source === "urn:entity"
     ? "Qloo urn:entity affinities (artists, brands, films, books, TV, podcasts, places): this key refused urn:tag with a 403"
@@ -50,6 +57,7 @@ export function buildReportModel(audit) {
     personas: audit.personas?.length ?? 0,
     personaSource: personaSourceOf(audit),
     personaSourceNote: audit.personaSourceNote ?? null,
+    tagScope: audit.tagScope ?? null,
     assistants: audit.systems ?? [],
     overall: segment(audit.overall),
     segments: (audit.segments ?? []).map(segment),

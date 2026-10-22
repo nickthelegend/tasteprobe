@@ -13,7 +13,7 @@ import { FlightBoard, Glass } from "@/components/Flight";
 import { PersonaTray, type PersonaResult } from "@/components/Tray";
 import { Landing } from "@/components/Landing";
 import { Logo } from "@/components/Logo";
-import { personaSourceOf, personaSourceText, summarizeAuditListing, type AuditListing } from "@/lib/report-model.mjs";
+import { personaSourceOf, personaSourceText, summarizeAuditListing, tagScopeText, type AuditListing } from "@/lib/report-model.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
 type RunCaps = { locked: boolean; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
@@ -336,7 +336,7 @@ export default function Home() {
               ? "Each persona anchors on one Qloo entity (pink) and blends two affinity-weighted entities from other segments. Numbers are Qloo affinity scores."
               : "Each persona anchors on one Qloo tag (pink) and blends two affinity-weighted tags. Numbers are Qloo affinity scores."}</p></div></div>
             <PersonaGrid personas={active.personas.filter((persona) => persona.segment === segment.name)} />
-            <p className="footnote persona-source">Personas from {personaSourceText(personaSourceOf(active))}.{active.personaSourceNote ? ` Qloo said: ${active.personaSourceNote}` : ""}</p>
+            <p className="footnote persona-source">Personas from {personaSourceText(personaSourceOf(active))}.{tagScopeText(active.tagScope) ? ` ${tagScopeText(active.tagScope)}.` : ""}{active.personaSourceNote ? ` Qloo said: ${active.personaSourceNote}` : ""}</p>
             {active.qlooSignals && <p className="footnote">
               <span className="stamp">unverified until first live run</span>{" "}
               Cross-domain Qloo signals (lilac chips): {active.qlooSignals.domains.map((domain) => `${domain.type} ${domain.error ? "failed" : `${domain.entities.length}`}`).join(" · ")}

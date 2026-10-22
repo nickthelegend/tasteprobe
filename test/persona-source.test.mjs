@@ -126,3 +126,26 @@ test("the preflight line says whether this key gets urn:tag", () => {
   try { readQlooResponse({ path: "/v2/insights", params: { "filter.type": "urn:tag" }, status: 401, body: "{}" }); } catch (error) { unauthorised = error; }
   assert.throws(() => tagSupportLine("Fixture Canteen", { ok: false, error: unauthorised }), /401/);
 });
+
+test("a city with fewer than 6 tags: the global tags are added, each tag keeps its scope, and the audit counts them", async () => {
+  const all = JSON.parse(tagInsights);
+  const cityOnly = { success: true, results: { tags: all.results.tags.slice(0, 3) } };
+  const calls = [];
+  const call = async (path, params) => {
+    calls.push(params);
+    const scoped = "signal.location.query" in params;
+    return readQlooResponse({ path, params, status: 200, body: JSON.stringify(scoped ? cityOnly : all) });
+  };
+  const signals = await collectPersonaSignals(call, venue);
+  assert.equal(calls.length, 2);
+  assert.equal(calls[1]["signal.location.query"], undefined, "the second call is the global neighbourhood");
+  assert.deepEqual(signals.tagScope, { city: 3, global: 4 });
+  assert.deepEqual(signals.tags.map((tag) => tag.scope), ["city", "city", "city", "global", "global", "global", "global"]);
+  const { tagScopeText } = await import("../src/lib/report-model.mjs");
+  assert.equal(tagScopeText(signals.tagScope), "4 of 7 tags come from Qloo's global neighbourhood (the city had 3, fewer than 6)");
+  assert.equal(tagScopeText({ city: 9, global: 0 }), "");
+  // Enough city tags: no global call, every tag city-scoped.
+  const full = fixtureCaller({ tag: { status: 200, body: tagInsights } });
+  const local = await collectPersonaSignals(full.call, venue);
+  assert.deepEqual(local.tagScope, { city: 7, global: 0 });
+});

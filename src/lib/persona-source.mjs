@@ -21,6 +21,7 @@ export const HACKATHON_ENTITY_TYPES = ["artist", "book", "brand", "destination",
 export const MIN_CITY_TAGS = 6;
 const ENTITIES_PER_TYPE = "15";
 
+const scopeCounts = (tags) => ({ city: tags.filter((tag) => tag.scope !== "global").length, global: tags.filter((tag) => tag.scope === "global").length });
 const message = (error) => (error instanceof Error ? error.message : String(error)).slice(0, 200);
 
 // True when Qloo answered 403 for this filter.type (the "unsupported type" answer).
@@ -36,7 +37,7 @@ export function entityTagsFromPayloads(payloads, { entityId, venueName }) {
     if (!payloads[type]) continue;
     for (const entity of parseQlooEntities(payloads[type])) {
       if (type === "place" && (entity.id === entityId || (venueName && (matchesBrand(entity.name, venueName) || matchesBrand(venueName, entity.name))))) continue;
-      tags.push({ id: entity.id, name: entity.name, affinity: entity.affinity, subtype: `urn:entity:${type}` });
+      tags.push({ id: entity.id, name: entity.name, affinity: entity.affinity, subtype: `urn:entity:${type}`, scope: "city" });
     }
   }
   return tags;
@@ -45,17 +46,18 @@ export function entityTagsFromPayloads(payloads, { entityId, venueName }) {
 async function fromTags(call, { entityId, city }) {
   const base = { "filter.type": "urn:tag", "signal.interests.entities": entityId, take: "50" };
   const local = await call("/v2/insights", { ...base, "signal.location.query": city });
-  let tags = parseQlooTags(local);
+  let tags = parseQlooTags(local).map((tag) => ({ ...tag, scope: "city" }));
   const raw = [{ scope: "city", payload: local }];
   if (tags.length < MIN_CITY_TAGS) {
-    // Sparse local coverage: fall back to the place's global taste neighbourhood and say so in the cache.
+    // Sparse local coverage: add the place's global taste neighbourhood. Each tag keeps its scope,
+    // and the audit records how many came from outside the city.
     const global = await call("/v2/insights", base);
     raw.push({ scope: "global", payload: global });
     const seen = new Set(tags.map((tag) => tag.id));
-    tags = [...tags, ...parseQlooTags(global).filter((tag) => !seen.has(tag.id))];
+    tags = [...tags, ...parseQlooTags(global).filter((tag) => !seen.has(tag.id)).map((tag) => ({ ...tag, scope: "global" }))];
   }
   if (!tags.length) throw new Error("Qloo returned no taste tags for this place. Check the place name or try a better-known listing.");
-  return { source: "urn:tag", tags, raw, entityResults: null, tagRefusal: null };
+  return { source: "urn:tag", tags, raw, entityResults: null, tagRefusal: null, tagScope: scopeCounts(tags) };
 }
 
 async function fromEntities(call, { entityId, city, venueName }, tagRefusal) {
@@ -77,7 +79,7 @@ async function fromEntities(call, { entityId, city, venueName }, tagRefusal) {
     const errors = PERSONA_ENTITY_TYPES.filter((type) => entityResults[type].error).map((type) => `${type}: ${entityResults[type].error}`);
     throw new Error(`Qloo refused urn:tag for this key (403) and returned no urn:entity affinities for this place either${errors.length ? ` (${errors.join("; ")})` : ""}. Try a better-known listing.`);
   }
-  return { source: "urn:entity", tags, raw, entityResults, tagRefusal };
+  return { source: "urn:entity", tags, raw, entityResults, tagRefusal, tagScope: scopeCounts(tags) };
 }
 
 // urn:tag first; on a 403 for urn:tag, urn:entity affinities. Any other error is not a refusal and

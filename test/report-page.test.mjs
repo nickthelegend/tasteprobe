@@ -88,3 +88,9 @@ test("agent runs show the search as a screen and the confirmation as the result"
   assert.match(html, /\+10 pts \(-10 to 30 pts\) on 8 held-out personas · not confirmed/);
   assert.match(html, /confirmation_failed: A copy cleared the screen/);
 });
+
+test("the report says how many persona tags came from Qloo's global neighbourhood", () => {
+  const html = render(createElement(PrintReport, { model: buildReportModel({ ...audit, tagScope: { city: 3, global: 4 } }) }));
+  assert.match(html, /Qloo urn:tag taste tags\. 4 of 7 tags come from Qloo&#x27;s global neighbourhood \(the city had 3, fewer than 6\)\./);
+  assert.doesNotMatch(render(createElement(PrintReport, { model: buildReportModel(audit) })), /global neighbourhood/);
+});

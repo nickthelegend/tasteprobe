@@ -1,4 +1,6 @@
-export type TasteTag = { id: string; name: string; affinity?: number; subtype: string };
+// scope: "city" (signal.location.query on the audit city) or "global" (added when the city had
+// fewer than 6 tags). Tags of audits saved before Oct 22 have no scope.
+export type TasteTag = { id: string; name: string; affinity?: number; subtype: string; scope?: "city" | "global" };
 export type CrossDomainSignal = { type: string; id: string; name: string; affinity?: number };
 export type Persona = { id: string; segment: string; segmentId: string; affinities: TasteTag[]; crossDomain?: CrossDomainSignal[] };
 export type QlooDemographics = { age: { bucket: string; score: number }[]; gender: { bucket: string; score: number }[] };
@@ -99,6 +101,8 @@ export type Audit = {
   personaSource?: "urn:tag" | "urn:entity";
   // The 403 Qloo gave for urn:tag, when personaSource is urn:entity.
   personaSourceNote?: string;
+  // Persona signals by scope: city-scoped, or from Qloo's global neighbourhood (sparse cities).
+  tagScope?: { city: number; global: number };
   // Where the audit was started: the web app, the CLI or the MCP server.
   origin?: "web" | "cli" | "mcp";
   qlooSignals?: QlooSignals;

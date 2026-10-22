@@ -16,6 +16,7 @@ export type ReportModel = {
   personas: number;
   personaSource: "urn:tag" | "urn:entity";
   personaSourceNote: string | null;
+  tagScope: { city: number; global: number } | null;
   assistants: string[];
   overall: ReportSegment;
   segments: ReportSegment[];
@@ -42,6 +43,7 @@ export type ReportModel = {
 export function buildReportModel(audit: Audit): ReportModel;
 export function personaSourceOf(audit: Pick<Audit, "personaSource"> | null | undefined): "urn:tag" | "urn:entity";
 export function personaSourceText(source: "urn:tag" | "urn:entity"): string;
+export function tagScopeText(scope: { city: number; global: number } | null | undefined): string;
 export type AuditListing = {
   id: string; brand: string; city: string; category: string; createdAt: string; share: number | null; answers: number; personas: number;
   personaSource: "urn:tag" | "urn:entity"; origin: "web" | "cli" | "mcp" | null;
