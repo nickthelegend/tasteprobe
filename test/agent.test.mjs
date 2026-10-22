@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  affordablePersonas, budgetExhausted, candidateStats, chargeBudget, confirmationCalls, confirmationResult, createBudget, DEFAULT_LIMITS,
+  affordablePersonas, agentBudgetPlan, budgetExhausted, candidateStats, chargeBudget, confirmationCalls, confirmationResult, createBudget, DEFAULT_LIMITS,
   nextPersonas, normalizeLimits, parseToolArguments, planConfirmation, screenedCandidate, selectBest, stopDecision,
-  tokenCostUsd, validateCopy,
+  STOP_REASONS, tokenCostUsd, validateCopy,
 } from "../src/lib/agent-core.mjs";
 import { seededRandom } from "../src/lib/stats.mjs";
 
@@ -130,6 +130,24 @@ test("confirmation plan: held-out personas from 16 up, a fresh re-ask below; its
   assert.deepEqual([big.selection.length, big.confirmation.length], [22, 11]);
   assert.equal(confirmationCalls(sixteen, 2), 32);
   assert.equal(confirmationCalls(planConfirmation(ids(8)), 1), 16);
+});
+
+test("a cap that leaves the search no budget is refused up front (budget_too_small), never reported as spent", () => {
+  const ids = (count) => Array.from({ length: count }, (_, index) => `p${index}`);
+  // (personas, assistants) at the UI's smallest 48-call option: the confirmation alone takes 48+.
+  for (const [personas, assistants, confirmation, minimum] of [[12, 3, 72, 78], [24, 3, 48, 54], [15, 2, 60, 64]]) {
+    const plan = agentBudgetPlan(ids(personas), assistants, normalizeLimits({ maxAssistantCalls: 48 }));
+    assert.equal(plan.confirmationCalls, confirmation, `${personas}x${assistants} confirmation`);
+    assert.equal(plan.minAssistantCalls, minimum, `${personas}x${assistants} minimum = confirmation + one search persona`);
+    assert.equal(plan.tooSmall, true);
+    assert.ok(plan.searchLimits.maxAssistantCalls < 2 * assistants);
+  }
+  const roomy = agentBudgetPlan(ids(24), 3, normalizeLimits({ maxAssistantCalls: 120 }));
+  assert.equal(roomy.tooSmall, false);
+  assert.equal(roomy.searchLimits.maxAssistantCalls, 72);
+  assert.equal(budgetExhausted(createBudget(), roomy.searchLimits), null, "a run that starts can afford a probe");
+  assert.equal(affordablePersonas(createBudget(), roomy.searchLimits, 8, 3), 8);
+  assert.match(STOP_REASONS.budget_too_small, /too small/);
 });
 
 // Null simulation: the copy has NO effect (fix and placebo share each persona's rate). The agent

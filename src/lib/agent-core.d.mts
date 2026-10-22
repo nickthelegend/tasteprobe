@@ -9,7 +9,7 @@ export type CandidateStats = {
   personas: number; placeboShare: number | null; fixShare: number | null; lift: number | null;
   liftCi: [number, number] | null; placeboCi: [number, number] | null; fixCi: [number, number] | null; failed: number;
 };
-export type StopReason = "lift_confirmed" | "confirmation_failed" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished";
+export type StopReason = "lift_confirmed" | "confirmation_failed" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished" | "budget_too_small";
 export type ConfirmationPlan = { mode: "holdout" | "rerun"; selection: string[]; confirmation: string[] };
 export type Confirmation = {
   candidateId: string; mode: "holdout" | "rerun"; personas: number; placeboShare: number | null; fixShare: number | null;
@@ -31,6 +31,7 @@ export function candidateStats(candidate: Pick<Candidate, "placeboRows" | "fixRo
 export function selectBest(candidates: Candidate[]): { candidate: Candidate; stats: CandidateStats & { lift: number; liftCi: [number, number] } } | null;
 export function planConfirmation(personaIds: string[]): ConfirmationPlan;
 export function confirmationCalls(plan: ConfirmationPlan, assistants: number): number;
+export function agentBudgetPlan(personaIds: string[], assistants: number, limits: AgentLimits): { plan: ConfirmationPlan; confirmationCalls: number; searchLimits: AgentLimits; minAssistantCalls: number; tooSmall: boolean };
 export function screenedCandidate(candidates: Candidate[], selectionSize: number): ReturnType<typeof selectBest>;
 export function confirmationResult(input: { candidateId: string; mode: "holdout" | "rerun"; placeboRows: CandidateRow[]; fixRows: CandidateRow[]; failed?: number }): Confirmation;
 export function stopDecision(candidates: Candidate[], budget: AgentBudget, limits: AgentLimits, selectionSize: number, confirmation?: Confirmation | null): { stop: boolean; reason: StopReason | null; confirm: string | null };

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { normalizeLimits } from "@/lib/agent-core.mjs";
+import { agentBudgetPlan, normalizeLimits } from "@/lib/agent-core.mjs";
 import { emptyTrace, runAgent } from "@/lib/agent";
 import { openRun, quotaRefusal, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
-import { missingKeys } from "@/lib/providers";
+import { getTestModels, missingKeys } from "@/lib/providers";
 import { findAudit, updateAudit, writeRaw } from "@/lib/storage";
 import type { AgentEvent } from "@/lib/types";
 
@@ -29,6 +29,15 @@ export async function POST(request: Request, context: { params: { id: string } }
     : [...audit.segments].sort((a, b) => a.share - b.share)[0];
   if (!segment) return NextResponse.json({ error: "That taste segment is not part of this audit." }, { status: 400 });
   const limits = normalizeLimits(body, policy.agentCaps);
+  // A cap that leaves the search no persona to test is refused here, before a run is spent.
+  const personaIds = audit.personas.filter((persona) => persona.segment === segment.name).map((persona) => persona.id);
+  const budgetPlan = agentBudgetPlan(personaIds, getTestModels().length, limits);
+  if (budgetPlan.tooSmall) {
+    return NextResponse.json({
+      error: `An assistant-call cap of ${limits.maxAssistantCalls} is too small for this segment: the confirmation probe and one search persona need at least ${budgetPlan.minAssistantCalls}. Nothing ran.`,
+      code: "budget_too_small", minAssistantCalls: budgetPlan.minAssistantCalls,
+    }, { status: 400 });
+  }
   const slot = startRun(ip, policy, "agent");
   if ("refusal" in slot) return slot.refusal;
 

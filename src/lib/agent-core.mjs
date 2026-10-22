@@ -149,6 +149,18 @@ export function confirmationCalls(plan, assistants) {
   return plan.confirmation.length * Math.max(1, assistants) * 2;
 }
 
+// The budget split for a run: the confirmation's calls come off the top, and the search must be able
+// to afford at least one persona (placebo + fix on every assistant). When it cannot, the run is
+// refused before it starts (budget_too_small) with the smallest cap that would work.
+export function agentBudgetPlan(personaIds, assistants, limits) {
+  const plan = planConfirmation(personaIds);
+  const reserved = confirmationCalls(plan, assistants);
+  const perPersona = Math.max(1, assistants) * 2;
+  const searchLimits = { ...limits, maxAssistantCalls: Math.max(0, limits.maxAssistantCalls - reserved) };
+  const minAssistantCalls = reserved + perPersona;
+  return { plan, confirmationCalls: reserved, searchLimits, minAssistantCalls, tooSmall: limits.maxAssistantCalls < minAssistantCalls };
+}
+
 // The best candidate if it clears the screen: probed on at least 8 selection personas (or the whole
 // selection when it is smaller) with a nominal 95% lift interval entirely above zero.
 export function screenedCandidate(candidates, selectionSize) {
@@ -189,6 +201,7 @@ export const STOP_REASONS = {
   budget_turns: "The agent used all of its reasoning turns.",
   budget_tries: "Every allowed copy was proposed and probed on the whole selection set without clearing the screen.",
   agent_finished: "The agent ended the loop without a copy that cleared the screen.",
+  budget_too_small: "The assistant-call cap is too small for this segment: after the confirmation probe's calls are set aside, the search could not test one persona. Nothing ran.",
 };
 
 // Personas a probe should use next for this candidate: ones it has not asked yet, in segment order.

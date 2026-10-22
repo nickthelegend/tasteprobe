@@ -1,7 +1,7 @@
 import type OpenAI from "openai";
 import {
-  affordablePersonas, budgetExhausted, candidateStats, chargeBudget, confirmationCalls, confirmationResult, createBudget, nextPersonas,
-  parseToolArguments, planConfirmation, qlooFilterTypes, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, validateQlooToolArgs,
+  affordablePersonas, agentBudgetPlan, budgetExhausted, candidateStats, chargeBudget, confirmationResult, createBudget, nextPersonas,
+  parseToolArguments, qlooFilterTypes, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, validateQlooToolArgs,
   type AgentBudget, type AgentLimits, type Candidate, type Confirmation, type StopReason,
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
@@ -85,6 +85,16 @@ export function emptyTrace(): AgentTrace {
   return { messages: [], probes: [] };
 }
 
+// The assistant-call cap cannot cover the confirmation plus one search persona (HTTP 400).
+export class AgentBudgetError extends Error {
+  minAssistantCalls: number;
+  code = "budget_too_small";
+  constructor(minAssistantCalls: number, given: number) {
+    super(`An assistant-call cap of ${given} is too small for this segment: the confirmation probe and one search persona need at least ${minAssistantCalls}. Nothing ran.`);
+    this.minAssistantCalls = minAssistantCalls;
+  }
+}
+
 // `trace` is filled in place, so a caller can still save the partial trace if a live call throws.
 export async function runAgent(audit: Audit, segment: SegmentResult, limits: AgentLimits, send: (event: AgentEvent) => void, trace: AgentTrace = emptyTrace()): Promise<{ run: AgentRun; trace: AgentTrace }> {
   const runId = crypto.randomUUID();
@@ -92,10 +102,11 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
   const prices = nebiusPrices();
   const assistants = getTestModels().length;
   const personas = audit.personas.filter((persona) => persona.segment === segment.name);
-  const plan = planConfirmation(personas.map((persona) => persona.id));
+  // The confirmation's assistant calls are set aside, so the search can never spend them. The route
+  // refuses a cap too small to leave the search one persona; checked again here for other callers.
+  const { plan, searchLimits, minAssistantCalls, tooSmall } = agentBudgetPlan(personas.map((persona) => persona.id), assistants, limits);
+  if (tooSmall) throw new AgentBudgetError(minAssistantCalls, limits.maxAssistantCalls);
   const personaIds = plan.selection;
-  // The confirmation's assistant calls are set aside, so the search can never spend them.
-  const searchLimits: AgentLimits = { ...limits, maxAssistantCalls: Math.max(0, limits.maxAssistantCalls - confirmationCalls(plan, assistants)) };
   let confirmation: Confirmation | null = null;
   let looks = 0;
   const venue = { brand: audit.brand, category: audit.category, city: audit.city };
