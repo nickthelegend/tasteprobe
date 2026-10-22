@@ -66,8 +66,17 @@ export function pickPlace(candidates, brand, city) {
   return { id: String(match.entity_id ?? match.id), name: match.name ?? brand, address: match.properties?.address, cityMatched: true };
 }
 
-// "urn:tag:genre:restaurant" → "Restaurant genre"; unknown shapes fall back to a readable label.
+// Segment names for personas built from urn:entity affinities (when the key refuses urn:tag).
+export const ENTITY_SEGMENT_LABELS = {
+  artist: "Music taste", brand: "Brand taste", movie: "Film taste", book: "Book taste",
+  tv_show: "TV taste", podcast: "Podcast taste", place: "Place taste",
+};
+
+// "urn:tag:genre:restaurant" → "Restaurant genre"; "urn:entity:artist" → "Music taste"; unknown
+// shapes fall back to a readable label.
 export function segmentLabel(subtype) {
+  const entity = /^urn:entity:([a-z_]+)$/.exec(String(subtype ?? ""));
+  if (entity) return ENTITY_SEGMENT_LABELS[entity[1]] ?? `${entity[1].replace(/_/g, " ")} taste`.replace(/^./, (letter) => letter.toUpperCase());
   const parts = String(subtype ?? "").replace(/^urn:tag:/, "").split(":").filter(Boolean);
   if (!parts.length) return "General taste";
   const [kind, ...rest] = parts;
@@ -206,11 +215,18 @@ export function buildPersonas(tags, count, seed = PERSONA_SEED, crossDomain = {}
   return personas;
 }
 
-const DOMAIN_WORDS = { artist: "the music of", brand: "the brand", movie: "the film", book: "the book" };
+const DOMAIN_WORDS = { artist: "the music of", brand: "the brand", movie: "the film", book: "the book", tv_show: "the TV show", podcast: "the podcast", place: "places like" };
+
+// A tag reads as its name ("Craft Cocktails"); an urn:entity affinity says what kind of thing it
+// is ("the film The Lunchbox"), so the prompt reads like a person.
+function affinityPhrase(tag) {
+  const entity = /^urn:entity:([a-z_]+)$/.exec(String(tag.subtype ?? ""));
+  return entity && DOMAIN_WORDS[entity[1]] ? `${DOMAIN_WORDS[entity[1]]} ${tag.name}` : tag.name;
+}
 
 // The tested assistant never sees the target brand: naming it would bias the measurement.
 export function personaPrompt(persona, category, city) {
-  const [primary, ...rest] = persona.affinities.map((tag) => tag.name);
+  const [primary, ...rest] = persona.affinities.map(affinityPhrase);
   const extra = rest.length ? `, and I also like ${rest.join(" and ")}` : "";
   const outside = persona.crossDomain?.length
     ? ` Outside of food and drink I love ${persona.crossDomain.map((item) => `${DOMAIN_WORDS[item.type] ?? ""} ${item.name}`.trim()).join(" and ")}.`

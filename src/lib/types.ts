@@ -83,6 +83,11 @@ export type Audit = {
   city: string;
   createdAt: string;
   personas: Persona[];
+  // Where the personas' tastes came from: Qloo urn:tag taste tags, or urn:entity affinities when
+  // the key refused urn:tag (403). Older audits without the field used urn:tag.
+  personaSource?: "urn:tag" | "urn:entity";
+  // The 403 Qloo gave for urn:tag, when personaSource is urn:entity.
+  personaSourceNote?: string;
   qlooSignals?: QlooSignals;
   overall: SegmentResult;
   segments: SegmentResult[];

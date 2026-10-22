@@ -14,6 +14,8 @@ export type ReportModel = {
   createdAt: string;
   durationSeconds: number;
   personas: number;
+  personaSource: "urn:tag" | "urn:entity";
+  personaSourceNote: string | null;
   assistants: string[];
   overall: ReportSegment;
   segments: ReportSegment[];
@@ -35,5 +37,7 @@ export type ReportModel = {
   reproducibility: NonNullable<Audit["meta"]> | null;
 };
 export function buildReportModel(audit: Audit): ReportModel;
+export function personaSourceOf(audit: Pick<Audit, "personaSource"> | null | undefined): "urn:tag" | "urn:entity";
+export function personaSourceText(source: "urn:tag" | "urn:entity"): string;
 export function summarizeAuditListing(audit: Audit): { id: string; brand: string; city: string; createdAt: string; share: number | null; answers: number };
 export function reportText(model: ReportModel): string;

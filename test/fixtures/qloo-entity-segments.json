@@ -1,0 +1,218 @@
+{
+  "_fixture": "Hand-written test fixture for the urn:tag -> urn:entity persona fallback. Each entry follows the documented /v2/insights urn:entity shape (results.entities[] with entity_id, name, query.affinity; docs.qloo.com). The 403 body imitates the developer guide's 'unsupported type' answer. Not recorded live responses; every name is made up.",
+  "venue": {
+    "entityId": "VENUE-1",
+    "name": "Fixture Canteen",
+    "city": "Testville"
+  },
+  "tagRefusal": {
+    "status": 403,
+    "body": "{\"success\":false,\"error\":\"filter.type urn:tag is not supported for this API key\"}"
+  },
+  "entities": {
+    "artist": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "ARTIST-1",
+            "name": "Synthetic Band One",
+            "types": [
+              "urn:entity:artist"
+            ],
+            "query": {
+              "affinity": 0.9
+            }
+          },
+          {
+            "entity_id": "ARTIST-2",
+            "name": "Synthetic Singer Two",
+            "types": [
+              "urn:entity:artist"
+            ],
+            "query": {
+              "affinity": 0.85
+            }
+          },
+          {
+            "entity_id": "ARTIST-3",
+            "name": "Synthetic Trio Three",
+            "types": [
+              "urn:entity:artist"
+            ],
+            "query": {
+              "affinity": 0.8
+            }
+          },
+          {
+            "entity_id": "ARTIST-4",
+            "name": "Synthetic DJ Four",
+            "types": [
+              "urn:entity:artist"
+            ],
+            "query": {
+              "affinity": 0.75
+            }
+          }
+        ]
+      }
+    },
+    "brand": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "BRAND-1",
+            "name": "Synthetic Sneakers",
+            "types": [
+              "urn:entity:brand"
+            ],
+            "query": {
+              "affinity": 0.8
+            }
+          },
+          {
+            "entity_id": "BRAND-2",
+            "name": "Synthetic Coffee Co",
+            "types": [
+              "urn:entity:brand"
+            ],
+            "query": {
+              "affinity": 0.75
+            }
+          },
+          {
+            "entity_id": "BRAND-3",
+            "name": "Synthetic Outfitters",
+            "types": [
+              "urn:entity:brand"
+            ],
+            "query": {
+              "affinity": 0.7
+            }
+          }
+        ]
+      }
+    },
+    "movie": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "MOVIE-1",
+            "name": "Synthetic Film One",
+            "types": [
+              "urn:entity:movie"
+            ],
+            "query": {
+              "affinity": 0.85
+            }
+          },
+          {
+            "entity_id": "MOVIE-2",
+            "name": "Synthetic Film Two",
+            "types": [
+              "urn:entity:movie"
+            ],
+            "query": {
+              "affinity": 0.8
+            }
+          },
+          {
+            "entity_id": "MOVIE-3",
+            "name": "Synthetic Film Three",
+            "types": [
+              "urn:entity:movie"
+            ],
+            "query": {
+              "affinity": 0.75
+            }
+          }
+        ]
+      }
+    },
+    "book": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "BOOK-1",
+            "name": "Synthetic Novel",
+            "types": [
+              "urn:entity:book"
+            ],
+            "query": {
+              "affinity": 0.7
+            }
+          },
+          {
+            "entity_id": "BOOK-2",
+            "name": "Synthetic Memoir",
+            "types": [
+              "urn:entity:book"
+            ],
+            "query": {
+              "affinity": 0.65
+            }
+          }
+        ]
+      }
+    },
+    "tv_show": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "TV_SHOW-1",
+            "name": "Synthetic Series",
+            "types": [
+              "urn:entity:tv_show"
+            ],
+            "query": {
+              "affinity": 0.6
+            }
+          }
+        ]
+      }
+    },
+    "podcast": {
+      "_status": 403,
+      "_body": "{\"success\":false,\"error\":\"filter.type urn:entity:podcast is not enabled for this API key\"}"
+    },
+    "place": {
+      "success": true,
+      "results": {
+        "entities": [
+          {
+            "entity_id": "VENUE-1",
+            "name": "Fixture Canteen",
+            "query": {
+              "affinity": 0.99
+            }
+          },
+          {
+            "entity_id": "PLACE-2",
+            "name": "The Fixture Canteen, Branch Road",
+            "query": {
+              "affinity": 0.95
+            }
+          },
+          {
+            "entity_id": "PLACE-3",
+            "name": "Synthetic Wine Bar",
+            "query": {
+              "affinity": 0.77
+            }
+          },
+          {
+            "entity_id": "PLACE-4",
+            "name": "Synthetic Bakery",
+            "query": {
+              "affinity": 0.66
+            }
+          }
+        ]
+      }
+    }
+  }
+}

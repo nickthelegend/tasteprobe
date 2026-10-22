@@ -58,3 +58,14 @@ test("empty state: no audits stored, or an unknown id with links to stored ones"
   assert.match(unknown, /This server has no stored audit missing-id\./);
   assert.match(unknown, /href="\/audits\/00000000-0000-4000-8000-000000000001\/report">Fixture Venue \(synthetic\), Testville<\/a>/);
 });
+
+test("the report says where the personas came from: urn:tag, or urn:entity after a 403", () => {
+  const tagged = render(createElement(PrintReport, { model: buildReportModel(audit) }));
+  assert.match(tagged, /<dt>Persona source<\/dt><dd>Qloo urn:tag taste tags\.<\/dd>/);
+  assert.match(tagged, /2 taste segments · from urn:tag/);
+  const fallback = buildReportModel({ ...audit, personaSource: "urn:entity", personaSourceNote: "Qloo /v2/insights returned 403 for filter.type=urn:tag" });
+  assert.equal(fallback.personaSource, "urn:entity");
+  const html = render(createElement(PrintReport, { model: fallback }));
+  assert.match(html, /Qloo urn:entity affinities \(artists, brands, films, books, TV, podcasts, places\): this key refused urn:tag with a 403\. Qloo said: Qloo \/v2\/insights returned 403 for filter\.type=urn:tag/);
+  assert.match(html, /from urn:entity/);
+});

@@ -2,8 +2,9 @@ import OpenAI from "openai";
 import { parseJsonObject } from "./json.mjs";
 import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "./qloo.mjs";
 import { DEFAULT_NEBIUS_MODEL, reasoningLabel, reasoningParams, reasoningText } from "./nebius.mjs";
-import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, parseQlooTags, pickPlace, type QlooEntity } from "./taste.mjs";
-import type { QlooSignals, TasteTag, Usage } from "./types";
+import { collectPersonaSignals, type PersonaSignals } from "./persona-source.mjs";
+import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, pickPlace, type QlooEntity } from "./taste.mjs";
+import type { QlooSignals, Usage } from "./types";
 
 export class ConfigError extends Error {}
 // Nemotron answered but its output could not be parsed (or was cut off at max_tokens). Counted
@@ -65,20 +66,11 @@ export async function verifyRival(name: string, city: string): Promise<{ name: s
   }
 }
 
-export async function fetchTasteTags(entityId: string, city: string): Promise<{ tags: TasteTag[]; raw: unknown[] }> {
-  const base = { "filter.type": "urn:tag", "signal.interests.entities": entityId, take: "50" };
-  const local = await qloo("/v2/insights", { ...base, "signal.location.query": city });
-  let tags = parseQlooTags(local);
-  const raw: unknown[] = [{ scope: "city", payload: local }];
-  if (tags.length < 6) {
-    // Sparse local coverage: fall back to the place's global taste neighbourhood and say so in the cache.
-    const global = await qloo("/v2/insights", base);
-    raw.push({ scope: "global", payload: global });
-    const seen = new Set(tags.map((tag) => tag.id));
-    tags = [...tags, ...parseQlooTags(global).filter((tag) => !seen.has(tag.id))];
-  }
-  if (!tags.length) throw new Error("Qloo returned no taste tags for this place. Check the place name or try a better-known listing.");
-  return { tags, raw };
+// Persona signals for the venue: urn:tag taste tags, or urn:entity affinities when the key refuses
+// urn:tag with a 403 (the hackathon host's documented answer for unsupported types). See
+// src/lib/persona-source.mjs.
+export function fetchPersonaSignals(entityId: string, city: string, venueName: string) {
+  return collectPersonaSignals(qloo, { entityId, city, venueName });
 }
 
 // Cross-domain taste: artists, brands, films and books with affinity to the venue (city-scoped),
@@ -86,11 +78,18 @@ export async function fetchTasteTags(entityId: string, city: string): Promise<{ 
 // error is recorded. Parameter names: filter.type, signal.interests.entities, signal.location.query
 // and take (max 50), all listed for artist, book, brand and movie in docs.qloo.com/reference/parameters.
 // filter.type=urn:demographics takes signal.interests.entities only (docs.qloo.com/reference/demographics-use-case).
-export async function fetchCrossDomainSignals(entityId: string, city: string) {
+// `prefetched` (the urn:entity persona results) is reused instead of asking Qloo twice.
+export async function fetchCrossDomainSignals(entityId: string, city: string, prefetched: PersonaSignals["entityResults"] = null) {
   const crossDomain: Record<string, QlooEntity[]> = {};
   const raw: unknown[] = [];
   const signals: QlooSignals = { domains: [], demographics: null };
   await Promise.all(CROSS_DOMAIN_TYPES.map(async (type) => {
+    const reused = prefetched?.[type];
+    if (reused) {
+      crossDomain[type] = reused.entities;
+      signals.domains.push({ type, entities: reused.entities.map((item) => item.name), ...(reused.error ? { error: reused.error } : {}) });
+      return;
+    }
     try {
       const payload = await qloo("/v2/insights", { "filter.type": `urn:entity:${type}`, "signal.interests.entities": entityId, "signal.location.query": city, take: "10" });
       raw.push({ type, payload });

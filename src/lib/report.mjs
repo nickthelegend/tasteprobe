@@ -35,6 +35,8 @@ export function buildReport({ audit, responses, rawFiles, mode, recordedAt, rend
     renderedAt,
     runtime,
     venue: { brand: audit.brand, category: audit.category, city: audit.city, qlooEntityId: audit.qlooEntityId, qlooAddress: audit.qlooAddress ?? null },
+    personaSource: audit.personaSource === "urn:entity" ? "urn:entity" : "urn:tag",
+    personaSourceNote: audit.personaSourceNote ?? null,
     models: {
       assistants: audit.meta?.assistants ?? audit.systems.map((name) => ({ name, model: name, host: "unknown" })),
       extraction: audit.extractionModel,
@@ -110,6 +112,7 @@ ${banner}
 <section><h2>Models and seeds</h2><ul>
 <li>Assistants: ${assistants || "none recorded"}; temperature ${escape(report.models.assistantTemperature ?? "n/a")}</li>
 <li>Extraction: <code>${escape(report.models.extraction)}</code> on Nebius; max_tokens ${escape(report.models.nemotronMaxTokens ?? "n/a")}; thinking ${escape(report.models.nemotronThinking ?? "n/a")}</li>
+<li>Personas from Qloo <code>${escape(report.personaSource ?? "urn:tag")}</code>${report.personaSource === "urn:entity" ? " (this key refused urn:tag with a 403, so each urn:entity type became a taste segment)" : " taste tags"}${report.personaSourceNote ? `. Qloo said: ${escape(report.personaSourceNote)}` : ""}</li>
 <li>Persona seed ${escape(report.seeds.persona ?? "n/a")}; lift bootstrap seed ${escape(report.seeds.liftBootstrap ?? "n/a")}</li>
 <li>Runtime: ${escape(report.runtime)}</li>
 </ul>${check ? `<h2 style="margin-top:14px">Extraction cross-check</h2><ul>${check}</ul>` : ""}</section>

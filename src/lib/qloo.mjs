@@ -9,6 +9,18 @@
 
 export const QLOO_HACKATHON_BASE_URL = "https://hackathon.api.qloo.com";
 
+// A Qloo HTTP error the caller can act on: `status` and the refused `filterType` (for /v2/insights)
+// are kept, so a 403 on urn:tag can switch the personas to urn:entity types instead of failing.
+export class QlooHttpError extends Error {
+  constructor(message, { status, path, filterType = null }) {
+    super(message);
+    this.name = "QlooHttpError";
+    this.status = status;
+    this.path = path;
+    this.filterType = filterType;
+  }
+}
+
 function snippet(body) {
   return String(body ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
 }
@@ -22,13 +34,13 @@ export function readQlooResponse({ path, params = {}, status, body, baseUrl = QL
     const hint = host === new URL(QLOO_HACKATHON_BASE_URL).host
       ? "Check QLOO_API_KEY."
       : `QLOO_BASE_URL points at ${host}; hackathon keys only work against ${QLOO_HACKATHON_BASE_URL}.`;
-    throw new Error(`Qloo ${path} returned 401 (key rejected). ${hint}`);
+    throw new QlooHttpError(`Qloo ${path} returned 401 (key rejected). ${hint}`, { status, path });
   }
   if (status === 403 && path.startsWith("/v2/insights")) {
     const type = params["filter.type"] ?? "this filter.type";
-    throw new Error(`Qloo ${path} returned 403 for filter.type=${type}: Qloo says this type is not enabled for your key. ${snippet(body)}`.trim());
+    throw new QlooHttpError(`Qloo ${path} returned 403 for filter.type=${type}: Qloo says this type is not enabled for your key. ${snippet(body)}`.trim(), { status, path, filterType: params["filter.type"] ?? null });
   }
-  if (status < 200 || status >= 300) throw new Error(`Qloo ${path} returned ${status}: ${snippet(body) || "no body"}`);
+  if (status < 200 || status >= 300) throw new QlooHttpError(`Qloo ${path} returned ${status}: ${snippet(body) || "no body"}`, { status, path, filterType: params["filter.type"] ?? null });
   try { return JSON.parse(body); }
   catch { throw new Error(`Qloo ${path} returned ${status} with a body that is not JSON: ${snippet(body)}`); }
 }

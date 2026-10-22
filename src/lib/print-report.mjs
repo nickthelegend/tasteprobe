@@ -3,6 +3,7 @@
 // so the same module renders in Next and in node:test (react-dom/server) without a build step.
 // React escapes every string, so stored copy and Qloo names are never injected as HTML.
 import { createElement as h, Fragment } from "react";
+import { personaSourceText } from "./report-model.mjs";
 
 const pct = (value) => (value === null || value === undefined ? "—" : `${Math.round(value * 100)}%`);
 const range = (ci) => (ci ? `${Math.round(ci[0] * 100)}–${Math.round(ci[1] * 100)}%` : "—");
@@ -95,7 +96,7 @@ export function PrintReport({ model, actions = null }) {
           h("span", { className: "big-num" }, overall.share === null ? "—" : Math.round(overall.share * 100), overall.share !== null && h("em", null, "%")),
           h("span", { className: "sub" }, `${overall.mentions} of ${answers.usable} usable answers recommend it · 95% ${range(overall.ci)}`))),
       h("dl", { className: "rp-facts" },
-        h("div", null, h("dt", null, "Qloo personas"), h("dd", null, model.personas), h("span", { className: "sub" }, `${model.segments.length} taste segments`)),
+        h("div", null, h("dt", null, "Qloo personas"), h("dd", null, model.personas), h("span", { className: "sub" }, `${model.segments.length} taste segments · from ${model.personaSource}`)),
         h("div", null, h("dt", null, "Answers"), h("dd", null, answers.usable), h("span", { className: "sub" }, `${answers.attempted} attempted · ${answers.dropped} dropped (${dropped(answers.droppedByKind)})`)),
         h("div", null, h("dt", null, "Assistants"), h("dd", { className: "text" }, model.assistants.join(", ") || "—")))),
 
@@ -157,6 +158,7 @@ export function PrintReport({ model, actions = null }) {
 
     h(Section, { no: next(), title: "How to reproduce it" },
       h("dl", { className: "rp-repro" },
+        h("div", null, h("dt", null, "Persona source"), h("dd", null, `${personaSourceText(model.personaSource)}.${model.personaSourceNote ? ` Qloo said: ${model.personaSourceNote}` : ""}`)),
         h("div", null, h("dt", null, "Extraction"), h("dd", null, `${model.extraction.model} on Nebius Token Factory · ${model.extraction.inputTokens.toLocaleString("en-US")} in / ${model.extraction.outputTokens.toLocaleString("en-US")} out tokens · ${model.extraction.estimatedCostUsd === null ? "cost not estimated (no rates set)" : `est. $${model.extraction.estimatedCostUsd}`}`)),
         model.reproducibility && h(Fragment, null,
           h("div", null, h("dt", null, "Assistants"), h("dd", null, model.reproducibility.assistants.map((item) => `${item.name} (${item.model} at ${item.host})`).join(", ") || "—")),

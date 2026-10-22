@@ -30,6 +30,15 @@ function lift(value) {
   return value ? { delta: round(value.delta), ci: interval(value.ci), clearsZero: Array.isArray(value.ci) && value.ci[0] > 0 } : null;
 }
 
+// Older audits have no personaSource; they were built from urn:tag before the fallback existed.
+export const personaSourceOf = (audit) => (audit?.personaSource === "urn:entity" ? "urn:entity" : "urn:tag");
+
+export function personaSourceText(source) {
+  return source === "urn:entity"
+    ? "Qloo urn:entity affinities (artists, brands, films, books, TV, podcasts, places): this key refused urn:tag with a 403"
+    : "Qloo urn:tag taste tags";
+}
+
 export function buildReportModel(audit) {
   if (!audit || typeof audit !== "object" || !audit.id) throw new Error("buildReportModel needs a stored audit.");
   const failedByKind = audit.failedByKind ?? { assistant: 0, unparseable: 0, extraction: 0 };
@@ -39,6 +48,8 @@ export function buildReportModel(audit) {
     createdAt: audit.createdAt,
     durationSeconds: Math.round((audit.durationMs ?? 0) / 1000),
     personas: audit.personas?.length ?? 0,
+    personaSource: personaSourceOf(audit),
+    personaSourceNote: audit.personaSourceNote ?? null,
     assistants: audit.systems ?? [],
     overall: segment(audit.overall),
     segments: (audit.segments ?? []).map(segment),
@@ -114,6 +125,7 @@ const range = (ci) => (ci ? `${Math.round(ci[0] * 100)}–${Math.round(ci[1] * 1
 export function reportText(model) {
   const lines = [
     `${model.venue.brand} (${model.venue.category}, ${model.venue.city}) · audit ${model.id} · ${model.createdAt}`,
+    `Personas from ${personaSourceText(model.personaSource)}.`,
     `Whole flight: ${pct(model.overall.share)} of ${model.answers.usable} usable answers recommend it (95% ${range(model.overall.ci)}); ${model.answers.dropped} of ${model.answers.attempted} dropped (${model.answers.droppedByKind.assistant} call errors, ${model.answers.droppedByKind.unparseable} unparseable, ${model.answers.droppedByKind.extraction} extraction errors).`,
     ...model.segments.map((item) => `- ${item.name}: ${pct(item.share)} (${item.mentions}/${item.answers}, 95% ${range(item.ci)}, ${item.personas} personas)${item.rivals[0] ? `; poured most instead: ${item.rivals[0].name}` : ""}`),
   ];

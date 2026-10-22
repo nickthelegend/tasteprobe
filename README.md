@@ -11,7 +11,7 @@
 ```mermaid
 flowchart LR
   I[Business + category + city] --> S[Qloo /search<br/>place in that city only]
-  S --> T[Qloo /v2/insights<br/>urn:tag affinities, city-scoped]
+  S --> T[Qloo /v2/insights<br/>urn:tag, or urn:entity per type on a 403]
   S --> X[Qloo /v2/insights<br/>artist · brand · movie · book · demographics]
   T --> P[Persona builder<br/>anchor tag + 2 by affinity<br/>>= 8 personas per segment]
   X --> P
@@ -105,7 +105,7 @@ Without keys, `run_audit` and `run_fix` return a tool error, `Setup required: QL
 ## How the numbers are made
 
 1. **Venue.** Qloo `/search` must return a place whose address or geocode names the requested city. If none does, the audit stops and lists what Qloo found elsewhere. It never audits a namesake in another city.
-2. **Personas.** Qloo `/v2/insights` (`filter.type=urn:tag`, `signal.interests.entities`, `signal.location.query`) returns up to 50 tags with affinity. Tags are grouped into segments by subtype. **Every segment gets at least 8 personas**: N personas allow at most floor(N/8) segments (max 6). Each persona anchors on one tag and adds two from other segments, sampled by affinity with seed 7. Where Qloo returns them, a persona also names one or two artists, brands, films or books with affinity to the venue.
+2. **Personas.** Qloo `/v2/insights` (`filter.type=urn:tag`, `signal.interests.entities`, `signal.location.query`) returns up to 50 taste tags with affinity, and tags are grouped into segments by subtype. **The hackathon host may refuse `urn:tag`:** the Qloo Agentic Hackathon Developer Guide lists only `urn:entity:*` types as supported and says other types answer 403. On a 403 for `urn:tag`, the personas are built from `urn:entity` affinities instead: one `/v2/insights` call per type (`artist`, `brand`, `movie`, `book`, `tv_show`, `podcast`, and `place` with the venue itself removed), all city-scoped on the venue, and each type becomes one taste segment ("Music taste", "Film taste", ...). Which path ran is stored on the audit as `personaSource` (`urn:tag` or `urn:entity`) and shown in the dashboard, the printable report and the CLI report. `npm run audit:live` checks it before spending anything: its preflight makes one 1-tag `urn:tag` call on the resolved place and prints whether the key gets `urn:tag`. Either way, **every segment gets at least 8 personas**: N personas allow at most floor(N/8) segments (max 6). Each persona anchors on one tag or entity, taken in affinity order, and adds two from other segments, sampled by affinity with seed 7. With `urn:tag` personas, a persona also names one or two artists, brands, films or books with affinity to the venue where Qloo returns them.
 3. **Prompts.** The **baseline** prompt holds only the persona's tastes, the category and the city. It never names the venue.
 4. **Extraction.** Nemotron returns the venues each answer recommends as JSON. Output that is truncated at `max_tokens`, has no JSON or has no `entities` array is counted as **unparseable**. It is never silently turned into "not recommended". A deterministic numbered-list parser reads the same answer, and the audit reports how often the two disagree, per assistant.
 5. **Denominators.** Share of voice is mentions / usable answers. Every segment also reports attempted answers and the dropped ones, split into assistant errors, unparseable extractions and failed extractions.
@@ -138,7 +138,7 @@ Every model call that TasteProbe itself makes goes to an NVIDIA open model on Ne
 ## Qloo
 
 - `/search` (`types=urn:entity:place`) resolves the venue in its own city and checks the rivals assistants recommend. A 404 is Qloo's documented "No results" and stops the audit with a readable message.
-- `/v2/insights` with `filter.type=urn:tag`, `signal.interests.entities` and `signal.location.query` builds the personas (Taste Analysis).
+- `/v2/insights` with `filter.type=urn:tag`, `signal.interests.entities` and `signal.location.query` builds the personas (Taste Analysis). If the key answers 403 for `urn:tag` (the hackathon guide lists it as unsupported), the personas come from `urn:entity:artist|brand|movie|book|tv_show|podcast|place` affinities instead, and the audit records `personaSource: "urn:entity"`.
 - `/v2/insights` with `filter.type=urn:entity:artist|brand|movie|book` adds cross-domain taste, and `filter.type=urn:demographics` adds the audience lean.
 - The agent reads Qloo live through its `qloo_insights` tool. The MCP server exposes the whole Qloo-grounded audit to other agents.
 - Raw Qloo payloads are cached server-side under `.data/` (git-ignored). Qloo's FAQ forbids putting Qloo response data in a public repo.
@@ -156,7 +156,7 @@ Checked against the live docs on **2026-10-21**, without keys. "Confirmed" means
 | `signal.location.query` works for artist, book, brand, movie and place; `filter.location.query` only for destination and place | Confirmed; we use `signal.location.query` throughout | [Parameter Reference](https://docs.qloo.com/reference/parameters), [Location-Based Insights](https://docs.qloo.com/reference/insights-with-location-use-case) |
 | `take` max 50 | Confirmed (we ask for 50 tags, 10 entities, 15 search results) | Parameter Reference |
 | `/search` takes `query`, `types` (`urn:entity:place` is valid), `take`; 404 means "No results" | Confirmed; 404 handling fixed in code | [Search Entities](https://docs.qloo.com/reference/get-search) |
-| `urn:tag` and `urn:demographics` on the **hackathon** host | **Unverified.** The guide's supported `filter.type` list names only `urn:entity:*` types and says an unsupported type returns 403. The personas depend on `urn:tag`. A 403 now names the refused type. | developer guide |
+| `urn:tag` and `urn:demographics` on the **hackathon** host | **Unverified, probably refused.** The guide (re-read 2026-10-22, now titled "Qloo Agentic Hackathon Developer Guide") lists only `urn:entity:artist/book/brand/destination/movie/person/place/podcast/tv_show/video_game` and says an unsupported type returns 403. The personas no longer depend on `urn:tag`: a 403 switches them to `urn:entity` segments (`personaSource`), and the CLI preflight reports which one the key gets. A refused `urn:demographics` is recorded as an error and the audit continues. | developer guide |
 | Tag affinity in `query.affinity`; place `properties.address` / `geocode` used for the city match | **Unverified.** The doc examples show neither for these calls. Without affinity, tags are weighted by `query.popularity` if present, otherwise evenly. Without an address or geocode, the city match fails with the list of what Qloo found. | — |
 | Nebius base URL `https://api.tokenfactory.nebius.com/v1/`, OpenAI-compatible | Confirmed | [Quickstart](https://docs.tokenfactory.nebius.com/quickstart) |
 | `tools` and `tool_choice` (`auto`, `none`, `required`, named) on chat completions | Confirmed | [Function calling](https://docs.tokenfactory.nebius.com/ai-models-inference/function-calling), [chat completion reference](https://docs.tokenfactory.nebius.com/api-reference/inference/create-chat-completion) |

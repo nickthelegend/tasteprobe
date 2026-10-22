@@ -1,6 +1,6 @@
 import { summarizeCrossCheck } from "./extract.mjs";
 import { estimateCost, pool, probePersona, sumUsage, toObservations, type FailedRow, type ResponseRow } from "./probe.ts";
-import { ASSISTANT_TEMPERATURE, assistantsMeta, EXTRACTION_SYSTEM_PROMPT, fetchCrossDomainSignals, fetchTasteTags, nebiusModel, nemotronSettings, resolvePlace, verifyRival } from "./providers.ts";
+import { ASSISTANT_TEMPERATURE, assistantsMeta, EXTRACTION_SYSTEM_PROMPT, fetchCrossDomainSignals, fetchPersonaSignals, nebiusModel, nemotronSettings, resolvePlace, verifyRival } from "./providers.ts";
 import { LIFT_BOOTSTRAP_SEED, summarizeObservations } from "./stats.mjs";
 import { saveAudit, writeRaw } from "./storage.ts";
 import { buildPersonas, matchesBrand, PERSONA_SEED, personaPrompt } from "./taste.mjs";
@@ -17,12 +17,15 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
   send({ type: "place", name: place.name, entityId: place.id, address: place.address });
 
   send({ type: "stage", stage: "qloo", message: `Fetching taste affinities for ${place.name} in ${input.city}` });
-  const [taste, cross] = await Promise.all([fetchTasteTags(place.id, input.city), fetchCrossDomainSignals(place.id, input.city)]);
-  const personas = buildPersonas(taste.tags, input.personaCount, PERSONA_SEED, cross.crossDomain);
+  const taste = await fetchPersonaSignals(place.id, input.city, place.name);
+  if (taste.source === "urn:entity") send({ type: "stage", stage: "qloo", message: "Qloo refused urn:tag for this key (403); building personas from artist, brand, film, book, TV, podcast and place affinities" });
+  const cross = await fetchCrossDomainSignals(place.id, input.city, taste.entityResults);
+  // With urn:entity personas the cross-domain types are already the segments, so they are not blended in twice.
+  const personas = buildPersonas(taste.tags, input.personaCount, PERSONA_SEED, taste.source === "urn:tag" ? cross.crossDomain : {});
   send({ type: "personas", personas });
 
   const auditId = crypto.randomUUID();
-  await writeRaw(auditId, "qloo", { search: place.raw, insights: taste.raw, crossDomain: cross.raw });
+  await writeRaw(auditId, "qloo", { search: place.raw, personaSource: taste.source, insights: taste.raw, crossDomain: cross.raw });
 
   send({ type: "stage", stage: "query", message: `Asking assistants as ${personas.length} Qloo personas` });
   const rows: ResponseRow[] = [];
@@ -62,6 +65,8 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
     city: input.city,
     createdAt: new Date().toISOString(),
     personas,
+    personaSource: taste.source,
+    ...(taste.tagRefusal ? { personaSourceNote: taste.tagRefusal } : {}),
     qlooSignals: cross.signals,
     overall: summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })), failures.map((row) => ({ ...row, segment: "All personas" })))[0],
     segments: summarizeObservations(observations, failures),

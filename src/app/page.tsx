@@ -13,6 +13,7 @@ import { FlightBoard, Glass } from "@/components/Flight";
 import { PersonaTray, type PersonaResult } from "@/components/Tray";
 import { Landing } from "@/components/Landing";
 import { Logo } from "@/components/Logo";
+import { personaSourceOf, personaSourceText } from "@/lib/report-model.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
 type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[] };
@@ -264,7 +265,7 @@ export default function Home() {
         </section>
 
         <section className="facts" aria-label="Audit totals">
-          <div><span className="label">Qloo personas</span><b>{active.personas.length}</b><span className="sub">{active.segments.length} taste segments</span></div>
+          <div><span className="label">Qloo personas</span><b>{active.personas.length}</b><span className="sub">{active.segments.length} taste segments · from <code>{personaSourceOf(active)}</code></span></div>
           <div><span className="label">Live answers</span><b>{active.responseCount}</b><span className="sub">{active.systems.join(", ")}{active.failedResponses ? ` · ${active.failedResponses} of ${active.responseCount + active.failedResponses} excluded${active.failedByKind ? ` (${active.failedByKind.assistant} call errors, ${active.failedByKind.unparseable} unparseable, ${active.failedByKind.extraction} extraction errors)` : ""}` : ""}</span></div>
           <div><span className="label">Poured most instead</span><b className="text">{active.overall.competitors[0]?.name ?? "—"}</b><span className="sub">{active.overall.competitors[0] ? `in ${pct(active.overall.competitors[0].share)} of answers` : "No competitors extracted"}</span></div>
         </section>
@@ -280,8 +281,11 @@ export default function Home() {
             <CompetitorBars brand={active.brand} segment={segment} checks={active.rivalChecks} />
           </section>
           <section className="panel">
-            <div className="panel-head"><div><h3>Palates in this glass</h3><p>Each persona anchors on one Qloo tag (pink) and blends two affinity-weighted tags. Numbers are Qloo affinity scores.</p></div></div>
+            <div className="panel-head"><div><h3>Palates in this glass</h3><p>{personaSourceOf(active) === "urn:entity"
+              ? "Each persona anchors on one Qloo entity (pink) and blends two affinity-weighted entities from other segments. Numbers are Qloo affinity scores."
+              : "Each persona anchors on one Qloo tag (pink) and blends two affinity-weighted tags. Numbers are Qloo affinity scores."}</p></div></div>
             <PersonaGrid personas={active.personas.filter((persona) => persona.segment === segment.name)} />
+            <p className="footnote persona-source">Personas from {personaSourceText(personaSourceOf(active))}.{active.personaSourceNote ? ` Qloo said: ${active.personaSourceNote}` : ""}</p>
             {active.qlooSignals && <p className="footnote">
               <span className="stamp">unverified until first live run</span>{" "}
               Cross-domain Qloo signals (lilac chips): {active.qlooSignals.domains.map((domain) => `${domain.type} ${domain.error ? "failed" : `${domain.entities.length}`}`).join(" · ")}

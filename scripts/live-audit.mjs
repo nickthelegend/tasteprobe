@@ -12,8 +12,10 @@ import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { DEFAULT_NEBIUS_MODEL } from "../src/lib/nebius.mjs";
+import { tagSupportLine } from "../src/lib/persona-source.mjs";
 import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "../src/lib/qloo.mjs";
 import { buildReport, renderReportHtml } from "../src/lib/report.mjs";
+import { pickPlace } from "../src/lib/taste.mjs";
 
 function parseArgs(argv) {
   const args = {};
@@ -62,20 +64,36 @@ async function call(label, url, init) {
   try { return JSON.parse(text); } catch { return text; }
 }
 
-// The cheapest real call each key allows: Qloo /search (take=1), Nebius /models (and the
-// configured model must be listed), each assistant's /models (a 1-token completion if /models
-// is not served).
-async function preflight(brand) {
+async function qlooGet(qlooBase, path, params) {
+  const url = new URL(path, qlooBase);
+  url.search = new URLSearchParams(params).toString();
+  let response;
+  try { response = await fetch(url, { headers: { "x-api-key": process.env.QLOO_API_KEY, accept: "application/json" }, signal: AbortSignal.timeout(30_000) }); }
+  catch (error) { throw new Error(`Qloo ${path}: network error (${error instanceof Error ? error.message : String(error)})`); }
+  return readQlooResponse({ path, params, status: response.status, body: await response.text(), baseUrl: qlooBase });
+}
+
+// The cheapest real call each key allows: Qloo /search, then one 1-tag /v2/insights urn:tag call on
+// the resolved place (does this key get urn:tag, or will personas come from urn:entity types?),
+// Nebius /models (and the configured model must be listed), each assistant's /models (a 1-token
+// completion if /models is not served).
+async function preflight(brand, city) {
   const results = [];
   const qlooBase = process.env.QLOO_BASE_URL || QLOO_HACKATHON_BASE_URL;
-  const search = new URL("/search", qlooBase);
-  search.search = new URLSearchParams({ query: brand, types: "urn:entity:place", take: "1" }).toString();
-  let response;
-  try { response = await fetch(search, { headers: { "x-api-key": process.env.QLOO_API_KEY, accept: "application/json" }, signal: AbortSignal.timeout(30_000) }); }
-  catch (error) { throw new Error(`Qloo /search: network error (${error instanceof Error ? error.message : String(error)})`); }
   // A 404 is Qloo's documented "No results": the key was accepted.
-  const found = readQlooResponse({ path: "/search", status: response.status, body: await response.text(), baseUrl: qlooBase });
+  const found = await qlooGet(qlooBase, "/search", { query: brand, types: "urn:entity:place", take: "15" });
   results.push(`Qloo ${new URL(qlooBase).host}: /search ok${found.noResults ? ` (no listing matches "${brand}" yet; the audit will say so)` : ""}`);
+  let place = null;
+  try { place = pickPlace(found.results ?? found.entities ?? [], brand, city); }
+  catch (error) { results.push(`Qloo urn:tag check skipped: ${error instanceof Error ? error.message : String(error)}`); }
+  if (place) {
+    try {
+      await qlooGet(qlooBase, "/v2/insights", { "filter.type": "urn:tag", "signal.interests.entities": place.id, "signal.location.query": city, take: "1" });
+      results.push(tagSupportLine(place.name, { ok: true }));
+    } catch (error) {
+      results.push(tagSupportLine(place.name, { ok: false, error }));
+    }
+  }
 
   const nebiusBase = (process.env.NEBIUS_BASE_URL || "https://api.tokenfactory.nebius.com/v1").replace(/\/$/, "");
   const wanted = process.env.NEBIUS_MODEL || DEFAULT_NEBIUS_MODEL;
@@ -169,7 +187,7 @@ async function live(args) {
     process.exit(1);
   }
   try {
-    for (const line of await preflight(brand)) console.log(`Preflight ok · ${line}`);
+    for (const line of await preflight(brand, city)) console.log(`Preflight ok · ${line}`);
   } catch (error) {
     fail(`Preflight failed · ${error instanceof Error ? error.message : String(error)}`);
   }

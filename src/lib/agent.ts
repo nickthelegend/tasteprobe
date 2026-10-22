@@ -5,7 +5,7 @@ import {
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
 import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
-import { COPY_RULES, fetchTasteTags, getTestModels, nebiusModel, nebiusPrices, nemotronTurn } from "./providers.ts";
+import { COPY_RULES, fetchPersonaSignals, getTestModels, nebiusModel, nebiusPrices, nemotronTurn } from "./providers.ts";
 import { placeboCopy, segmentLabel } from "./taste.mjs";
 import type { AgentCandidateSummary, AgentEvent, AgentRun, Audit, SegmentResult } from "./types";
 
@@ -109,11 +109,13 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
   async function execute(name: string, args: Record<string, unknown>): Promise<{ ok: boolean; result: unknown; summary: string }> {
     if (name === "qloo_insights") {
       if (!qlooCache) {
-        const { tags, raw } = await fetchTasteTags(audit.qlooEntityId, audit.city);
+        // Same fallback as the audit: urn:tag, or urn:entity affinities when the key refuses urn:tag.
+        const { tags, raw, source } = await fetchPersonaSignals(audit.qlooEntityId, audit.city, audit.brand);
         trace.qloo = raw;
         const byAffinity = [...tags].sort((a, b) => (b.affinity ?? 0) - (a.affinity ?? 0));
         const view = (tag: (typeof tags)[number]) => ({ name: tag.name, affinity: round(tag.affinity ?? null) });
         qlooCache = {
+          source,
           segment_tags: byAffinity.filter((tag) => segmentLabel(tag.subtype) === segment.name).slice(0, 12).map(view),
           strongest_tags: byAffinity.slice(0, 12).map(view),
         };
