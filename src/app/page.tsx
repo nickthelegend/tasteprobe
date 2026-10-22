@@ -204,7 +204,7 @@ export default function Home() {
   const showResults = Boolean(active && !run);
 
   return <main>
-    <Landing status={status} auditCount={auditTotal} />
+    <Landing status={status} auditCount={auditTotal} featured={audits?.[0]?.featured ? audits[0].brand : null} />
 
     <section className="room" id="room" aria-labelledby="room-title">
       <div className="room-head">
@@ -363,7 +363,6 @@ export default function Home() {
             <PersonaGrid personas={active.personas.filter((persona) => persona.segment === segment.name)} />
             <p className="footnote persona-source">Personas from {personaSourceText(personaSourceOf(active))}.{tagScopeText(active.tagScope) ? ` ${tagScopeText(active.tagScope)}.` : ""}{active.personaSourceNote ? ` Qloo said: ${active.personaSourceNote}` : ""}</p>
             {active.qlooSignals && <p className="footnote">
-              <span className="stamp">unverified until first live run</span>{" "}
               Cross-domain Qloo signals (lilac chips): {active.qlooSignals.domains.map((domain) => `${domain.type} ${domain.error ? "failed" : `${domain.entities.length}`}`).join(" · ")}
               {active.qlooSignals.demographics
                 ? ` · audience lean: ${active.qlooSignals.demographics.age.slice(0, 2).map((item) => item.bucket.replace(/_/g, " ")).join(", ") || "no age data"}${active.qlooSignals.demographics.gender[0] ? `, ${active.qlooSignals.demographics.gender[0].bucket}` : ""}`

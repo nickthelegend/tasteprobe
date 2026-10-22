@@ -61,7 +61,7 @@ export function Evidence({ auditId, brand, segment, attemptId }: { auditId: stri
           <pre>{row.answer}</pre>
         </div>
       </details>)}
-      {rows.length > 30 && <p className="footnote">Showing 30 of {rows.length}. All responses are cached under <code>.data/raw/{auditId}</code>.</p>}
+      {rows.length > 30 && <p className="footnote">Showing 30 of {rows.length}. All responses are cached in the server’s audit store (<code>raw/{auditId}</code>).</p>}
     </div> : <p className="footnote">No cached responses for this segment.</p>}
   </>;
 }

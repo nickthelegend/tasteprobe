@@ -96,7 +96,8 @@ test.describe("landing: the tasting sheet", () => {
     // Open them all for the record, and check what the label promises about missing keys.
     for (let index = 1; index < 6; index++) await items.nth(index).locator("summary").click();
     await expect(items.nth(4)).toContainText("Without them the tasting room says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.");
-    await expect(items.nth(5)).toContainText("Not yet against live keys from this repo.");
+    // Data-driven from this server's store (empty on the dev and standalone targets).
+    await expect(items.nth(5).locator("p")).toHaveText("Not on this server: no audit has been stored here yet. Every glass above the tasting room is an example; the tasting room fills only from a live run, and that run’s raw provider payloads are kept with it for checking.");
     await page.locator("#label").screenshot({ path: test.info().outputPath("06-back-label.png"), animations: "disabled" });
   });
 

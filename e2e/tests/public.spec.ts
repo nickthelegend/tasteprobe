@@ -29,6 +29,13 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     await expect(flights.locator("button").nth(1)).toContainText("Visitor Venue 1 (synthetic)");
     await expect(flights.locator(".cellar-more")).toHaveText("2 older flights not listed");
     await expect(page.locator(".masthead-live")).toContainText("14 flights poured here");
+    // No pre-live copy once the store has audits: no "unverified until first live run" stamp, and
+    // the FAQ answers from the store (here the SYNTHETIC test store, so this checks the copy logic).
+    await expect(page.getByText("unverified until first live run")).toHaveCount(0);
+    const faq = page.locator("#label details").filter({ hasText: "Has it run end to end?" });
+    await faq.locator("summary").click();
+    await expect(faq.locator("p")).toHaveText(`Yes, on this server: 14 audits stored, each saved by a live run (Qloo, Nemotron on Nebius and the assistants under test); the featured one is ${FEATURED_NAME}. Open one in the tasting room to read every answer behind it. Every glass above the tasting room is an example.`);
+    await expect(faq).not.toContainText("Not yet");
     await expectNoHorizontalScroll(page);
     await shot(page, "13-public-featured-results");
   });

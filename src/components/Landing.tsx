@@ -42,7 +42,15 @@ function cellarLine(status: CellarStatus, auditCount: number | null) {
   return `${keys.join(" · ")}${poured}`;
 }
 
-export function Landing({ status, auditCount }: { status: CellarStatus; auditCount: number | null }) {
+// The "Has it run end to end?" answer, from this server's store: every stored audit was saved by a
+// live run (the app has no other way to create one).
+function liveRunAnswer(auditCount: number | null, featured: string | null) {
+  if (auditCount === null) return "Checking this server’s audit store…";
+  if (auditCount === 0) return "Not on this server: no audit has been stored here yet. Every glass above the tasting room is an example; the tasting room fills only from a live run, and that run’s raw provider payloads are kept with it for checking.";
+  return `Yes, on this server: ${auditCount} ${auditCount === 1 ? "audit" : "audits"} stored, each saved by a live run (Qloo, Nemotron on Nebius and the assistants under test)${featured ? `; the featured one is ${featured}` : ""}. Open one in the tasting room to read every answer behind it. Every glass above the tasting room is an example.`;
+}
+
+export function Landing({ status, auditCount, featured = null }: { status: CellarStatus; auditCount: number | null; featured?: string | null }) {
   return <div className="sheet" id="top">
     <div className="masthead">
       <span className="masthead-title">TasteProbe tasting sheet</span>
@@ -149,7 +157,7 @@ export function Landing({ status, auditCount }: { status: CellarStatus; auditCou
         <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Lift is a paired bootstrap over personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
         <details><summary>What does a fix change?</summary><p>Nothing on your site. The copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled. The baseline is re-asked in the same run, so model drift since the audit does not count as lift, and every attempt is kept.</p></details>
         <details><summary>What do I need to run it?</summary><p><code>QLOO_API_KEY</code>, <code>NEBIUS_API_KEY</code>, and <code>OPENAI_API_KEY</code> or a <code>MODEL_2_*</code> OpenAI-compatible endpoint in <code>.env.local</code>. Without them the tasting room says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
-        <details><summary>Has it run end to end?</summary><p>Not yet against live keys from this repo. Every glass on this page above the tasting room is an example. The Qloo parsing follows the documented <code>/v2/insights</code> shape; the first live audit’s raw payload is cached for checking, and tool calling on Nebius is unverified until that run.</p></details>
+        <details><summary>Has it run end to end?</summary><p>{liveRunAnswer(auditCount, featured)}</p></details>
       </div>
       <p className="label-foot"><a href={REPO}>Source on GitHub</a> · <a href={`${REPO}#how-the-numbers-are-made`}>How the numbers are made</a> · MIT</p>
     </section>
