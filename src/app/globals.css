@@ -338,6 +338,9 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .cf-copy { display: grid; gap: 12px; align-content: start; font-size: 15px; color: var(--muted); }
 .cf-copy b { color: var(--ink); font-weight: 500; }
 .cf blockquote, .agent-result blockquote { margin: 0; padding: 14px 18px; border-left: 3px solid var(--pink); background: #fff; border-radius: 0 12px 12px 0; font-size: 18px; line-height: 1.45; color: var(--ink); letter-spacing: -.02em; }
+.agent-confirm { padding: 10px 14px; border-radius: 12px; font-size: 14.5px; }
+.agent-confirm.is-passed { background: rgba(255, 110, 199, .12); border-left: 3px solid var(--pink-text); }
+.agent-confirm.is-failed { background: var(--paper); border-left: 3px solid var(--line-strong); }
 .cf-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
 .cf-controls .field { flex: 1 1 220px; }
 .cf-controls .field-sm { flex: 0 1 160px; }

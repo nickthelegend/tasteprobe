@@ -28,7 +28,7 @@ const COURSES: { title: string; body: React.ReactNode; tag: string }[] = [
   { title: "Take tasting notes", tag: "NVIDIA Nemotron", body: <>Every assistant answer is a tasting note. Nemotron on Nebius extracts the venues it recommends, cross-checked against a plain numbered-list parser.</> },
   { title: "Measure the glass", tag: "Wilson 95%", body: <>Each glass fills to your share of the answers. The pour lines are a Wilson interval on a persona-adjusted sample size, because one persona’s answers move together.</> },
   { title: "Re-pour three flights", tag: "paired bootstrap", body: <>Nemotron writes copy for the weakest glass. The same personas re-ask every assistant three ways at once: baseline, a placebo that only names you, and the fix.</> },
-  { title: "Keep the sommelier’s notebook", tag: "tool calling", body: <>A Nemotron agent revises copy with four tools under a budget. Every attempt is written down; the stop rule runs in code, not in the model.</> },
+  { title: "Keep the sommelier’s notebook", tag: "tool calling", body: <>A Nemotron agent revises copy with four tools under a budget. Every attempt is written down. Its intervals only screen; a win needs one confirmation probe on held-out personas, and the stop rule runs in code, not in the model.</> },
 ];
 
 function cellarLine(status: CellarStatus, auditCount: number | null) {
@@ -130,7 +130,7 @@ export function Landing({ status, auditCount }: { status: CellarStatus; auditCou
           <ol>
             <li><b>Tools</b> live Qloo insights · propose copy · probe the segment · read the stats</li>
             <li><b>Probe</b> placebo against fix on the segment’s next personas</li>
-            <li><b>Stop</b> when a copy’s lift interval clears zero, or tries, calls, tokens or dollars run out</li>
+            <li><b>Stop</b> after one confirmation probe on personas the search never used, once a copy clears the screen; or when tries, calls, tokens or dollars run out</li>
             <li><b>Enforced</b> in code, not by the model; every attempt stays in the notebook</li>
           </ol>
         </article>

@@ -2,10 +2,14 @@ import type { ArmSummary, Audit, Counterfactual } from "@/lib/types";
 import { FlightBoard } from "./Flight";
 import { pct, signedPts } from "./format";
 
-function verdict([low, high]: [number, number], delta: number) {
-  if (low > 0) return <><strong>The copy itself lifted visibility.</strong> Fix beat the placebo by {signedPts(delta)}; the 95% paired interval ({signedPts(low)} to {signedPts(high)}) sits above zero.</>;
-  if (high < 0) return <><strong>The copy hurt visibility.</strong> Fix trailed the placebo by {signedPts(delta)}; the 95% paired interval ({signedPts(low)} to {signedPts(high)}) sits below zero.</>;
-  return <><strong>Not distinguishable from the placebo.</strong> Fix minus placebo is {signedPts(delta)}, but the 95% paired interval ({signedPts(low)} to {signedPts(high)}) includes zero. Try more personas or different copy.</>;
+// Each attempt's interval is nominal: it is right for one look at one copy. With several attempts on
+// an audit, the chance that one of them clears zero by luck grows, so the verdict says how many
+// attempts there have been and asks for a re-pour before a win is relied on.
+function verdict([low, high]: [number, number], delta: number, attempt: number, attempts: number) {
+  const looks = attempts > 1 ? ` This is attempt ${attempt} of ${attempts} on this audit; with several attempts one can clear zero by chance, so re-pour the same copy before relying on it.` : "";
+  if (low > 0) return <><strong>Fix beat the placebo on this attempt.</strong> Fix minus placebo is {signedPts(delta)}; the nominal 95% paired interval ({signedPts(low)} to {signedPts(high)}) sits above zero.{looks}</>;
+  if (high < 0) return <><strong>The copy trailed the placebo on this attempt.</strong> Fix minus placebo is {signedPts(delta)}; the nominal 95% paired interval ({signedPts(low)} to {signedPts(high)}) sits below zero.{looks}</>;
+  return <><strong>Not distinguishable from the placebo.</strong> Fix minus placebo is {signedPts(delta)}, but the nominal 95% paired interval ({signedPts(low)} to {signedPts(high)}) includes zero. Try more personas or different copy.</>;
 }
 
 function armDetail(arm: ArmSummary) {
@@ -53,7 +57,7 @@ export function CounterfactualPanel({ audit, segmentId, onSegment, running, read
           { id: "placebo", name: "Placebo", share: result.arms.placebo.responses ? result.arms.placebo.share : null, interval: result.arms.placebo.ci, detail: armDetail(result.arms.placebo) },
           { id: "fix", name: "Fix", share: result.arms.fix.responses ? result.arms.fix.share : null, interval: result.arms.fix.ci, detail: armDetail(result.arms.fix) },
         ]} />
-        <div className="verdict">{verdict(result.lift.fixVsPlacebo.ci, result.lift.fixVsPlacebo.delta)}</div>
+        <div className="verdict">{verdict(result.lift.fixVsPlacebo.ci, result.lift.fixVsPlacebo.delta, result.attempt, history.length)}</div>
         <p className="footnote">Name exposure alone (placebo − baseline): {signedPts(exposure.delta)}, 95% CI {signedPts(exposure.ci[0])} to {signedPts(exposure.ci[1])}. All three arms ran concurrently on the same {result.personas} personas; failed calls are excluded from each arm’s denominator and counted above.</p>
       </div>
     </div>
@@ -63,7 +67,7 @@ export function CounterfactualPanel({ audit, segmentId, onSegment, running, read
         {[...history].reverse().map((item) => <li key={item.id}>
           <button className={item.id === result.id ? "current" : ""} aria-pressed={item.id === result.id} onClick={() => onAttempt(item.id)}>
             <span className="cf-h-copy">#{item.attempt} · {item.segment} · “{item.change}”</span>
-            <span className="cf-h-lift">{signedPts(item.lift.fixVsPlacebo.delta)} vs placebo{item.lift.fixVsPlacebo.ci[0] > 0 ? " · CI above 0" : ""}</span>
+            <span className="cf-h-lift">{signedPts(item.lift.fixVsPlacebo.delta)} vs placebo{item.lift.fixVsPlacebo.ci[0] > 0 ? " · nominal CI above 0" : ""}</span>
           </button>
         </li>)}
       </ol>

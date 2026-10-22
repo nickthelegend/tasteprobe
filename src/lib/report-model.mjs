@@ -90,6 +90,10 @@ export function buildReportModel(audit) {
       stopDetail: run.stopDetail,
       candidates: run.candidates?.length ?? 0,
       best: run.best ? { copy: run.best.copy, personas: run.best.personas, lift: round(run.best.lift), liftCi: interval(run.best.liftCi) } : null,
+      search: run.search ?? null,
+      confirmation: run.confirmation
+        ? { mode: run.confirmation.mode, personas: run.confirmation.personas, lift: round(run.confirmation.lift), liftCi: interval(run.confirmation.liftCi), passed: run.confirmation.passed }
+        : null,
       budget: run.budget,
       createdAt: run.createdAt,
     })),
@@ -133,7 +137,8 @@ export function reportText(model) {
     const lift = fix.lift.fixVsPlacebo;
     lines.push(`Fix attempt ${fix.attempt} on ${fix.segment}: fix − placebo ${lift ? `${lift.delta >= 0 ? "+" : "−"}${Math.abs(Math.round(lift.delta * 100))} pts (95% ${range(lift.ci)})${lift.clearsZero ? ", clears zero" : ""}` : "n/a"}.`);
   }
-  for (const run of model.agentRuns) lines.push(`Agent run on ${run.segment}: stopped (${run.stopReason}) ${run.stopDetail}`);
+  if (model.fixes.length > 1) lines.push(`Fix intervals are nominal per attempt; ${model.fixes.length} attempts were made on this audit.`);
+  for (const run of model.agentRuns) lines.push(`Agent run on ${run.segment}: stopped (${run.stopReason}) ${run.stopDetail}${run.confirmation ? ` Confirmation on ${run.confirmation.personas} ${run.confirmation.mode === "holdout" ? "held-out" : "re-asked"} personas: ${run.confirmation.passed ? "confirmed" : "not confirmed"}.` : ""}`);
   lines.push(`Extraction: ${model.extraction.model} on Nebius Token Factory, ${model.extraction.inputTokens} in / ${model.extraction.outputTokens} out tokens.`);
   return lines.join("\n");
 }

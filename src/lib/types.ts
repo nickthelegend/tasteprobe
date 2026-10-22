@@ -53,6 +53,11 @@ export type AgentCandidateSummary = {
   failed: number;
 };
 export type AgentBudgetSummary = { tries: number; turns: number; assistantCalls: number; nemotronCalls: number; inputTokens: number; outputTokens: number; usd: number; priced: boolean };
+// The one confirmation probe of a screened copy, on held-out personas or a fresh re-ask.
+export type AgentConfirmation = {
+  candidateId: string; mode: "holdout" | "rerun"; personas: number; placeboShare: number | null; fixShare: number | null;
+  lift: number | null; liftCi: [number, number] | null; failed: number; passed: boolean;
+};
 // One run of the tool-calling fix agent (placebo vs fix probes only; see src/lib/agent.ts).
 export type AgentRun = {
   id: string;
@@ -65,12 +70,17 @@ export type AgentRun = {
   budget: AgentBudgetSummary;
   limits: { maxTries: number; maxAssistantCalls: number; maxUsd: number | null; maxNemotronTokens: number; maxTurns: number };
   steps: number;
+  // The search's selection personas, how many probes (looks) it made and how many copies it tried.
+  search?: { personas: number; looks: number; candidates: number };
+  // Null when no copy cleared the screen. Runs saved before the confirmation rule have no field.
+  confirmation?: AgentConfirmation | null;
   createdAt: string;
 };
 export type AgentEvent =
   | { type: "start"; runId: string; segment: string; model: string; limits: AgentRun["limits"] }
   | { type: "step"; turn: number; text: string; reasoningChars: number; toolCalls: string[]; usage: Usage; costUsd: number | null; budget: AgentBudgetSummary }
   | { type: "tool"; turn: number; name: string; args: Record<string, unknown>; ok: boolean; summary: string }
+  | { type: "confirm"; candidateId: string; mode: "holdout" | "rerun"; personas: number; passed: boolean; summary: string; budget: AgentBudgetSummary }
   | { type: "stop"; reason: string; detail: string }
   | { type: "done"; run: AgentRun }
   | { type: "error"; message: string };

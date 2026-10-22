@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
-  affordablePersonas, budgetExhausted, candidateStats, chargeBudget, createBudget, DEFAULT_LIMITS, nextPersonas,
-  normalizeLimits, parseToolArguments, selectBest, stopDecision, tokenCostUsd, validateCopy,
+  affordablePersonas, budgetExhausted, candidateStats, chargeBudget, confirmationCalls, confirmationResult, createBudget, DEFAULT_LIMITS,
+  nextPersonas, normalizeLimits, parseToolArguments, planConfirmation, screenedCandidate, selectBest, stopDecision,
+  tokenCostUsd, validateCopy,
 } from "../src/lib/agent-core.mjs";
+import { seededRandom } from "../src/lib/stats.mjs";
 
 const limits = normalizeLimits({ maxTries: 3, maxAssistantCalls: 96, maxUsd: 0.05, maxNemotronTokens: 100_000, maxTurns: 10 });
 const prices = { input: 0.06, output: 0.24 };
@@ -94,14 +96,102 @@ test("best candidate has the highest lower bound, then the larger point lift", (
   assert.equal(selectBest([]), null);
 });
 
-test("stop rule: lift CI above zero on enough personas, else budget, else keep going", () => {
+test("stop rule: a search interval above zero only screens; one confirmation decides; else budget, else keep going", () => {
   const budget = createBudget();
-  assert.deepEqual(stopDecision([candidate("c1", 1, 7)], budget, limits, 16), { stop: true, reason: "lift_ci_above_zero" });
-  // Same effect on only 4 personas is not enough evidence to stop.
+  // Screened: the loop must run the confirmation, it may not stop on the search interval.
+  assert.deepEqual(stopDecision([candidate("c1", 1, 7)], budget, limits, 16), { stop: false, reason: null, confirm: "c1" });
+  assert.equal(screenedCandidate([candidate("c1", 1, 7)], 16).candidate.id, "c1");
+  // Same effect on only 4 personas does not even clear the screen.
   assert.equal(stopDecision([candidate("c1", 0, 4, 4)], budget, limits, 16).stop, false);
-  assert.deepEqual(stopDecision([candidate("c1", 3, 3)], budget, limits, 16), { stop: false, reason: null });
+  assert.equal(stopDecision([candidate("c1", 0, 4, 4)], budget, limits, 16).confirm, null);
+  assert.deepEqual(stopDecision([candidate("c1", 3, 3)], budget, limits, 16), { stop: false, reason: null, confirm: null });
   assert.equal(stopDecision([candidate("c1", 3, 3)], { ...budget, assistantCalls: 96 }, limits, 16).reason, "budget_assistant_calls");
   const spent = { ...budget, tries: 3 };
   assert.equal(stopDecision([candidate("c1", 3, 3, 8)], spent, limits, 8).reason, "budget_tries");
   assert.equal(stopDecision([candidate("c1", 3, 3, 8)], spent, limits, 16).stop, false);
+  // After the confirmation the run stops either way, and only a passed confirmation is a win.
+  const passed = confirmationResult({ candidateId: "c1", mode: "holdout", placeboRows: rows(8, 1, 100), fixRows: rows(8, 7, 100) });
+  assert.equal(passed.passed, true);
+  assert.equal(passed.personas, 8);
+  assert.deepEqual(stopDecision([candidate("c1", 1, 7)], budget, limits, 16, passed), { stop: true, reason: "lift_confirmed", confirm: null });
+  const failed = confirmationResult({ candidateId: "c1", mode: "holdout", placeboRows: rows(8, 3, 100), fixRows: rows(8, 3, 100) });
+  assert.equal(failed.passed, false);
+  assert.deepEqual(stopDecision([candidate("c1", 1, 7)], budget, limits, 16, failed), { stop: true, reason: "confirmation_failed", confirm: null });
+});
+
+test("confirmation plan: held-out personas from 16 up, a fresh re-ask below; its calls are reserved", () => {
+  const ids = (count) => Array.from({ length: count }, (_, index) => `p${index}`);
+  assert.deepEqual(planConfirmation(ids(8)), { mode: "rerun", selection: ids(8), confirmation: ids(8) });
+  const sixteen = planConfirmation(ids(16));
+  assert.equal(sixteen.mode, "holdout");
+  assert.deepEqual([sixteen.selection.length, sixteen.confirmation.length], [8, 8]);
+  assert.equal(sixteen.selection.filter((id) => sixteen.confirmation.includes(id)).length, 0, "held-out personas are never searched");
+  const big = planConfirmation(ids(33));
+  assert.deepEqual([big.selection.length, big.confirmation.length], [22, 11]);
+  assert.equal(confirmationCalls(sixteen, 2), 32);
+  assert.equal(confirmationCalls(planConfirmation(ids(8)), 1), 16);
+});
+
+// Null simulation: the copy has NO effect (fix and placebo share each persona's rate). The agent
+// policy follows the README (probe 8 at a time, keep probing while the point lift is positive,
+// otherwise revise) under the default limits (3 copies, 120 assistant calls). Seeded, so the rates
+// below are exact for this code. The old rule stopped on the search interval and is reported as
+// `screened`; the new rule needs the confirmation probe as well.
+function nullTrial(seed, segmentSize, assistants) {
+  const random = seededRandom(seed);
+  const rates = Array.from({ length: segmentSize }, () => Math.min(0.95, Math.max(0.02, 0.3 + (random() - 0.5) * 0.5)));
+  const ids = rates.map((_, index) => `p${index}`);
+  const draw = (personaIds) => {
+    const placeboRows = [], fixRows = [];
+    for (const id of personaIds) for (let model = 0; model < assistants; model++) {
+      const rate = rates[Number(id.slice(1))];
+      placeboRows.push({ personaId: id, brand: random() < rate });
+      fixRows.push({ personaId: id, brand: random() < rate });
+    }
+    return { placeboRows, fixRows };
+  };
+  const plan = planConfirmation(ids);
+  const limits = normalizeLimits({});
+  const search = { ...limits, maxAssistantCalls: limits.maxAssistantCalls - confirmationCalls(plan, assistants) };
+  const candidates = [];
+  let budget = createBudget();
+  for (let attempt = 0; attempt < limits.maxTries; attempt++) {
+    const current = { id: `c${attempt}`, copy: "x", rationale: "", placeboRows: [], fixRows: [], personasProbed: [], failed: 0 };
+    candidates.push(current);
+    budget = chargeBudget(budget, { tries: 1 }, null);
+    while (current.personasProbed.length < plan.selection.length) {
+      const fresh = nextPersonas(plan.selection, current.personasProbed, 8);
+      const affordable = affordablePersonas(budget, search, fresh.length, assistants);
+      if (!affordable) return { screened: false, confirmed: false };
+      const chosen = fresh.slice(0, affordable);
+      const probe = draw(chosen);
+      current.placeboRows.push(...probe.placeboRows);
+      current.fixRows.push(...probe.fixRows);
+      current.personasProbed.push(...chosen);
+      budget = chargeBudget(budget, { assistantCalls: chosen.length * assistants * 2 }, null);
+      const decision = stopDecision(candidates, budget, search, plan.selection.length);
+      if (decision.confirm) {
+        const confirmation = confirmationResult({ candidateId: decision.confirm, mode: plan.mode, ...draw(plan.confirmation) });
+        return { screened: true, confirmed: stopDecision(candidates, budget, search, plan.selection.length, confirmation).reason === "lift_confirmed" };
+      }
+      if (decision.stop) return { screened: false, confirmed: false };
+      if (!(candidateStats(current).lift > 0)) break;
+    }
+  }
+  return { screened: false, confirmed: false };
+}
+
+test("null simulation: the confirmed rule keeps false wins at or under 5%, the search interval alone does not", { timeout: 120_000 }, () => {
+  const trials = 800;
+  for (const [segmentSize, assistants] of [[8, 2], [16, 1]]) {
+    let screened = 0, confirmed = 0;
+    for (let trial = 0; trial < trials; trial++) {
+      const outcome = nullTrial(5000 + trial, segmentSize, assistants);
+      if (outcome.screened) screened++;
+      if (outcome.confirmed) confirmed++;
+    }
+    const screenRate = screened / trials, winRate = confirmed / trials;
+    assert.ok(screenRate > 0.05, `segment ${segmentSize}, ${assistants} assistant(s): the search interval alone 'won' ${(screenRate * 100).toFixed(1)}% of null runs; expected well above 5%`);
+    assert.ok(winRate <= 0.05, `segment ${segmentSize}, ${assistants} assistant(s): false confirmed wins ${(winRate * 100).toFixed(1)}% of null runs; must be <= 5%`);
+  }
 });

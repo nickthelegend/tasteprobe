@@ -39,6 +39,7 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { a
           meta: `${tokens(event.usage.inputTokens, event.usage.outputTokens)}${event.reasoningChars ? ` · ${event.reasoningChars.toLocaleString()} reasoning chars` : ""} · ${event.costUsd === null ? "cost unpriced" : `$${event.costUsd.toFixed(5)}`} · ${event.budget.assistantCalls} assistant calls so far`,
         });
         if (event.type === "tool") push({ kind: "tool", title: event.summary, ok: event.ok });
+        if (event.type === "confirm") push({ kind: "tool", title: event.summary, ok: event.passed, meta: `${event.budget.assistantCalls} assistant calls so far` });
         if (event.type === "stop") push({ kind: "stop", title: event.detail });
         if (event.type === "error") throw new Error(event.message);
         if (event.type === "done") { finished = true; onRun(event.run); }
@@ -68,7 +69,7 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { a
         {running ? <><span className="spinner" /> Agent running</> : "Run agent loop"}
       </button>
     </div>
-    <p className="footnote">Nemotron plans with tool calls (Qloo insights, propose copy, probe the segment against the placebo, read stats) and revises until a copy’s lift interval clears zero or the budget is spent. The code enforces the stop rule, not the model.</p>
+    <p className="footnote">Nemotron plans with tool calls (Qloo insights, propose copy, probe the segment against the placebo, read stats) and revises. Its intervals are nominal and only screen: after several looks at several copies, one clears zero by chance in about 1 run in 8. A copy that clears the screen gets one confirmation probe on personas the search never used (or a fresh re-ask of a small segment), and only that probe can declare a win. The code enforces this, not the model.</p>
     {error && <p className="agent-error" role="alert">{error}</p>}
     {!running && !lines.length && !last && <p className="agent-empty">No agent runs on this audit yet. Each turn, tool call and stop reason is written here as it streams.</p>}
     {lines.length > 0 && <ol className="agent-log" aria-live="polite">
@@ -83,7 +84,9 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { a
       <p><strong>Stopped:</strong> {last.stopDetail}</p>
       {last.best ? <>
         <blockquote>“{last.best.copy}”</blockquote>
-        <p>Fix {last.best.fixShare === null ? "n/a" : pct(last.best.fixShare)} vs placebo {last.best.placeboShare === null ? "n/a" : pct(last.best.placeboShare)} on {last.best.personas} personas{last.best.lift !== null && last.best.liftCi ? <> · lift {signedPts(last.best.lift)}, 95% CI {signedPts(last.best.liftCi[0])} to {signedPts(last.best.liftCi[1])}</> : null}{last.best.failed ? ` · ${last.best.failed} failed calls excluded` : ""}</p>
+        <p>Search (screen only): fix {last.best.fixShare === null ? "n/a" : pct(last.best.fixShare)} vs placebo {last.best.placeboShare === null ? "n/a" : pct(last.best.placeboShare)} on {last.best.personas} personas{last.best.lift !== null && last.best.liftCi ? <> · lift {signedPts(last.best.lift)}, nominal 95% CI {signedPts(last.best.liftCi[0])} to {signedPts(last.best.liftCi[1])}</> : null}{last.best.failed ? ` · ${last.best.failed} failed calls excluded` : ""}{last.search ? ` · ${last.search.looks} ${last.search.looks === 1 ? "look" : "looks"} across ${last.search.candidates} ${last.search.candidates === 1 ? "copy" : "copies"} on ${last.search.personas} search personas` : ""}</p>
+        {last.confirmation ? <p className={`agent-confirm ${last.confirmation.passed ? "is-passed" : "is-failed"}`}><strong>Confirmation ({last.confirmation.mode === "holdout" ? `${last.confirmation.personas} held-out personas` : `fresh re-ask of ${last.confirmation.personas} personas`}):</strong> fix {last.confirmation.fixShare === null ? "n/a" : pct(last.confirmation.fixShare)} vs placebo {last.confirmation.placeboShare === null ? "n/a" : pct(last.confirmation.placeboShare)}{last.confirmation.lift !== null && last.confirmation.liftCi ? <> · lift {signedPts(last.confirmation.lift)}, nominal 95% CI {signedPts(last.confirmation.liftCi[0])} to {signedPts(last.confirmation.liftCi[1])}</> : null} · {last.confirmation.passed ? "confirmed" : "not confirmed"}</p>
+          : last.confirmation === null ? <p className="footnote">No copy cleared the screen, so no confirmation probe ran.</p> : null}
       </> : <p>No candidate was probed.</p>}
       <p className="footnote">{last.candidates.length} {last.candidates.length === 1 ? "candidate" : "candidates"} · {last.steps} turns · {last.budget.assistantCalls} assistant calls · {(last.budget.inputTokens + last.budget.outputTokens).toLocaleString()} Nemotron tokens · {last.budget.priced ? `$${last.budget.usd.toFixed(4)}` : "cost unpriced"}{last.candidates.length > 1 ? ` · others: ${last.candidates.filter((item) => item.id !== last.best?.id).map((item) => `${item.id} ${item.lift === null ? "unprobed" : signedPts(item.lift)}${item.liftCi ? ` (${ci(item.liftCi)})` : ""}`).join(", ")}` : ""}</p>
     </div>}

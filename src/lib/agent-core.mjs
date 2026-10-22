@@ -116,35 +116,78 @@ export function candidateStats(candidate) {
 }
 
 // Highest lower confidence bound on lift wins; ties go to the larger point lift, then more personas.
+// These are nominal intervals: picking the best of several copies after several looks is a screen,
+// not a test (see stopDecision).
 export function selectBest(candidates) {
   const scored = candidates.map((candidate) => ({ candidate, stats: candidateStats(candidate) })).filter((item) => item.stats.liftCi);
   scored.sort((a, b) => b.stats.liftCi[0] - a.stats.liftCi[0] || b.stats.lift - a.stats.lift || b.stats.personas - a.stats.personas);
   return scored[0] ?? null;
 }
 
-// Stop as soon as a candidate probed on at least 8 personas has a lift interval entirely above
-// zero; otherwise stop when any budget dimension runs out or every allowed copy is fully probed.
-export function stopDecision(candidates, budget, limits, segmentPersonas) {
+// Why a search-phase interval alone cannot end the run: the agent looks at the interval after every
+// probe (optional stopping) across up to maxTries copies (multiple comparisons). A seeded null
+// simulation (test/agent.test.mjs) puts the false "lift above zero" rate of that rule at 12-18%,
+// against a nominal 2.5%. So the search only SCREENS. A copy that clears the screen gets ONE
+// confirmation probe on personas the search never used (held-out personas when the segment has
+// at least 16; otherwise a fresh re-ask of the same personas, whose answers are new draws), and
+// only that confirmation's interval can declare a win. One confirmation per run, then the run stops.
+
+// Splits a segment's personas into the search's selection set and the confirmation set.
+export function planConfirmation(personaIds) {
+  const count = personaIds.length;
+  if (count >= 2 * MIN_PERSONAS_PER_SEGMENT) {
+    const held = Math.max(MIN_PERSONAS_PER_SEGMENT, Math.floor(count / 3));
+    return { mode: "holdout", selection: personaIds.slice(0, count - held), confirmation: personaIds.slice(count - held) };
+  }
+  return { mode: "rerun", selection: [...personaIds], confirmation: [...personaIds] };
+}
+
+// Assistant calls the confirmation probe needs (placebo + fix for every confirmation persona). The
+// search may not spend them, so a screened copy can always be confirmed.
+export function confirmationCalls(plan, assistants) {
+  return plan.confirmation.length * Math.max(1, assistants) * 2;
+}
+
+// The best candidate if it clears the screen: probed on at least 8 selection personas (or the whole
+// selection when it is smaller) with a nominal 95% lift interval entirely above zero.
+export function screenedCandidate(candidates, selectionSize) {
   const best = selectBest(candidates);
-  if (best && best.stats.personas >= Math.min(MIN_PERSONAS_PER_SEGMENT, segmentPersonas) && best.stats.liftCi[0] > 0) {
-    return { stop: true, reason: "lift_ci_above_zero" };
-  }
+  return best && best.stats.personas >= Math.min(MIN_PERSONAS_PER_SEGMENT, selectionSize) && best.stats.liftCi[0] > 0 ? best : null;
+}
+
+// The confirmation probe's verdict: passed only if its own nominal 95% lift interval is above zero.
+export function confirmationResult({ candidateId, mode, placeboRows, fixRows, failed = 0 }) {
+  const stats = candidateStats({ placeboRows, fixRows, personasProbed: [...new Set([...placeboRows, ...fixRows].map((row) => row.personaId))], failed });
+  return {
+    candidateId, mode, personas: stats.personas, placeboShare: stats.placeboShare, fixShare: stats.fixShare,
+    lift: stats.lift, liftCi: stats.liftCi, failed, passed: Boolean(stats.liftCi && stats.liftCi[0] > 0),
+  };
+}
+
+// What the loop does next. `limits` are the SEARCH limits (the confirmation's calls already taken
+// out). After the confirmation the run stops either way; a screened copy asks for the confirmation;
+// otherwise the run stops when any budget dimension runs out or every allowed copy is fully probed.
+export function stopDecision(candidates, budget, limits, selectionSize, confirmation = null) {
+  if (confirmation) return { stop: true, reason: confirmation.passed ? "lift_confirmed" : "confirmation_failed", confirm: null };
+  const screened = screenedCandidate(candidates, selectionSize);
+  if (screened) return { stop: false, reason: null, confirm: screened.candidate.id };
   const exhausted = budgetExhausted(budget, limits);
-  if (exhausted) return { stop: true, reason: exhausted };
-  if (budget.tries >= limits.maxTries && candidates.length && candidates.every((candidate) => candidate.personasProbed.length >= segmentPersonas)) {
-    return { stop: true, reason: "budget_tries" };
+  if (exhausted) return { stop: true, reason: exhausted, confirm: null };
+  if (budget.tries >= limits.maxTries && candidates.length && candidates.every((candidate) => candidate.personasProbed.length >= selectionSize)) {
+    return { stop: true, reason: "budget_tries", confirm: null };
   }
-  return { stop: false, reason: null };
+  return { stop: false, reason: null, confirm: null };
 }
 
 export const STOP_REASONS = {
-  lift_ci_above_zero: "A copy's 95% lift interval over the placebo is entirely above zero.",
-  budget_assistant_calls: "The assistant-call budget is spent.",
+  lift_confirmed: "A copy cleared the screen, then beat the placebo again on a confirmation probe the search never used: its nominal 95% lift interval is above zero.",
+  confirmation_failed: "A copy cleared the screen, but its confirmation probe's lift interval included zero, so no win is declared.",
+  budget_assistant_calls: "The assistant-call budget for the search is spent.",
   budget_nemotron_tokens: "The Nemotron token budget is spent.",
   budget_usd: "The dollar cap on Nemotron spend was reached.",
   budget_turns: "The agent used all of its reasoning turns.",
-  budget_tries: "Every allowed copy was proposed and probed on the whole segment.",
-  agent_finished: "The agent ended the loop without a qualifying copy.",
+  budget_tries: "Every allowed copy was proposed and probed on the whole selection set without clearing the screen.",
+  agent_finished: "The agent ended the loop without a copy that cleared the screen.",
 };
 
 // Personas a probe should use next for this candidate: ones it has not asked yet, in segment order.

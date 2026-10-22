@@ -69,3 +69,22 @@ test("the report says where the personas came from: urn:tag, or urn:entity after
   assert.match(html, /Qloo urn:entity affinities \(artists, brands, films, books, TV, podcasts, places\): this key refused urn:tag with a 403\. Qloo said: Qloo \/v2\/insights returned 403 for filter\.type=urn:tag/);
   assert.match(html, /from urn:entity/);
 });
+
+test("agent runs show the search as a screen and the confirmation as the result", () => {
+  const run = {
+    id: "r1", segment: "Place keyword", model: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B", stopReason: "confirmation_failed",
+    stopDetail: "A copy cleared the screen, but its confirmation probe's lift interval included zero, so no win is declared.",
+    best: { id: "c2", copy: "Synthetic copy", rationale: "", personas: 8, placeboShare: 0.1, fixShare: 0.6, lift: 0.5, liftCi: [0.2, 0.8], failed: 0 },
+    candidates: [{}, {}], budget: { tries: 2, turns: 6, assistantCalls: 64, nemotronCalls: 70, inputTokens: 1000, outputTokens: 500, usd: 0, priced: false },
+    limits: { maxTries: 3, maxAssistantCalls: 120, maxUsd: null, maxNemotronTokens: 400000, maxTurns: 12 }, steps: 6,
+    search: { personas: 8, looks: 3, candidates: 2 },
+    confirmation: { candidateId: "c2", mode: "holdout", personas: 8, placeboShare: 0.2, fixShare: 0.3, lift: 0.1, liftCi: [-0.1, 0.3], failed: 0, passed: false },
+    createdAt: "2026-10-22T12:00:00.000Z",
+  };
+  const html = render(createElement(PrintReport, { model: buildReportModel({ ...audit, agentRuns: [run] }) }));
+  assert.match(html, /Search intervals are nominal and only screen/);
+  assert.match(html, /3 looks · 2 copies · 8 personas/);
+  assert.match(html, /\+50 pts \(20 to 80 pts\)/);
+  assert.match(html, /\+10 pts \(-10 to 30 pts\) on 8 held-out personas · not confirmed/);
+  assert.match(html, /confirmation_failed: A copy cleared the screen/);
+});

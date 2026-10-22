@@ -31,7 +31,10 @@ export type ReportModel = {
   }[];
   agentRuns: {
     segment: string; model: string; stopReason: string; stopDetail: string; candidates: number;
-    best: { copy: string; personas: number; lift: number | null; liftCi: Interval } | null; budget: AgentBudgetSummary; createdAt: string;
+    best: { copy: string; personas: number; lift: number | null; liftCi: Interval } | null;
+    search: { personas: number; looks: number; candidates: number } | null;
+    confirmation: { mode: "holdout" | "rerun"; personas: number; lift: number | null; liftCi: Interval; passed: boolean } | null;
+    budget: AgentBudgetSummary; createdAt: string;
   }[];
   extraction: { model: string; inputTokens: number; outputTokens: number; estimatedCostUsd: number | null };
   reproducibility: NonNullable<Audit["meta"]> | null;

@@ -1,7 +1,8 @@
 import type OpenAI from "openai";
 import {
-  affordablePersonas, budgetExhausted, candidateStats, chargeBudget, createBudget, nextPersonas, parseToolArguments,
-  selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, type AgentBudget, type AgentLimits, type Candidate, type StopReason,
+  affordablePersonas, budgetExhausted, candidateStats, chargeBudget, confirmationCalls, confirmationResult, createBudget, nextPersonas,
+  parseToolArguments, planConfirmation, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy,
+  type AgentBudget, type AgentLimits, type Candidate, type Confirmation, type StopReason,
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
 import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
@@ -25,12 +26,12 @@ export const AGENT_TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
   } },
   { type: "function", function: {
     name: "probe_segment",
-    description: "Live test of a candidate: the next n personas of the segment ask every assistant twice, once with a neutral placebo snippet and once with the candidate copy. Costs n x assistants x 2 assistant calls. Returns updated stats.",
+    description: "Live test of a candidate on the search personas: the next n of them ask every assistant twice, once with a neutral placebo snippet and once with the candidate copy. Costs n x assistants x 2 assistant calls. Returns updated stats (nominal intervals; they only screen).",
     parameters: { type: "object", properties: { candidate_id: { type: "string" }, n: { type: "integer", minimum: 1 } }, required: ["candidate_id", "n"] },
   } },
   { type: "function", function: {
     name: "get_stats",
-    description: "Placebo share, fix share and the paired 95% lift interval (fix minus placebo) for every candidate, plus the budget left.",
+    description: "Placebo share, fix share and the paired nominal 95% lift interval (fix minus placebo) for every candidate on the search personas, plus the budget left.",
     parameters: { type: "object", properties: {} },
   } },
 ];
@@ -50,7 +51,7 @@ function summarize(candidate: Candidate): AgentCandidateSummary {
 function remaining(budget: AgentBudget, limits: AgentLimits) {
   return {
     tries_left: limits.maxTries - budget.tries,
-    assistant_calls_left: limits.maxAssistantCalls - budget.assistantCalls,
+    assistant_calls_left_for_search: limits.maxAssistantCalls - budget.assistantCalls,
     nemotron_tokens_left: limits.maxNemotronTokens - budget.inputTokens - budget.outputTokens,
     turns_left: limits.maxTurns - budget.turns,
     usd_spent: budget.priced ? round(budget.usd, 5) : "unpriced (set NEBIUS_*_PRICE_PER_MILLION)",
@@ -59,13 +60,16 @@ function remaining(budget: AgentBudget, limits: AgentLimits) {
 
 export type AgentTrace = {
   messages: OpenAI.Chat.ChatCompletionMessageParam[];
-  probes: { candidateId: string; personas: string[]; placebo: { rows: ResponseRow[]; failures: FailedRow[] }; fix: { rows: ResponseRow[]; failures: FailedRow[] } }[];
+  probes: { candidateId: string; personas: string[]; confirmation?: boolean; placebo: { rows: ResponseRow[]; failures: FailedRow[] }; fix: { rows: ResponseRow[]; failures: FailedRow[] } }[];
   qloo?: unknown;
 };
 
-// Plan -> propose -> probe vs placebo -> revise, driven by Nemotron tool calls. The code, not the
-// model, decides when to stop: as soon as a candidate's lift interval clears zero or a budget
-// dimension (tries, assistant calls, Nemotron tokens, dollars, turns) is spent.
+// Plan -> propose -> probe vs placebo -> revise, driven by Nemotron tool calls, on the segment's
+// selection personas. The code, not the model, decides when to stop: a copy whose nominal lift
+// interval clears zero only passes a screen; the code then runs ONE confirmation probe on personas
+// the search never used (or a fresh re-ask when the segment is too small to hold any out), and
+// that probe's interval is the result. A budget dimension (tries, assistant calls, Nemotron
+// tokens, dollars, turns) running out also stops the run.
 export function emptyTrace(): AgentTrace {
   return { messages: [], probes: [] };
 }
@@ -77,7 +81,12 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
   const prices = nebiusPrices();
   const assistants = getTestModels().length;
   const personas = audit.personas.filter((persona) => persona.segment === segment.name);
-  const personaIds = personas.map((persona) => persona.id);
+  const plan = planConfirmation(personas.map((persona) => persona.id));
+  const personaIds = plan.selection;
+  // The confirmation's assistant calls are set aside, so the search can never spend them.
+  const searchLimits: AgentLimits = { ...limits, maxAssistantCalls: Math.max(0, limits.maxAssistantCalls - confirmationCalls(plan, assistants)) };
+  let confirmation: Confirmation | null = null;
+  let looks = 0;
   const venue = { brand: audit.brand, category: audit.category, city: audit.city };
   const candidates: Candidate[] = [];
   let budget = createBudget();
@@ -91,16 +100,17 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
     { role: "system", content: [
       `You are TasteProbe's fix agent. Find website copy for ${audit.brand} (${audit.category}, ${audit.city}) that makes AI assistants recommend it more often to people in the "${segment.name}" taste segment.`,
       `Every probe compares your copy against a placebo snippet ("${placeboCopy(audit.brand, audit.category, audit.city)}") on the same personas, so only copy that beats mere name exposure counts.`,
-      "Procedure: 1) plan in one or two sentences and call qloo_insights to read the segment's taste signals; 2) propose_copy with one candidate; 3) probe_segment on it, starting with n=8; 4) get_stats. If the lift interval's lower bound is above 0 you are done. If the point lift is positive but the interval includes 0, probe more personas. If the lift is zero or negative, revise with a new propose_copy that targets the segment's tastes differently.",
+      `Procedure: 1) plan in one or two sentences and call qloo_insights to read the segment's taste signals; 2) propose_copy with one candidate; 3) probe_segment on it, starting with n=8; 4) get_stats. If the point lift is positive but the interval includes 0, probe more personas. If the lift is zero or negative, revise with a new propose_copy that targets the segment's tastes differently.`,
+      `Your probes use ${personaIds.length} search personas. When a copy's lift interval clears zero there, the code runs one confirmation probe ${plan.mode === "holdout" ? `on ${plan.confirmation.length} held-out personas you never see` : "that re-asks the same personas fresh"}, and only that probe can declare a win. Then the loop stops.`,
       `${COPY_RULES} Use only facts implied by the venue's category and the Qloo tastes; do not invent dishes, events or people.`,
-      "The loop stops automatically when a lift interval clears zero or the budget runs out. Call one tool at a time.",
+      "The loop also stops when the budget runs out. Call one tool at a time.",
     ].join("\n") },
     { role: "user", content: JSON.stringify({
       venue,
-      segment: { name: segment.name, personas: personas.length, baseline_share: round(segment.share), baseline_ci: segment.ci.map((value) => round(value)) },
+      segment: { name: segment.name, personas: personas.length, search_personas: personaIds.length, baseline_share: round(segment.share), baseline_ci: segment.ci.map((value) => round(value)) },
       rivals_recommended_instead: segment.competitors.slice(0, 5).map((item) => item.name),
       assistants_under_test: assistants,
-      budget: remaining(budget, limits),
+      budget: remaining(budget, searchLimits),
     }) },
   ];
 
@@ -129,16 +139,16 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
       const candidate: Candidate = { id: `c${candidates.length + 1}`, copy: String(args.copy).trim(), rationale: typeof args.rationale === "string" ? args.rationale.trim() : "", placeboRows: [], fixRows: [], personasProbed: [], failed: 0 };
       candidates.push(candidate);
       budget = chargeBudget(budget, { tries: 1 }, prices);
-      return { ok: true, result: { candidate_id: candidate.id, budget: remaining(budget, limits) }, summary: `Proposed ${candidate.id}: “${candidate.copy}”` };
+      return { ok: true, result: { candidate_id: candidate.id, budget: remaining(budget, searchLimits) }, summary: `Proposed ${candidate.id}: “${candidate.copy}”` };
     }
     if (name === "probe_segment") {
       const key = String(args.candidate_id ?? args.copy ?? "");
       const candidate = candidates.find((item) => item.id === key || item.copy === key);
       if (!candidate) return { ok: false, result: { error: `Unknown candidate "${key}". Call propose_copy first.` }, summary: "Rejected: unknown candidate" };
-      const requested = Math.max(1, Math.min(personas.length, Math.floor(Number(args.n) || 8)));
+      const requested = Math.max(1, Math.min(personaIds.length, Math.floor(Number(args.n) || 8)));
       const fresh = nextPersonas(personaIds, candidate.personasProbed, requested);
-      if (!fresh.length) return { ok: false, result: { error: "Every persona in this segment already tested this candidate." }, summary: `Rejected: ${candidate.id} fully probed` };
-      const affordable = affordablePersonas(budget, limits, fresh.length, assistants);
+      if (!fresh.length) return { ok: false, result: { error: "Every search persona already tested this candidate." }, summary: `Rejected: ${candidate.id} fully probed` };
+      const affordable = affordablePersonas(budget, searchLimits, fresh.length, assistants);
       if (!affordable) return { ok: false, result: { error: "The assistant-call budget cannot cover one more persona." }, summary: "Rejected: assistant-call budget spent" };
       const chosen = personas.filter((persona) => fresh.slice(0, affordable).includes(persona.id));
       const outcome = await runArms(venue, chosen, candidate.copy, ["placebo", "fix"]);
@@ -154,23 +164,60 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
       candidate.fixRows.push(...outcome.fix.rows.map(({ personaId, brand }) => ({ personaId, brand })));
       candidate.personasProbed.push(...chosen.map((persona) => persona.id));
       candidate.failed += failures.length;
+      looks++;
       const stats = summarize(candidate);
       const failedByKind = failures.reduce<Record<string, number>>((counts, failure) => ({ ...counts, [failure.kind]: (counts[failure.kind] ?? 0) + 1 }), {});
       return {
         ok: true,
-        result: { ...stats, new_personas: chosen.length, failed_this_probe: failedByKind, budget: remaining(budget, limits) },
+        result: { ...stats, new_personas: chosen.length, failed_this_probe: failedByKind, budget: remaining(budget, searchLimits) },
         summary: `Probed ${candidate.id} on ${chosen.length} personas: fix ${stats.fixShare === null ? "n/a" : `${Math.round(stats.fixShare * 100)}%`} vs placebo ${stats.placeboShare === null ? "n/a" : `${Math.round(stats.placeboShare * 100)}%`}${failures.length ? `, ${failures.length} failed` : ""}`,
       };
     }
     if (name === "get_stats") {
-      return { ok: true, result: { candidates: candidates.map(summarize), budget: remaining(budget, limits) }, summary: `Read stats for ${candidates.length} candidates` };
+      return { ok: true, result: { candidates: candidates.map(summarize), budget: remaining(budget, searchLimits) }, summary: `Read stats for ${candidates.length} candidates` };
     }
     return { ok: false, result: { error: `Unknown tool ${name}` }, summary: `Rejected: unknown tool ${name}` };
   }
 
+  // The single confirmation probe for a screened copy: placebo vs fix, run by the code.
+  async function confirm(candidateId: string) {
+    const candidate = candidates.find((item) => item.id === candidateId) as Candidate;
+    const chosen = personas.filter((persona) => plan.confirmation.includes(persona.id));
+    const outcome = await runArms(venue, chosen, candidate.copy, ["placebo", "fix"]);
+    trace.probes.push({ candidateId, personas: chosen.map((persona) => persona.id), confirmation: true, placebo: outcome.placebo, fix: outcome.fix });
+    const rows = [...outcome.placebo.rows, ...outcome.fix.rows];
+    const failures = [...outcome.placebo.failures, ...outcome.fix.failures];
+    budget = chargeBudget(budget, {
+      assistantCalls: chosen.length * assistants * 2,
+      nemotronCalls: rows.length + failures.filter((failure) => failure.kind !== "assistant").length,
+      usage: sumUsage(rows),
+    }, prices);
+    confirmation = confirmationResult({
+      candidateId, mode: plan.mode,
+      placeboRows: outcome.placebo.rows.map(({ personaId, brand }) => ({ personaId, brand })),
+      fixRows: outcome.fix.rows.map(({ personaId, brand }) => ({ personaId, brand })),
+      failed: failures.length,
+    });
+    const pctText = (value: number | null) => value === null ? "n/a" : `${Math.round(value * 100)}%`;
+    send({
+      type: "confirm", candidateId, mode: plan.mode, personas: confirmation.personas, passed: confirmation.passed,
+      summary: `Confirmation of ${candidateId} on ${chosen.length} ${plan.mode === "holdout" ? "held-out" : "re-asked"} personas: fix ${pctText(confirmation.fixShare)} vs placebo ${pctText(confirmation.placeboShare)} · ${confirmation.passed ? "interval above zero" : "interval includes zero"}${failures.length ? ` · ${failures.length} failed` : ""}`,
+      budget,
+    });
+  }
+
+  async function decide(fallback: StopReason | null) {
+    const decision = stopDecision(candidates, budget, searchLimits, personaIds.length, confirmation);
+    if (decision.confirm) {
+      await confirm(decision.confirm);
+      return stopDecision(candidates, budget, searchLimits, personaIds.length, confirmation).reason;
+    }
+    return decision.reason ?? fallback;
+  }
+
   let reason: StopReason | null = null;
   while (!reason) {
-    const exhausted = budgetExhausted(budget, limits);
+    const exhausted = budgetExhausted(budget, searchLimits);
     if (exhausted) { reason = exhausted; break; }
     const turn = await nemotronTurn(messages, AGENT_TOOLS);
     steps++;
@@ -189,7 +236,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
         messages.push({ role: "user", content: turn.finishReason === "length" ? "Your reply hit the token limit. Reply briefly and call exactly one tool." : "Use the tools: propose_copy, then probe_segment." });
         continue;
       }
-      reason = stopDecision(candidates, budget, limits, personas.length).reason ?? "agent_finished";
+      reason = await decide("agent_finished");
       break;
     }
     for (const call of toolCalls) {
@@ -198,14 +245,17 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
       send({ type: "tool", turn: steps, name: call.function.name, args: parsed.ok ? parsed.value : {}, ok: outcome.ok, summary: outcome.summary });
       messages.push({ role: "tool", tool_call_id: call.id, content: JSON.stringify(outcome.result) });
     }
-    reason = stopDecision(candidates, budget, limits, personas.length).reason;
+    reason = await decide(null);
   }
 
-  send({ type: "stop", reason, detail: STOP_REASONS[reason] });
+  const stopReason: StopReason = reason ?? "agent_finished";
+  send({ type: "stop", reason: stopReason, detail: STOP_REASONS[stopReason] });
   const best = selectBest(candidates);
   const run: AgentRun = {
-    id: runId, segment: segment.name, model, stopReason: reason, stopDetail: STOP_REASONS[reason],
+    id: runId, segment: segment.name, model, stopReason, stopDetail: STOP_REASONS[stopReason],
     best: best ? summarize(best.candidate) : null, candidates: candidates.map(summarize), budget, limits, steps,
+    search: { personas: personaIds.length, looks, candidates: candidates.length },
+    confirmation,
     createdAt: new Date().toISOString(),
   };
   return { run, trace };

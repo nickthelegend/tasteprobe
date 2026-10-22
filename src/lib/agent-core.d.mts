@@ -9,7 +9,12 @@ export type CandidateStats = {
   personas: number; placeboShare: number | null; fixShare: number | null; lift: number | null;
   liftCi: [number, number] | null; placeboCi: [number, number] | null; fixCi: [number, number] | null; failed: number;
 };
-export type StopReason = "lift_ci_above_zero" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished";
+export type StopReason = "lift_confirmed" | "confirmation_failed" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished";
+export type ConfirmationPlan = { mode: "holdout" | "rerun"; selection: string[]; confirmation: string[] };
+export type Confirmation = {
+  candidateId: string; mode: "holdout" | "rerun"; personas: number; placeboShare: number | null; fixShare: number | null;
+  lift: number | null; liftCi: [number, number] | null; failed: number; passed: boolean;
+};
 
 export const DEFAULT_LIMITS: AgentLimits;
 export type AgentCaps = { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number };
@@ -22,8 +27,12 @@ export function budgetExhausted(budget: AgentBudget, limits: AgentLimits): StopR
 export function affordablePersonas(budget: AgentBudget, limits: AgentLimits, requested: number, assistants: number): number;
 export function validateCopy(copy: unknown): string | null;
 export function parseToolArguments(raw: unknown): { ok: true; value: Record<string, unknown> } | { ok: false; error: string };
-export function candidateStats(candidate: Candidate): CandidateStats;
+export function candidateStats(candidate: Pick<Candidate, "placeboRows" | "fixRows" | "personasProbed" | "failed">): CandidateStats;
 export function selectBest(candidates: Candidate[]): { candidate: Candidate; stats: CandidateStats & { lift: number; liftCi: [number, number] } } | null;
-export function stopDecision(candidates: Candidate[], budget: AgentBudget, limits: AgentLimits, segmentPersonas: number): { stop: boolean; reason: StopReason | null };
+export function planConfirmation(personaIds: string[]): ConfirmationPlan;
+export function confirmationCalls(plan: ConfirmationPlan, assistants: number): number;
+export function screenedCandidate(candidates: Candidate[], selectionSize: number): ReturnType<typeof selectBest>;
+export function confirmationResult(input: { candidateId: string; mode: "holdout" | "rerun"; placeboRows: CandidateRow[]; fixRows: CandidateRow[]; failed?: number }): Confirmation;
+export function stopDecision(candidates: Candidate[], budget: AgentBudget, limits: AgentLimits, selectionSize: number, confirmation?: Confirmation | null): { stop: boolean; reason: StopReason | null; confirm: string | null };
 export const STOP_REASONS: Record<StopReason, string>;
 export function nextPersonas(segmentPersonaIds: string[], probedIds: string[], count: number): string[];

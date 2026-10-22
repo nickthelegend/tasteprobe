@@ -118,7 +118,13 @@ Without keys, `run_audit` and `run_fix` return a tool error, `Setup required: QL
    - **fix**: the proposed copy, injected exactly the same way.
 
    The headline lift is **fix − placebo**, a paired bootstrap over personas because both arms share them. Placebo − baseline is shown as the name-exposure effect. Every attempt is kept in `counterfactuals[]` and shown as a history.
-8. **Agent loop.** Nemotron gets four tools: `qloo_insights` (live), `propose_copy` (rules enforced in code), `probe_segment(candidate_id, n)` (placebo vs fix on the next n personas) and `get_stats`. It plans, proposes, probes and revises. **The code decides when to stop**: as soon as a copy probed on at least 8 personas has a lift CI entirely above zero, or when the copy tries, assistant calls, Nemotron tokens, dollar cap or turns run out. Steps stream as NDJSON with tokens and cost. The run summary and the full trace (messages and every probe answer) are saved. The stop rule, budget accounting and best-candidate selection are pure functions with their own tests.
+8. **Agent loop.** Nemotron gets four tools: `qloo_insights` (live), `propose_copy` (rules enforced in code), `probe_segment(candidate_id, n)` (placebo vs fix on the next n search personas) and `get_stats`. It plans, proposes, probes and revises. **The code decides when to stop, and the search only screens.** The agent looks at the lift interval after every probe and across up to 3 copies, so "stop when an interval clears zero" would declare false wins far more often than 2.5%: a seeded null simulation with the repo's own bootstrap (copy has no effect) puts that rule at 12-18% with 3 copies (4.5% with one copy and one look). So:
+   - The segment's personas are split. From 16 personas up, a third (at least 8) are **held out** and never probed during the search; below 16, the confirmation **re-asks the same personas fresh** (new answers from the assistants). The confirmation's assistant calls are set aside before the search starts, so it can always run.
+   - A copy whose nominal 95% lift interval clears zero on at least 8 search personas has only **passed the screen**. The code then runs **one confirmation probe** (placebo vs fix on the confirmation personas). Its interval is the result: `lift_confirmed` if it is above zero, `confirmation_failed` if not. One confirmation per run, then the run stops.
+   - The run also stops when the copy tries, assistant calls, Nemotron tokens, dollar cap or turns run out.
+   - In the same 2000-run null simulation, false confirmed wins are 0.2-0.6% across segment sizes 8-24, 1-2 assistants and 1-5 copies (the screen alone: 4.5-13.5%); `test/agent.test.mjs` asserts at most 5%. The price is power: a real effect has to show up twice.
+
+   Every interval shown is labelled nominal, and the run records its looks, copies and search personas. Steps stream as NDJSON with tokens and cost. The run summary and the full trace (messages and every probe answer, including the confirmation) are saved. The stop rule, budget accounting, confirmation plan and best-candidate selection are pure functions with their own tests.
 
 ## NVIDIA Nemotron on Nebius Token Factory
 
@@ -195,6 +201,7 @@ CI (`.github/workflows/ci.yml`) runs all four on Node 22. The fixtures in `test/
 - The fix experiment is prompt-level: it shows whether assistants would use the copy if they retrieved it, not whether a published change would be crawled.
 - Intervals cover sampling over personas and answers. They don't cover extraction errors (the cross-check reports those separately) or the choice of prompt template.
 - The agent's dollar cap covers Nemotron tokens at your configured rates. Assistant calls are capped by count.
+- Intervals are nominal. The agent corrects for its own repeated looks with a confirmation probe; repeated manual fix attempts on one audit are not corrected (each attempt says which attempt it is, and asks for a re-pour before a win is relied on). The confirmation in a segment under 16 personas re-asks the same personas, so it guards against answer noise, not against those personas being unusual.
 - Storage is a local JSON file under `.data/` (mode 600). Writes are serialised in-process and atomic. Run one server per data directory. Serverless hosts need `TASTEPROBE_DATA_DIR` on a persistent volume and roughly 5-minute requests.
 
 ## License

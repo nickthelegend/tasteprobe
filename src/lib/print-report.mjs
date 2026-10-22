@@ -124,7 +124,7 @@ export function PrintReport({ model, actions = null }) {
         h("b", null, check.name),
         check.detail && h("span", { className: "sub" }, check.detail))))),
 
-    h(Section, { no: next(), title: "Re-pours: baseline, placebo, fix", note: "The same personas re-ask every assistant three ways at once. The headline lift is fix − placebo, so it measures the copy and not mere exposure to the name." },
+    h(Section, { no: next(), title: "Re-pours: baseline, placebo, fix", note: `The same personas re-ask every assistant three ways at once. The headline lift is fix − placebo, so it measures the copy and not mere exposure to the name. Each interval is nominal for one attempt${model.fixes.length > 1 ? `; with ${model.fixes.length} attempts on this audit, one clearing zero by chance is likelier than 2.5%` : ""}.` },
       model.fixes.length === 0
         ? h("p", { className: "rp-empty-line" }, "No fix has been tested on this audit yet.")
         : model.fixes.map((fix) => h("div", { key: fix.attempt, className: "rp-fix" },
@@ -142,11 +142,17 @@ export function PrintReport({ model, actions = null }) {
             h("span", null, h("b", null, `Fix − placebo: ${pts(fix.lift.fixVsPlacebo?.delta)}`), ` (95% ${ptsRange(fix.lift.fixVsPlacebo?.ci)}${fix.lift.fixVsPlacebo?.clearsZero ? ", clears zero" : ", does not clear zero"})`),
             h("span", { className: "sub" }, `Name exposure (placebo − baseline): ${pts(fix.lift.placeboVsBaseline?.delta)}, 95% ${ptsRange(fix.lift.placeboVsBaseline?.ci)}. Placebo snippet: “${fix.placebo}”. Copy by ${fix.model}.`))))),
 
-    model.agentRuns.length > 0 && h(Section, { no: next(), title: "Agent runs", note: "Nemotron tool-calling loop; the code, not the model, decides when to stop." },
+    model.agentRuns.length > 0 && h(Section, { no: next(), title: "Agent runs", note: "Nemotron tool-calling loop; the code, not the model, decides when to stop. Search intervals are nominal and only screen (several looks at several copies); a win needs the one confirmation probe on personas the search never used." },
       h(Table, {
         caption: "Agent runs",
-        columns: ["Segment", "Stopped because", "Candidates", "Best copy", "Best lift (95%)", "Budget used"],
-        rows: model.agentRuns.map((run) => [run.segment, `${run.stopReason}: ${run.stopDetail}`, run.candidates, run.best?.copy ?? "—", run.best ? `${pts(run.best.lift)} (${ptsRange(run.best.liftCi)})` : "—", `${run.budget.assistantCalls} assistant calls · ${run.budget.inputTokens + run.budget.outputTokens} Nemotron tokens${run.budget.priced ? ` · $${run.budget.usd.toFixed(4)}` : ""}`]),
+        columns: ["Segment", "Stopped because", "Search", "Best copy", "Search lift (nominal 95%)", "Confirmation (nominal 95%)", "Budget used"],
+        rows: model.agentRuns.map((run) => [
+          run.segment, `${run.stopReason}: ${run.stopDetail}`,
+          run.search ? `${run.search.looks} looks · ${run.search.candidates} copies · ${run.search.personas} personas` : `${run.candidates} copies`,
+          run.best?.copy ?? "—", run.best ? `${pts(run.best.lift)} (${ptsRange(run.best.liftCi)})` : "—",
+          run.confirmation ? `${pts(run.confirmation.lift)} (${ptsRange(run.confirmation.liftCi)}) on ${run.confirmation.personas} ${run.confirmation.mode === "holdout" ? "held-out" : "re-asked"} personas · ${run.confirmation.passed ? "confirmed" : "not confirmed"}` : "none run",
+          `${run.budget.assistantCalls} assistant calls · ${run.budget.inputTokens + run.budget.outputTokens} Nemotron tokens${run.budget.priced ? ` · $${run.budget.usd.toFixed(4)}` : ""}`,
+        ]),
       })),
 
     model.qlooSignals && h(Section, { no: next(), title: "Qloo signals", note: "Cross-domain affinities used to colour the personas. A failed call is listed with its error, not hidden." },
