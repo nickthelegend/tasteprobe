@@ -11,14 +11,26 @@ export const QLOO_HACKATHON_BASE_URL = "https://hackathon.api.qloo.com";
 
 // A Qloo HTTP error the caller can act on: `status` and the refused `filterType` (for /v2/insights)
 // are kept, so a 403 on urn:tag can switch the personas to urn:entity types instead of failing.
+// The message is a status plus a classified reason and never quotes Qloo's response body: these
+// messages are stored on the audit and served publicly, and Qloo forbids publishing its raw
+// payloads. The body snippet stays on `detail`, for server-side use only.
 export class QlooHttpError extends Error {
-  constructor(message, { status, path, filterType = null }) {
+  constructor(message, { status, path, filterType = null, detail = "" }) {
     super(message);
     this.name = "QlooHttpError";
     this.status = status;
     this.path = path;
     this.filterType = filterType;
+    this.detail = detail;
   }
+}
+
+function reasonFor(status) {
+  if (status === 400) return "bad request";
+  if (status === 404) return "not found";
+  if (status === 429) return "rate limited";
+  if (status >= 500) return "Qloo server error";
+  return "unexpected status";
 }
 
 function snippet(body) {
@@ -38,9 +50,9 @@ export function readQlooResponse({ path, params = {}, status, body, baseUrl = QL
   }
   if (status === 403 && path.startsWith("/v2/insights")) {
     const type = params["filter.type"] ?? "this filter.type";
-    throw new QlooHttpError(`Qloo ${path} returned 403 for filter.type=${type}: Qloo says this type is not enabled for your key. ${snippet(body)}`.trim(), { status, path, filterType: params["filter.type"] ?? null });
+    throw new QlooHttpError(`Qloo ${path} returned 403 for filter.type=${type}: Qloo says this type is not enabled for your key.`, { status, path, filterType: params["filter.type"] ?? null, detail: snippet(body) });
   }
-  if (status < 200 || status >= 300) throw new QlooHttpError(`Qloo ${path} returned ${status}: ${snippet(body) || "no body"}`, { status, path, filterType: params["filter.type"] ?? null });
+  if (status < 200 || status >= 300) throw new QlooHttpError(`Qloo ${path} returned ${status} (${reasonFor(status)}).`, { status, path, filterType: params["filter.type"] ?? null, detail: snippet(body) });
   try { return JSON.parse(body); }
-  catch { throw new Error(`Qloo ${path} returned ${status} with a body that is not JSON: ${snippet(body)}`); }
+  catch { throw new QlooHttpError(`Qloo ${path} returned ${status} with a body that is not JSON.`, { status, path, filterType: params["filter.type"] ?? null, detail: snippet(body) }); }
 }

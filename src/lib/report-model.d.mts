@@ -42,6 +42,8 @@ export type ReportModel = {
   reproducibility: NonNullable<Audit["meta"]> | null;
 };
 export function buildReportModel(audit: Audit): ReportModel;
+export const PUBLIC_ASSISTANT_HOSTS: string[];
+export function publicAudit(audit: Audit): Audit;
 export type Provenance = "live" | "synthetic" | "unrecorded";
 export function provenanceOf(audit: Pick<Audit, "live" | "_fixture"> | null | undefined): Provenance;
 export const PROVENANCE_TEXT: Record<Provenance, string>;

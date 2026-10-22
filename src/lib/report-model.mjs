@@ -40,6 +40,19 @@ export function provenanceOf(audit) {
 
 export const PROVENANCE_TEXT = { live: "Live run", synthetic: "Synthetic fixture, not a live run", unrecorded: "Provenance not recorded" };
 
+// Hosts of the assistants under test that are public APIs. Any other MODEL_n_BASE_URL host may be a
+// private endpoint, so public reads show it as "custom endpoint" (the model id stays).
+export const PUBLIC_ASSISTANT_HOSTS = ["api.openai.com", "api.tokenfactory.nebius.com"];
+
+// The stored audit as anyone with the URL may read it (GET /api/audits/<id>, the report page).
+export function publicAudit(audit) {
+  if (!audit?.meta?.assistants) return audit;
+  return {
+    ...audit,
+    meta: { ...audit.meta, assistants: audit.meta.assistants.map((item) => (PUBLIC_ASSISTANT_HOSTS.includes(item.host) ? item : { ...item, host: "custom endpoint" })) },
+  };
+}
+
 // Older audits have no personaSource; they were built from urn:tag before the fallback existed.
 export const personaSourceOf = (audit) => (audit?.personaSource === "urn:entity" ? "urn:entity" : "urn:tag");
 

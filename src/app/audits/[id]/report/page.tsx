@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PrintButton } from "@/components/PrintButton";
 import { PrintReport, ReportEmpty } from "@/lib/print-report.mjs";
-import { buildReportModel, listAudits } from "@/lib/report-model.mjs";
+import { buildReportModel, listAudits, publicAudit } from "@/lib/report-model.mjs";
 import { readAudits } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
   const back = <a className="tp-btn tp-btn-line" href="/#room">Back to the tasting room</a>;
   return <main className="rp-page">
     {audit
-      ? <PrintReport model={buildReportModel(audit)} actions={<>{back}<PrintButton /></>} />
+      ? <PrintReport model={buildReportModel(publicAudit(audit))} actions={<>{back}<PrintButton /></>} />
       : <ReportEmpty requestedId={audits.length ? id : null} stored={listAudits(audits, { featuredId: process.env.TASTEPROBE_FEATURED_AUDIT_ID?.trim() || null }).items} actions={back} />}
   </main>;
 }

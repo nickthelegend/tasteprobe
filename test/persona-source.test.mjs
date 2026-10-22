@@ -102,7 +102,11 @@ test("only a 403 on urn:tag is a refusal: a 401 or an outage still fails loudly"
   await assert.rejects(collectPersonaSignals(rejected.call, venue), /401 \(key rejected\)/);
   assert.equal(rejected.calls.length, 1);
   const outage = fixtureCaller({ tag: { status: 502, body: "bad gateway" } });
-  await assert.rejects(collectPersonaSignals(outage.call, venue), /returned 502: bad gateway/);
+  await assert.rejects(collectPersonaSignals(outage.call, venue), (error) => {
+    assert.match(error.message, /returned 502 \(Qloo server error\)\./);
+    assert.doesNotMatch(error.message, /bad gateway/);
+    return true;
+  });
   assert.equal(isFilterTypeRefused(new Error("403"), "urn:tag"), false);
 });
 

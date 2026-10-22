@@ -78,3 +78,18 @@ test("provenance: the synthetic fixture is never counted or described as a live 
   assert.match(reportText(buildReportModel(audit)), /^Synthetic fixture, not a live run\.$/m);
   assert.doesNotMatch(reportText(buildReportModel(live)), /Synthetic fixture|Provenance not recorded/);
 });
+
+test("public reads show a private assistant host as 'custom endpoint', keep public API hosts and model ids", async () => {
+  const { publicAudit } = await import("../src/lib/report-model.mjs");
+  const stored = { ...audit, meta: { ...audit.meta, assistants: [
+    { name: "gpt", model: "gpt-4o-mini", host: "api.openai.com" },
+    { name: "llama", model: "meta-llama/Llama-3.3-70B-Instruct", host: "api.tokenfactory.nebius.com" },
+    { name: "private", model: "in-house-1", host: "llm.internal.example.com" },
+  ] } };
+  const shown = publicAudit(stored);
+  assert.deepEqual(shown.meta.assistants.map((item) => item.host), ["api.openai.com", "api.tokenfactory.nebius.com", "custom endpoint"]);
+  assert.equal(shown.meta.assistants[2].model, "in-house-1");
+  assert.doesNotMatch(JSON.stringify(shown), /llm\.internal\.example\.com/);
+  assert.equal(stored.meta.assistants[2].host, "llm.internal.example.com", "the stored audit is not changed");
+  assert.equal(publicAudit(audit).meta.assistants[0].host, "custom endpoint");
+});

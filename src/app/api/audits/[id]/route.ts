@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { ArmRun } from "@/lib/experiment";
 import type { ResponseRow } from "@/lib/probe";
+import { publicAudit } from "@/lib/report-model.mjs";
 import { findAudit, readRaw } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,8 @@ const trim = (rows: ResponseRow[] = []) => rows.map(({ personaId, segment, model
 // ?attempt=<id> picks a fix attempt; the latest one is returned by default.
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
-  const audit = await findAudit(id);
+  const stored = await findAudit(id);
+  const audit = stored && publicAudit(stored);
   if (!audit) return NextResponse.json({ error: "Audit not found." }, { status: 404 });
   const query = new URL(request.url).searchParams;
   if (!query.has("evidence")) return NextResponse.json(audit);

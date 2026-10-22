@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { parseJsonObject } from "./json.mjs";
-import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "./qloo.mjs";
+import { QLOO_HACKATHON_BASE_URL, QlooHttpError, readQlooResponse } from "./qloo.mjs";
 import { DEFAULT_NEBIUS_MODEL, reasoningLabel, reasoningParams, reasoningText } from "./nebius.mjs";
 import { collectPersonaSignals, type PersonaSignals } from "./persona-source.mjs";
 import { requestSignal, runSignal, throwIfDeadline, untilDeadline } from "./run-deadline.mjs";
@@ -131,6 +131,8 @@ export async function fetchCrossDomainSignals(entityId: string, city: string, pr
       signals.domains.push({ type, entities: crossDomain[type].map((item) => item.name) });
     } catch (error) {
       throwIfDeadline();
+      // The stored error is Qloo's status and reason; the body Qloo sent stays in the raw store only.
+      if (error instanceof QlooHttpError) raw.push({ type, error: { status: error.status, detail: error.detail } });
       signals.domains.push({ type, entities: [], error: error instanceof Error ? error.message.slice(0, 200) : String(error) });
     }
   }));
@@ -140,6 +142,7 @@ export async function fetchCrossDomainSignals(entityId: string, city: string, pr
     signals.demographics = parseQlooDemographics(payload);
   } catch (error) {
     throwIfDeadline();
+    if (error instanceof QlooHttpError) raw.push({ type: "demographics", error: { status: error.status, detail: error.detail } });
     signals.demographicsError = error instanceof Error ? error.message.slice(0, 200) : String(error);
   }
   signals.domains.sort((a, b) => CROSS_DOMAIN_TYPES.indexOf(a.type) - CROSS_DOMAIN_TYPES.indexOf(b.type));

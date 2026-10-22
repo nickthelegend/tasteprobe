@@ -81,6 +81,11 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     }
     const full = await (await request.get(`/api/audits/${FEATURED}`)).text();
     expect(full).toContain('"qlooEntityId"');
+    // A private assistant host is never published: the fixture's example.test reads "custom endpoint".
+    expect(JSON.parse(full).meta.assistants).toEqual([{ name: "assistant-a", model: "a-1", host: "custom endpoint" }]);
+    expect(full).not.toContain("example.test");
+    expect(await (await request.get(`/api/audits/${FEATURED}?evidence=1`)).text()).not.toContain("example.test");
+    expect(await (await request.get(`/audits/${FEATURED}/report`)).text()).not.toContain("example.test");
     const bytes = (await listing.body()).length;
     expect(bytes, `${bytes} bytes for 12 summaries vs ${full.length} for one full audit`).toBeLessThan(full.length * 2);
     const page2 = await (await request.get("/api/audits?offset=12")).json();
