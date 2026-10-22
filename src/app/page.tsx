@@ -114,6 +114,24 @@ export default function Home() {
 
   useEffect(() => () => opens.current.abort(), []);
 
+  // The next page of past flights (GET /api/audits?offset=&limit=12), appended without duplicates.
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  async function loadOlder() {
+    if (!audits) return;
+    setLoadingOlder(true);
+    try {
+      const response = await fetch(`/api/audits?offset=${audits.length}&limit=12`);
+      if (!response.ok) throw new Error(`Could not load older flights (${response.status}).`);
+      const page: Listing[] = await response.json();
+      setAuditTotal(Number(response.headers.get("x-total-count") ?? audits.length + page.length));
+      setAudits((current) => [...(current ?? []), ...page.filter((item) => !(current ?? []).some((shown) => shown.id === item.id))]);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not load older flights.");
+    } finally {
+      setLoadingOlder(false);
+    }
+  }
+
   useEffect(() => {
     fetch("/api/status").then((response) => response.json()).then(setStatus)
       .catch(() => setError("Could not reach the TasteProbe server for its configuration status."));
@@ -406,10 +424,13 @@ export default function Home() {
 
       {audits && audits.length > 0 && <nav className="cellar-book" aria-label="Saved audits">
         <span className="label">Past flights</span>
-        <div>{audits.map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit.id)} disabled={!controls.canSwitchAudit}>
+        <div className="cellar-flights">{audits.map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit.id)} disabled={!controls.canSwitchAudit}>
           <strong>{audit.featured && <em className="featured">Featured</em>}{audit.brand}</strong><small>{audit.city} · {audit.share === null ? "—" : pct(audit.share)} · {new Date(audit.createdAt).toLocaleDateString()}{audit.origin ? ` · ${audit.origin}` : ""}</small>
         </button>)}</div>
-        {auditTotal !== null && auditTotal > audits.length && <small className="cellar-more">{auditTotal - audits.length} older {auditTotal - audits.length === 1 ? "flight" : "flights"} not listed</small>}
+        {auditTotal !== null && auditTotal > audits.length && <div className="cellar-more-row">
+          <small className="cellar-more">{auditTotal - audits.length} older {auditTotal - audits.length === 1 ? "flight" : "flights"} not listed</small>
+          <button type="button" className="btn btn-ghost cellar-older" onClick={loadOlder} disabled={loadingOlder}>{loadingOlder ? <><span className="spinner" /> Loading</> : "Show older flights"}</button>
+        </div>}
       </nav>}
     </section>
 

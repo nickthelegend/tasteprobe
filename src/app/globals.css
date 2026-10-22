@@ -401,6 +401,8 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .cellar-book strong { font-weight: 500; }
 .cellar-book .featured { display: inline-block; margin-right: 6px; padding: 1px 7px; border-radius: 999px; background: var(--pink); color: var(--berry); font: 600 10px/1.6 var(--mono); font-style: normal; letter-spacing: .05em; text-transform: uppercase; vertical-align: 2px; }
 .cellar-more { color: var(--muted); font-size: 12.5px; }
+.cellar-book > .cellar-more-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; overflow: visible; padding: 0; }
+.cellar-book .cellar-more-row .cellar-older { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px 16px; font-size: 13.5px; }
 .cellar-book small { color: var(--muted); font-size: 12.5px; }
 
 .colophon { background: var(--berry); color: rgba(255, 244, 250, .75); padding: 28px max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))); display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; font-size: 13.5px; }

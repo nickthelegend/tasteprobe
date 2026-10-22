@@ -23,10 +23,11 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     const room = page.locator("#room");
     await expect(room.getByRole("heading", { level: 3, name: FEATURED_NAME, exact: true })).toBeVisible();
     const flights = room.getByRole("navigation", { name: "Saved audits" });
-    await expect(flights.locator("button")).toHaveCount(12);
-    await expect(flights.locator("button").first()).toContainText(`Featured${FEATURED_NAME}`);
-    await expect(flights.locator("button").first()).toHaveClass(/current/);
-    await expect(flights.locator("button").nth(1)).toContainText("Visitor Venue 1 (synthetic)");
+    const glasses = flights.locator(".cellar-flights button");
+    await expect(glasses).toHaveCount(12);
+    await expect(glasses.first()).toContainText(`Featured${FEATURED_NAME}`);
+    await expect(glasses.first()).toHaveClass(/current/);
+    await expect(glasses.nth(1)).toContainText("Visitor Venue 1 (synthetic)");
     await expect(flights.locator(".cellar-more")).toHaveText("2 older flights not listed");
     await expect(page.locator(".masthead-live")).toContainText("14 flights poured here");
     // No pre-live copy once the store has audits: no "unverified until first live run" stamp, and
@@ -38,6 +39,30 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     await expect(faq).not.toContainText("Not yet");
     await expectNoHorizontalScroll(page);
     await shot(page, "13-public-featured-results");
+  });
+
+  test("Show older flights pages in the rest of the store; every flight opens", async ({ page }) => {
+    await page.goto("/#room");
+    const room = page.locator("#room");
+    await expect(room.getByRole("heading", { level: 3, name: FEATURED_NAME, exact: true })).toBeVisible();
+    const flights = room.getByRole("navigation", { name: "Saved audits" });
+    const glasses = flights.locator(".cellar-flights button");
+    await expect(glasses).toHaveCount(12);
+    const older = page.waitForResponse((response) => response.url().includes("/api/audits?offset=12&limit=12"));
+    await flights.getByRole("button", { name: "Show older flights" }).click();
+    expect((await older).status()).toBe(200);
+    await expect(glasses).toHaveCount(14);
+    await expect(flights.getByRole("button", { name: "Show older flights" })).toHaveCount(0);
+    await expect(flights.locator(".cellar-more")).toHaveCount(0);
+    await expect(glasses.nth(12)).toContainText("Visitor Venue 12 (synthetic)");
+    await expect(glasses.nth(13)).toContainText("Visitor Venue 13 (synthetic)");
+    await expectNoHorizontalScroll(page);
+    for (let index = 0; index < 14; index++) {
+      const name = (await glasses.nth(index).locator("strong").textContent())!.replace(/^Featured/, "");
+      await glasses.nth(index).click();
+      await expect(glasses.nth(index)).toHaveClass(/current/);
+      await expect(room.getByRole("heading", { level: 3, name, exact: true })).toBeVisible();
+    }
   });
 
   test("GET /api/audits is summaries only: no personas, Qloo ids, affinities or answers", async ({ request }) => {
@@ -110,7 +135,7 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     await page.goto("/#room");
     const room = page.locator("#room");
     await expect(room.getByRole("heading", { level: 3, name: FEATURED_NAME, exact: true })).toBeVisible();
-    const flights = room.getByRole("navigation", { name: "Saved audits" }).locator("button");
+    const flights = room.getByRole("navigation", { name: "Saved audits" }).locator(".cellar-flights button");
     // Hold the real server's answer for Visitor Venue 1 for 2 s (it is still answered by the server).
     let held = 0;
     await page.route("**/api/audits/00000000-0000-4000-8000-000000000100", async (route) => {
