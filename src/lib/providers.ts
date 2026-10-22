@@ -288,23 +288,45 @@ export async function suggestContentChange(input: { brand: string; category: str
   return { change: parsed.change.trim(), rationale: typeof parsed.rationale === "string" ? parsed.rationale.trim() : "", model, usage, raw: text };
 }
 
-let catalogCache: { at: number; result: { ok: boolean; detail: string } } | undefined;
+type CatalogResult = { ok: boolean; detail: string };
+// The catalog check is a status read, not a run: its own client with a short timeout and no
+// retries, one request in flight shared by every caller, a success kept 5 min and a failure only
+// 30 s (so one network blip does not paint the room red for minutes).
+export const CATALOG_TIMEOUT_MS = 5_000;
+const CATALOG_OK_TTL_MS = 5 * 60_000;
+export const CATALOG_FAIL_TTL_MS = 30_000;
+let catalogCache: { at: number; result: CatalogResult } | undefined;
+let catalogInFlight: Promise<CatalogResult> | undefined;
 
 // Confirms the configured NVIDIA model is actually served for this Nebius key.
-export async function checkNebiusModel() {
-  if (!process.env.NEBIUS_API_KEY) return { ok: false, detail: "NEBIUS_API_KEY not set" };
-  if (catalogCache && Date.now() - catalogCache.at < 5 * 60_000) return catalogCache.result;
-  let result: { ok: boolean; detail: string };
-  try {
-    const ids: string[] = [];
-    for await (const model of nebius().models.list()) ids.push(model.id);
-    const wanted = nebiusModel();
-    result = ids.includes(wanted)
-      ? { ok: true, detail: wanted }
-      : { ok: false, detail: `${wanted} is not in your Nebius catalog. NVIDIA models available: ${ids.filter((id) => id.toLowerCase().startsWith("nvidia/")).join(", ") || "none"}` };
-  } catch (error) {
-    result = { ok: false, detail: `Nebius catalog check failed: ${describe(error)}` };
-  }
-  catalogCache = { at: Date.now(), result };
-  return result;
+export function checkNebiusModel(): Promise<CatalogResult> {
+  const apiKey = process.env.NEBIUS_API_KEY;
+  if (!apiKey) return Promise.resolve({ ok: false, detail: "NEBIUS_API_KEY not set" });
+  if (catalogCache && Date.now() - catalogCache.at < (catalogCache.result.ok ? CATALOG_OK_TTL_MS : CATALOG_FAIL_TTL_MS)) return Promise.resolve(catalogCache.result);
+  catalogInFlight ??= (async () => {
+    let result: CatalogResult;
+    try {
+      const client = new OpenAI({ apiKey, baseURL: NEBIUS_BASE_URL(), timeout: CATALOG_TIMEOUT_MS, maxRetries: 0 });
+      const ids: string[] = [];
+      for await (const model of client.models.list()) ids.push(model.id);
+      const wanted = nebiusModel();
+      result = ids.includes(wanted)
+        ? { ok: true, detail: wanted }
+        : { ok: false, detail: `${wanted} is not in your Nebius catalog. NVIDIA models available: ${ids.filter((id) => id.toLowerCase().startsWith("nvidia/")).join(", ") || "none"}` };
+    } catch (error) {
+      result = { ok: false, detail: `Nebius catalog check failed: ${describe(error)}` };
+    }
+    catalogCache = { at: Date.now(), result };
+    return result;
+  })().finally(() => { catalogInFlight = undefined; });
+  return catalogInFlight;
+}
+
+// For GET /api/status, which must answer at once: the catalog result if it is cached or arrives
+// within `waitMs`, otherwise null ("checking") while the shared check carries on.
+export async function nebiusModelStatus(waitMs = 1_500): Promise<CatalogResult | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const waited = new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), waitMs); });
+  try { return await Promise.race([checkNebiusModel(), waited]); }
+  finally { clearTimeout(timer); }
 }

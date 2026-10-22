@@ -20,7 +20,7 @@ const EXAMPLE_REPOUR: FlightItem[] = [
   { id: "fix", name: "Fix", share: 0.38, interval: [0.24, 0.54] },
 ];
 
-export type CellarStatus = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[] } | null;
+export type CellarStatus = { qloo: boolean; nebius: { configured: boolean; ok: boolean | null; model: string; detail: string }; systems: string[] } | null;
 
 const COURSES: { title: string; body: React.ReactNode; tag: string }[] = [
   { title: "Source the palates", tag: "Qloo Taste AI", body: <>Qloo <code>/search</code> resolves the venue in its city, then <code>/v2/insights</code> returns taste tags with affinity for that city, topped up from the venue’s global neighbourhood when the city has fewer than six (each audit says how many). If the key refuses <code>urn:tag</code>, as the hackathon host may, the palates come from artist, brand, film, book, TV, podcast and place affinities instead.</> },
@@ -36,7 +36,7 @@ function cellarLine(status: CellarStatus, auditCount: number | null, liveCount: 
   if (!status) return "Checking the cellar…";
   const keys = [
     status.qloo ? "Qloo key set" : "Qloo key missing",
-    status.nebius.configured ? (status.nebius.ok ? "Nebius model reachable" : "Nebius check failed") : "Nebius key missing",
+    status.nebius.configured ? (status.nebius.ok === null ? "Nebius model check running" : status.nebius.ok ? "Nebius model reachable" : "Nebius check failed") : "Nebius key missing",
     status.systems.length ? `${status.systems.length} ${status.systems.length === 1 ? "assistant" : "assistants"}` : "no assistant",
   ];
   const live = liveCount === null ? "" : liveCount === 0 ? ", none from a live run" : liveCount === auditCount ? ", all from live runs" : `, ${liveCount} from live runs`;

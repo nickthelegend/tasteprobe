@@ -156,6 +156,21 @@ test.describe("tasting room with no keys", () => {
     expect(status.runs).toEqual({ locked: false, setupRequired: null, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, deadlineSeconds: 900, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
   });
 
+  test("a status read that never answers ends in 'status unavailable', not an endless Checking", async ({ page }, info) => {
+    test.skip(info.project.name !== "desktop-standalone", "the 10 s status timeout is checked once, on the production build");
+    test.setTimeout(45_000);
+    // Hold the app's own GET /api/status past the room's 10 s timeout; the real server still answers it later.
+    await page.route("**/api/status", async (route) => { await new Promise((resolve) => setTimeout(resolve, 12_000)); await route.continue().catch(() => undefined); });
+    await page.goto("/#room");
+    const room = page.locator("#room");
+    await expect(room.getByRole("status").filter({ hasText: "Checking which keys are configured…" })).toBeVisible();
+    await expect(room.locator(".order-head .stamp")).toHaveText("checking");
+    await expect(room.getByRole("alert").filter({ hasText: "Status unavailable" })).toContainText("Status unavailable: could not read this server's configuration (no answer in 10 s). Reload to try again.", { timeout: 15_000 });
+    await expect(room.getByText("Checking which keys are configured…")).toHaveCount(0);
+    await expect(room.locator(".order-head .stamp")).toHaveText("status unavailable");
+    await expect(room.getByRole("button", { name: "Run audit" })).toBeDisabled();
+  });
+
   test("the image optimizer is off: /_next/image answers 404 for any image", async ({ request }) => {
     // images.unoptimized in next.config.mjs; the app uses no next/image, so the optimizer and its
     // advisories are unreachable on every target.

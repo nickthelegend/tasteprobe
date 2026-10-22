@@ -18,7 +18,12 @@ import { latestOnly, mergeIfCurrent, roomControls } from "@/lib/ui-state.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
 type RunCaps = { locked: boolean; setupRequired?: string | null; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
-type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[]; runs: RunCaps };
+type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean | null; model: string; detail: string }; systems: string[]; runs: RunCaps };
+// How long the room waits for /api/status, and how often it asks again while the Nebius catalog
+// check is still running (ok: null).
+const STATUS_TIMEOUT_MS = 10_000;
+const STATUS_RECHECK_MS = 2_000;
+const STATUS_RECHECKS = 10;
 const PERSONA_CHOICES = [16, 24, 48, 100, 200];
 type Listing = AuditListing & { featured: boolean };
 
@@ -61,6 +66,7 @@ function splitSetup(item: string) {
 
 export default function Home() {
   const [status, setStatus] = useState<Status | null>(null);
+  const [statusFailed, setStatusFailed] = useState(false);
   // Summaries only (GET /api/audits); the selected audit is fetched in full by id.
   const [audits, setAudits] = useState<Listing[] | null>(null);
   const [auditTotal, setAuditTotal] = useState<number | null>(null);
@@ -135,8 +141,26 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetch("/api/status").then((response) => response.json()).then(setStatus)
-      .catch(() => setError("Could not reach the TasteProbe server for its configuration status."));
+    // The status read is bounded: a hung server or proxy ends in a readable "status unavailable"
+    // instead of an endless "Checking…". While Nebius is still being checked, ask again.
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const readStatus = async (attempt: number) => {
+      try {
+        const response = await fetch("/api/status", { signal: AbortSignal.timeout(STATUS_TIMEOUT_MS), cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const next: Status = await response.json();
+        if (stopped) return;
+        setStatus(next);
+        if (next.nebius.configured && next.nebius.ok === null && attempt < STATUS_RECHECKS) timer = setTimeout(() => readStatus(attempt + 1), STATUS_RECHECK_MS);
+      } catch (caught) {
+        if (stopped) return;
+        setStatusFailed(true);
+        const why = caught instanceof DOMException && caught.name === "TimeoutError" ? `no answer in ${STATUS_TIMEOUT_MS / 1000} s` : caught instanceof Error ? caught.message : "unknown error";
+        setError(`Status unavailable: could not read this server's configuration (${why}). Reload to try again.`);
+      }
+    };
+    void readStatus(0);
     // The featured audit (if the server has one) comes first, so it opens by default.
     fetch("/api/audits").then(async (response) => {
       const list: Listing[] = await response.json();
@@ -145,6 +169,7 @@ export default function Home() {
       setAudits(list);
       if (list[0]) select(list[0].id);
     }).catch(() => { setAudits([]); setAuditTotal(0); setLiveTotal(0); setError("Could not load saved audits."); });
+    return () => { stopped = true; clearTimeout(timer); };
   }, []);
 
   const missing = missingConfig(status);
@@ -222,7 +247,7 @@ export default function Home() {
   }
 
   const stageIndex = run ? STAGES.findIndex((item) => item.id === (run.stage === "personas" ? "qloo" : run.stage)) : -1;
-  const dotClass = (ok: boolean | undefined) => `dot ${status ? (ok ? "ok" : "bad") : ""}`;
+  const dotClass = (ok: boolean | null | undefined) => `dot ${status && ok !== null ? (ok ? "ok" : "bad") : ""}`;
   const showResults = Boolean(active && !run);
 
   return <main>
@@ -247,7 +272,7 @@ export default function Home() {
         {showResults && <><a href="#sheet">Tasting sheet</a><a href="#repour-live">Re-pour</a><a href="#notes">Tasting notes</a></>}
       </nav>}
 
-      {status === null && !error && <div className="checking" role="status"><span className="spinner" />Checking which keys are configured…</div>}
+      {status === null && !statusFailed && <div className="checking" role="status"><span className="spinner" />Checking which keys are configured…</div>}
 
       {missing.length > 0 && <section className="setup" role="alert" aria-labelledby="setup-title">
         <div className="setup-head">
@@ -261,7 +286,7 @@ export default function Home() {
           return <li key={item}><strong>Setup required: <code>{name}</code></strong>{detail && <span>{detail}</span>}</li>;
         })}</ul>
       </section>}
-      {status?.nebius.configured && !status.nebius.ok && <div className="alert" role="alert">
+      {status?.nebius.configured && status.nebius.ok === false && <div className="alert" role="alert">
         <span className="alert-mark" aria-hidden="true">!</span>
         <div><strong>Nebius model check failed</strong><p>{status.nebius.detail}</p></div>
         <span />
@@ -283,7 +308,7 @@ export default function Home() {
       <section className="order" id="pour" aria-labelledby="form-title">
         <div className="order-head">
           <h3 id="form-title">Order a flight</h3>
-          <span className={`stamp ${status === null ? "" : ready ? "stamp-ok" : "stamp-bad"}`}>{status === null ? "checking" : ready ? "ready to pour" : "setup required"}</span>
+          <span className={`stamp ${status === null ? (statusFailed ? "stamp-bad" : "") : ready ? "stamp-ok" : "stamp-bad"}`}>{status === null ? (statusFailed ? "status unavailable" : "checking") : ready ? "ready to pour" : "setup required"}</span>
         </div>
         <form className="order-form" onSubmit={runAudit}>
           <label className="field field-wide"><span>Business name</span><input required minLength={2} value={form.brand} onChange={(event) => setForm({ ...form, brand: event.target.value })} placeholder="Exact listing name, so Qloo can resolve it" autoComplete="off" /></label>
