@@ -71,6 +71,7 @@ async function fromEntities(call, { entityId, city, venueName }, tagRefusal) {
       payloads[type] = payload;
       entityResults[type] = { entities: parseQlooEntities(payload) };
     } catch (error) {
+      if (error?.code === "deadline") throw error; // the run's deadline passed: stop, don't record it
       entityResults[type] = { entities: [], error: message(error) };
     }
   }));

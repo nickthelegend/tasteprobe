@@ -3,6 +3,7 @@ import { parseJsonObject } from "./json.mjs";
 import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "./qloo.mjs";
 import { DEFAULT_NEBIUS_MODEL, reasoningLabel, reasoningParams, reasoningText } from "./nebius.mjs";
 import { collectPersonaSignals, type PersonaSignals } from "./persona-source.mjs";
+import { requestSignal, runSignal, throwIfDeadline, untilDeadline } from "./run-deadline.mjs";
 import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, parseQlooTags, pickPlace, type QlooEntity } from "./taste.mjs";
 import type { QlooSignals, Usage } from "./types";
 
@@ -38,11 +39,12 @@ async function qloo(path: string, params: Record<string, string>) {
   if (!key) throw new ConfigError("Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.");
   const url = new URL(path, QLOO_BASE_URL());
   for (const [name, value] of Object.entries(params)) url.searchParams.set(name, value);
-  const response = await fetch(url, {
+  // The 30 s request timeout, plus the run's deadline (run-deadline.mjs) when one is running.
+  const response = await untilDeadline(fetch(url, {
     headers: { "x-api-key": key, accept: "application/json" },
     cache: "no-store",
-    signal: AbortSignal.timeout(30_000),
-  });
+    signal: requestSignal(30_000),
+  }));
   return readQlooResponse({ path, params, status: response.status, body: await response.text(), baseUrl: QLOO_BASE_URL() });
 }
 
@@ -62,6 +64,7 @@ export async function verifyRival(name: string, city: string): Promise<{ name: s
       ? { name, status: "verified", qlooId: place.id }
       : { name, status: "unverified", detail: `closest Qloo listing in ${city} is ${place.name}` };
   } catch (error) {
+    throwIfDeadline();
     return { name, status: "unverified", detail: error instanceof Error ? error.message.slice(0, 200) : String(error) };
   }
 }
@@ -114,6 +117,7 @@ export async function fetchCrossDomainSignals(entityId: string, city: string, pr
       crossDomain[type] = parseQlooEntities(payload);
       signals.domains.push({ type, entities: crossDomain[type].map((item) => item.name) });
     } catch (error) {
+      throwIfDeadline();
       signals.domains.push({ type, entities: [], error: error instanceof Error ? error.message.slice(0, 200) : String(error) });
     }
   }));
@@ -122,6 +126,7 @@ export async function fetchCrossDomainSignals(entityId: string, city: string, pr
     raw.push({ type: "demographics", payload });
     signals.demographics = parseQlooDemographics(payload);
   } catch (error) {
+    throwIfDeadline();
     signals.demographicsError = error instanceof Error ? error.message.slice(0, 200) : String(error);
   }
   signals.domains.sort((a, b) => CROSS_DOMAIN_TYPES.indexOf(a.type) - CROSS_DOMAIN_TYPES.indexOf(b.type));
@@ -184,9 +189,10 @@ export function nemotronSettings() {
 export async function askAssistants(prompt: string) {
   return Promise.all(configuredModels().map(async ({ client, model, name }) => {
     try {
-      const completion = await client.chat.completions.create({ model, messages: [{ role: "user", content: prompt }], temperature: ASSISTANT_TEMPERATURE });
+      const completion = await untilDeadline(client.chat.completions.create({ model, messages: [{ role: "user", content: prompt }], temperature: ASSISTANT_TEMPERATURE }, { signal: runSignal() }));
       return { model: name, ok: true as const, answer: completion.choices[0]?.message?.content ?? "" };
     } catch (error) {
+      throwIfDeadline();
       return { model: name, ok: false as const, error: `${name}: ${describe(error)}` };
     }
   }));
@@ -217,10 +223,11 @@ function usageOf(completion: OpenAI.Chat.ChatCompletion): Usage {
 async function nemotron(messages: OpenAI.Chat.ChatCompletionMessageParam[], temperature: number) {
   const model = nebiusModel();
   try {
-    const completion = await nebius().chat.completions.create({ model, messages, temperature, max_tokens: nemotronMaxTokens(), ...thinkingParams() });
+    const completion = await untilDeadline(nebius().chat.completions.create({ model, messages, temperature, max_tokens: nemotronMaxTokens(), ...thinkingParams() }, { signal: runSignal() }));
     const choice = completion.choices[0];
     return { model, text: choice?.message?.content ?? "", usage: usageOf(completion), finishReason: choice?.finish_reason ?? null };
   } catch (error) {
+    throwIfDeadline();
     if (error instanceof ConfigError) throw error;
     throw new Error(`Nebius ${model}: ${describe(error)}`);
   }
@@ -231,11 +238,12 @@ async function nemotron(messages: OpenAI.Chat.ChatCompletionMessageParam[], temp
 export async function nemotronTurn(messages: OpenAI.Chat.ChatCompletionMessageParam[], tools: OpenAI.Chat.ChatCompletionTool[]) {
   const model = nebiusModel();
   try {
-    const completion = await nebius().chat.completions.create({ model, messages, tools, tool_choice: "auto", temperature: 0.4, max_tokens: nemotronMaxTokens(), ...thinkingParams() });
+    const completion = await untilDeadline(nebius().chat.completions.create({ model, messages, tools, tool_choice: "auto", temperature: 0.4, max_tokens: nemotronMaxTokens(), ...thinkingParams() }, { signal: runSignal() }));
     const choice = completion.choices[0];
     const message = choice?.message ?? { role: "assistant" as const, content: "", refusal: null };
     return { model, message, usage: usageOf(completion), finishReason: choice?.finish_reason ?? null, reasoning: reasoningText(message) };
   } catch (error) {
+    throwIfDeadline();
     if (error instanceof ConfigError) throw error;
     throw new Error(`Nebius ${model}: ${describe(error)}`);
   }

@@ -1,6 +1,7 @@
 import { askAssistants, extractEntities, nebiusPrices, UnparseableError } from "./providers.ts";
 import { parseNumberedList } from "./extract.mjs";
 import { matchesBrand } from "./taste.mjs";
+import { pool, throwIfDeadline } from "./run-deadline.mjs";
 import type { Persona, Usage } from "./types";
 
 export type ResponseRow = {
@@ -21,17 +22,8 @@ export type ResponseRow = {
 export type FailureKind = "assistant" | "unparseable" | "extraction";
 export type FailedRow = { personaId: string; segment: string; model?: string; kind: FailureKind; error: string };
 
-export async function pool<T, R>(values: T[], concurrency: number, task: (value: T, index: number) => Promise<R>): Promise<R[]> {
-  const output = new Array<R>(values.length);
-  let cursor = 0;
-  await Promise.all(Array.from({ length: Math.min(concurrency, values.length) }, async () => {
-    while (cursor < values.length) {
-      const index = cursor++;
-      output[index] = await task(values[index], index);
-    }
-  }));
-  return output;
-}
+// Bounded concurrency, stopping at the run's deadline (src/lib/run-deadline.mjs).
+export { pool };
 
 // Ask every tested assistant the persona's prompt, then have Nemotron extract what each one recommended.
 export async function probePersona(persona: Persona, prompt: string, brand: string, category: string, city: string) {
@@ -58,6 +50,7 @@ export async function probePersona(persona: Persona, prompt: string, brand: stri
         usage: extraction.usage,
       });
     } catch (error) {
+      throwIfDeadline();
       failures.push({ personaId: persona.id, segment: persona.segment, model: result.model, kind: error instanceof UnparseableError ? "unparseable" : "extraction", error: error instanceof Error ? error.message : String(error) });
     }
   }));

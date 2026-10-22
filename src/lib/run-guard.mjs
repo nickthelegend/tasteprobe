@@ -10,14 +10,18 @@
 //   4. per-IP token bucket (TASTEPROBE_RUNS_PER_IP_PER_HOUR) and a daily quota per instance
 //      (TASTEPROBE_DAILY_RUNS). The address comes only from the header named in
 //      TASTEPROBE_TRUSTED_IP_HEADER (x-real-ip on Railway); without it every caller shares one bucket;
-//   5. one run at a time per process ("a flight is already pouring").
+//   5. one run at a time per process ("a flight is already pouring"), with a wall-clock deadline
+//      (TASTEPROBE_RUN_DEADLINE_SECONDS, default 900): past it the run's signal aborts and the slot
+//      is freed (see run-deadline.mjs).
 // Refusals are readable 401/403/415/400/429 JSON answers, never a success. Reads stay open.
 import { timingSafeEqual } from "node:crypto";
 import { DEFAULT_CAPS } from "./agent-core.mjs";
+import { RunDeadlineError } from "./run-deadline.mjs";
 
 export const HARD_MAX_PERSONAS = 200;
 export const DEFAULT_RUNS_PER_IP_PER_HOUR = 10;
 export const DEFAULT_DAILY_RUNS = 100;
+export const DEFAULT_RUN_DEADLINE_SECONDS = 900;
 // The agent caps default to what the UI offers (AgentLoop: up to 5 copies and 480 assistant calls).
 // A request can ask for less, never more; env variables can move them within the hard bounds in
 // agent-core.mjs.
@@ -38,6 +42,7 @@ export function runPolicy(env = process.env) {
   const header = typeof env.TASTEPROBE_TRUSTED_IP_HEADER === "string" ? env.TASTEPROBE_TRUSTED_IP_HEADER.trim().toLowerCase() : "";
   // A production server with no token fails closed unless the owner opts in to open runs.
   const setupRequired = !token && env.NODE_ENV === "production" && env.TASTEPROBE_RUNS_OPEN !== "1" ? "TASTEPROBE_RUN_TOKEN" : null;
+  const deadlineSeconds = positiveInt(env.TASTEPROBE_RUN_DEADLINE_SECONDS, DEFAULT_RUN_DEADLINE_SECONDS, 1, 86_400);
   return {
     token,
     setupRequired,
@@ -45,6 +50,8 @@ export function runPolicy(env = process.env) {
     maxPersonas: positiveInt(env.TASTEPROBE_MAX_PERSONAS, HARD_MAX_PERSONAS, 8, HARD_MAX_PERSONAS),
     runsPerIpPerHour: positiveInt(env.TASTEPROBE_RUNS_PER_IP_PER_HOUR, DEFAULT_RUNS_PER_IP_PER_HOUR, 1, 10_000),
     dailyRuns: positiveInt(env.TASTEPROBE_DAILY_RUNS, DEFAULT_DAILY_RUNS, 1, 1_000_000),
+    deadlineSeconds,
+    deadlineMs: deadlineSeconds * 1000,
     agentCaps: {
       maxTries: positiveInt(env.TASTEPROBE_AGENT_MAX_TRIES, DEFAULT_AGENT_CAPS.maxTries, 1, 8),
       maxAssistantCalls: positiveInt(env.TASTEPROBE_AGENT_MAX_CALLS, DEFAULT_AGENT_CAPS.maxAssistantCalls, 4, 1000),
@@ -56,7 +63,7 @@ export function runPolicy(env = process.env) {
 
 // What /api/status may show: the caps and whether runs are locked, never the token.
 export function publicPolicy(policy) {
-  return { locked: policy.token !== null, setupRequired: policy.setupRequired ?? null, maxPersonas: policy.maxPersonas, runsPerIpPerHour: policy.runsPerIpPerHour, dailyRuns: policy.dailyRuns, agentCaps: policy.agentCaps, oneAtATime: true };
+  return { locked: policy.token !== null, setupRequired: policy.setupRequired ?? null, maxPersonas: policy.maxPersonas, runsPerIpPerHour: policy.runsPerIpPerHour, dailyRuns: policy.dailyRuns, deadlineSeconds: policy.deadlineSeconds, agentCaps: policy.agentCaps, oneAtATime: true };
 }
 
 const refusal = (status, code, error, extra = {}) => ({ status, body: { error, code, ...extra } });
@@ -156,7 +163,8 @@ export class RunGate {
   }
 
   // Takes the one run slot and spends one run from the address and the day. Returns
-  // { release } or a 429 refusal. `release` is idempotent.
+  // { release, signal } or a 429 refusal. `release` is idempotent. When the policy's deadline
+  // passes first, `signal` aborts with a RunDeadlineError and the slot is released.
   start(ip, policy, kind) {
     const quota = this.checkQuota(ip, policy);
     if (quota) return quota;
@@ -166,7 +174,20 @@ export class RunGate {
     this.spend(ip, policy);
     this.dailyCount += 1;
     let released = false;
-    return { release: () => { if (!released) { released = true; if (this.running === slot) this.running = null; } } };
+    const controller = new AbortController();
+    const release = () => {
+      if (released) return;
+      released = true;
+      clearTimeout(timer);
+      if (this.running === slot) this.running = null;
+    };
+    const deadlineMs = policy.deadlineMs ?? DEFAULT_RUN_DEADLINE_SECONDS * 1000;
+    const timer = setTimeout(() => {
+      controller.abort(new RunDeadlineError(kind, deadlineMs / 1000));
+      release();
+    }, deadlineMs);
+    timer.unref?.();
+    return { release, signal: controller.signal };
   }
 }
 

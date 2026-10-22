@@ -3,6 +3,7 @@ import { agentBudgetPlan, normalizeLimits } from "@/lib/agent-core.mjs";
 import { emptyTrace, runAgent } from "@/lib/agent";
 import { openRun, quotaRefusal, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
+import { runWithDeadline } from "@/lib/run-deadline.mjs";
 import { getTestModels, missingKeys } from "@/lib/providers";
 import { findAudit, updateAudit, writeRaw } from "@/lib/storage";
 import type { AgentEvent } from "@/lib/types";
@@ -45,7 +46,7 @@ export async function POST(request: Request, context: { params: { id: string } }
   const trace = emptyTrace();
   const { stream } = createNdjsonStream<AgentEvent>(async (send) => {
     try {
-      const { run } = await runAgent(audit, segment, limits, send, trace);
+      const { run } = await runWithDeadline(slot.signal, () => runAgent(audit, segment, limits, send, trace));
       await writeRaw(audit.id, `agent-${run.id}`, { run, trace });
       await updateAudit(audit.id, (current) => { current.agentRuns = [...(current.agentRuns ?? []), run]; });
       send({ type: "done", run });

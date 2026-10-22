@@ -3,6 +3,7 @@ import { z } from "zod";
 import { runAudit } from "@/lib/audit";
 import { openRun, quotaRefusal, refuse, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
+import { runWithDeadline } from "@/lib/run-deadline.mjs";
 import { requireKeys } from "@/lib/providers";
 import { checkPersonaCap } from "@/lib/run-guard.mjs";
 import { LISTING_PAGE, listAudits } from "@/lib/report-model.mjs";
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
 
   // The audit runs to the end and is saved even if the client disconnects; see ndjson-stream.mjs.
   const { stream } = createNdjsonStream<AuditEvent>(async (send) => {
-    const audit = await runAudit(input, send);
+    const audit = await runWithDeadline(slot.signal, () => runAudit(input, send));
     send({ type: "done", audit });
   }, {
     onError: (error) => ({ type: "error", message: error instanceof Error ? error.message : "Audit failed unexpectedly." }),

@@ -5,6 +5,7 @@ import {
   type AgentBudget, type AgentLimits, type Candidate, type Confirmation, type StopReason,
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
+import { throwIfDeadline } from "./run-deadline.mjs";
 import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
 import { COPY_RULES, fetchPersonaSignals, getTestModels, nebiusModel, nebiusPrices, nemotronTurn, qlooOnHackathonHost, qlooTasteProfile } from "./providers.ts";
 import { placeboCopy, segmentLabel } from "./taste.mjs";
@@ -258,6 +259,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
 
   let reason: StopReason | null = null;
   while (!reason) {
+    throwIfDeadline(); // past TASTEPROBE_RUN_DEADLINE_SECONDS: stop between turns
     const exhausted = budgetExhausted(budget, searchLimits);
     if (exhausted) { reason = exhausted; break; }
     const turn = await nemotronTurn(messages, tools);

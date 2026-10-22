@@ -153,7 +153,7 @@ test.describe("tasting room with no keys", () => {
     expect(await form.json()).toEqual({ code: "json_required", error: "Send the request as JSON (Content-Type: application/json)." });
     const status = await (await request.get("/api/status")).json();
     expect(status.gate).toEqual({ running: null, runsToday: 0 });
-    expect(status.runs).toEqual({ locked: false, setupRequired: null, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
+    expect(status.runs).toEqual({ locked: false, setupRequired: null, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, deadlineSeconds: 900, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
   });
 
   test('no control in the tasting room is labelled with "log"', async ({ page }) => {

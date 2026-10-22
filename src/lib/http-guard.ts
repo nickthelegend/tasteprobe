@@ -22,7 +22,7 @@ export function quotaRefusal(ip: string, policy: RunPolicy) {
 }
 
 // Takes the one run slot (429 when a flight is already pouring) and spends one run.
-export function startRun(ip: string, policy: RunPolicy, kind: "audit" | "fix" | "agent"): { release: () => void } | { refusal: NextResponse } {
+export function startRun(ip: string, policy: RunPolicy, kind: "audit" | "fix" | "agent"): { release: () => void; signal: AbortSignal } | { refusal: NextResponse } {
   const slot = sharedRunGate().start(ip, policy, kind);
   return "status" in slot ? { refusal: refuse(slot) } : slot;
 }

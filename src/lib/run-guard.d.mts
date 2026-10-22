@@ -1,12 +1,13 @@
 import type { AgentCaps } from "./agent-core.mjs";
 
-export type RunPolicy = { token: string | null; setupRequired: "TASTEPROBE_RUN_TOKEN" | null; trustedIpHeader: string | null; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: AgentCaps };
-export type PublicRunPolicy = { locked: boolean; setupRequired: "TASTEPROBE_RUN_TOKEN" | null; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: AgentCaps; oneAtATime: true };
+export type RunPolicy = { token: string | null; setupRequired: "TASTEPROBE_RUN_TOKEN" | null; trustedIpHeader: string | null; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; deadlineSeconds: number; deadlineMs: number; agentCaps: AgentCaps };
+export type PublicRunPolicy = { locked: boolean; setupRequired: "TASTEPROBE_RUN_TOKEN" | null; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; deadlineSeconds: number; agentCaps: AgentCaps; oneAtATime: true };
 export type Refusal = { status: number; body: { error: string; code: string; [key: string]: unknown } };
 type HeaderReader = { get(name: string): string | null };
 export const HARD_MAX_PERSONAS: number;
 export const DEFAULT_RUNS_PER_IP_PER_HOUR: number;
 export const DEFAULT_DAILY_RUNS: number;
+export const DEFAULT_RUN_DEADLINE_SECONDS: number;
 export const DEFAULT_AGENT_CAPS: AgentCaps;
 export const RUN_TOKEN_HEADER: string;
 export const MAX_BUCKETS: number;
@@ -24,6 +25,6 @@ export class RunGate {
   dailyCount: number;
   snapshot(): GateSnapshot;
   checkQuota(ip: string, policy: RunPolicy): Refusal | null;
-  start(ip: string, policy: RunPolicy, kind: string): Refusal | { release: () => void };
+  start(ip: string, policy: RunPolicy, kind: string): Refusal | { release: () => void; signal: AbortSignal };
 }
 export function sharedRunGate(): RunGate;
