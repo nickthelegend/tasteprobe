@@ -13,12 +13,13 @@ import { FlightBoard, Glass } from "@/components/Flight";
 import { PersonaTray, type PersonaResult } from "@/components/Tray";
 import { Landing } from "@/components/Landing";
 import { Logo } from "@/components/Logo";
-import { personaSourceOf, personaSourceText } from "@/lib/report-model.mjs";
+import { personaSourceOf, personaSourceText, summarizeAuditListing, type AuditListing } from "@/lib/report-model.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
 type RunCaps = { locked: boolean; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
 type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[]; runs: RunCaps };
 const PERSONA_CHOICES = [16, 24, 48, 100, 200];
+type Listing = AuditListing & { featured: boolean };
 
 // Persona counts this server allows: the usual choices up to the cap, plus the cap itself.
 function personaChoices(max: number) {
@@ -58,7 +59,10 @@ function splitSetup(item: string) {
 
 export default function Home() {
   const [status, setStatus] = useState<Status | null>(null);
-  const [audits, setAudits] = useState<Audit[] | null>(null);
+  // Summaries only (GET /api/audits); the selected audit is fetched in full by id.
+  const [audits, setAudits] = useState<Listing[] | null>(null);
+  const [auditTotal, setAuditTotal] = useState<number | null>(null);
+  const [opening, setOpening] = useState<string | null>(null);
   const [active, setActive] = useState<Audit | null>(null);
   const [run, setRun] = useState<Run | null>(null);
   const [error, setError] = useState("");
@@ -71,17 +75,35 @@ export default function Home() {
   // Run token for a locked server (TASTEPROBE_RUN_TOKEN). Kept in memory only, sent as a header.
   const [runToken, setRunToken] = useState("");
 
-  function select(audit: Audit) {
+  function show(audit: Audit) {
     setActive(audit);
     setSegmentId(weakestSegmentId(audit));
     setAttemptId(undefined);
   }
 
+  async function select(id: string) {
+    setOpening(id);
+    try {
+      const response = await fetch(`/api/audits/${id}`);
+      if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error ?? `Could not open the audit (${response.status}).`);
+      show(await response.json());
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not open the audit.");
+    } finally {
+      setOpening(null);
+    }
+  }
+
   useEffect(() => {
     fetch("/api/status").then((response) => response.json()).then(setStatus)
       .catch(() => setError("Could not reach the TasteProbe server for its configuration status."));
-    fetch("/api/audits").then((response) => response.json()).then((list: Audit[]) => { setAudits(list); if (list[0]) select(list[0]); })
-      .catch(() => { setAudits([]); setError("Could not load saved audits."); });
+    // The featured audit (if the server has one) comes first, so it opens by default.
+    fetch("/api/audits").then(async (response) => {
+      const list: Listing[] = await response.json();
+      setAuditTotal(Number(response.headers.get("x-total-count") ?? list.length));
+      setAudits(list);
+      if (list[0]) select(list[0].id);
+    }).catch(() => { setAudits([]); setAuditTotal(0); setError("Could not load saved audits."); });
   }, []);
 
   const missing = missingConfig(status);
@@ -123,8 +145,10 @@ export default function Home() {
           finished = true;
           const final = results;
           setLiveResults((current) => ({ ...current, [message.audit.id]: final }));
-          setAudits((current) => [message.audit, ...(current ?? []).filter((item) => item.id !== message.audit.id)]);
-          select(message.audit);
+          const listing: Listing = { ...summarizeAuditListing(message.audit), featured: false };
+          setAudits((current) => [...(current ?? []).filter((item) => item.featured), listing, ...(current ?? []).filter((item) => !item.featured && item.id !== listing.id)]);
+          setAuditTotal((current) => (current ?? 0) + 1);
+          show(message.audit);
         }
       });
       if (!finished) throw new Error("The connection closed before the results arrived. The audit keeps running on the server and appears under Past flights when it finishes; reload in a few minutes.");
@@ -145,7 +169,6 @@ export default function Home() {
       const updated: Audit = { ...active, counterfactuals: [...(active.counterfactuals ?? []), payload] };
       setActive(updated);
       setAttemptId(payload.id);
-      setAudits((current) => (current ?? []).map((item) => item.id === updated.id ? updated : item));
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Counterfactual re-test failed.");
     } finally {
@@ -158,7 +181,7 @@ export default function Home() {
   const showResults = Boolean(active && !run);
 
   return <main>
-    <Landing status={status} auditCount={audits === null ? null : audits.length} />
+    <Landing status={status} auditCount={auditTotal} />
 
     <section className="room" id="room" aria-labelledby="room-title">
       <div className="room-head">
@@ -254,8 +277,8 @@ export default function Home() {
         <FlightBoard items={Array.from({ length: Math.min(6, maxSegmentsFor(form.personaCount)) }, (_, index) => ({ id: `empty-${index}`, name: "Not poured", share: null }))} stamp="Empty flight" size={64} compact
           caption={`${form.personaCount} personas fill up to ${maxSegmentsFor(form.personaCount)} glasses.`} />
         <div className="empty-copy">
-          <h3 id="empty-title">{audits === null ? "Loading saved flights…" : "Nothing poured yet"}</h3>
-          <p>{audits === null ? "Reading the audit store." : "No audits are stored on this server. Glasses fill here only after live Qloo, Nebius and assistant calls complete for a real venue."}</p>
+          <h3 id="empty-title">{audits === null ? "Loading saved flights…" : opening ? "Opening the saved flight…" : "Nothing poured yet"}</h3>
+          <p>{audits === null ? "Reading the audit store." : opening ? "Reading the stored audit." : "No audits are stored on this server. Glasses fill here only after live Qloo, Nebius and assistant calls complete for a real venue."}</p>
         </div>
       </section>}
 
@@ -330,7 +353,6 @@ export default function Home() {
           <AgentLoop audit={active} segmentId={segmentId} ready={ready && !fixing} headers={runHeaders} caps={caps?.agentCaps} onRun={(agentRun) => {
             const updated: Audit = { ...active, agentRuns: [...(active.agentRuns ?? []), agentRun] };
             setActive(updated);
-            setAudits((current) => (current ?? []).map((item) => item.id === updated.id ? updated : item));
           }} />
         </section>
 
@@ -362,9 +384,10 @@ export default function Home() {
 
       {audits && audits.length > 0 && <nav className="cellar-book" aria-label="Saved audits">
         <span className="label">Past flights</span>
-        <div>{audits.slice(0, 12).map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit)} disabled={run !== null}>
-          <strong>{audit.brand}</strong><small>{audit.city} · {pct(audit.overall?.share ?? 0)} · {new Date(audit.createdAt).toLocaleDateString()}</small>
+        <div>{audits.map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit.id)} disabled={run !== null}>
+          <strong>{audit.featured && <em className="featured">Featured</em>}{audit.brand}</strong><small>{audit.city} · {audit.share === null ? "—" : pct(audit.share)} · {new Date(audit.createdAt).toLocaleDateString()}{audit.origin ? ` · ${audit.origin}` : ""}</small>
         </button>)}</div>
+        {auditTotal !== null && auditTotal > audits.length && <small className="cellar-more">{auditTotal - audits.length} older {auditTotal - audits.length === 1 ? "flight" : "flights"} not listed</small>}
       </nav>}
     </section>
 

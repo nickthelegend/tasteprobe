@@ -5,6 +5,7 @@ import { openRun, quotaRefusal, refuse, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
 import { requireKeys } from "@/lib/providers";
 import { checkPersonaCap } from "@/lib/run-guard.mjs";
+import { LISTING_PAGE, listAudits } from "@/lib/report-model.mjs";
 import { readAudits } from "@/lib/storage";
 import { MIN_PERSONAS_PER_SEGMENT } from "@/lib/taste.mjs";
 import type { AuditEvent } from "@/lib/types";
@@ -19,8 +20,17 @@ const requestSchema = z.object({
   personaCount: z.number().int().min(MIN_PERSONAS_PER_SEGMENT, `Use at least ${MIN_PERSONAS_PER_SEGMENT} personas (one segment needs ${MIN_PERSONAS_PER_SEGMENT}).`).max(200).default(24),
 });
 
-export async function GET() {
-  return NextResponse.json(await readAudits());
+// One page of audit summaries (no personas, Qloo affinities or answers; the full audit is
+// GET /api/audits/<id>). TASTEPROBE_FEATURED_AUDIT_ID is pinned first. ?limit= (max 50) and
+// ?offset= page through the rest; x-total-count says how many are stored.
+export async function GET(request: Request) {
+  const query = new URL(request.url).searchParams;
+  const listing = listAudits(await readAudits(), {
+    featuredId: process.env.TASTEPROBE_FEATURED_AUDIT_ID?.trim() || null,
+    limit: Number(query.get("limit") ?? LISTING_PAGE),
+    offset: Number(query.get("offset") ?? 0),
+  });
+  return NextResponse.json(listing.items, { headers: { "x-total-count": String(listing.total), ...(listing.featuredId ? { "x-featured-audit": listing.featuredId } : {}) } });
 }
 
 // The spend guard (run token, JSON only, persona cap, per-IP and daily quota, one run at a time)

@@ -72,7 +72,7 @@ export function createServer() {
       const { runAudit } = await import("../lib/audit.ts");
       const audit = await runAudit({ brand, city, category, personaCount: personas }, (event) => {
         if (event.type === "progress") progress(extra, event.done, event.total, `${event.done}/${event.total} personas answered`);
-      });
+      }, "mcp");
       const model = buildReportModel(audit);
       return { content: [text(`${reportText(model)}\nPrintable report: /audits/${audit.id}/report`)], structuredContent: model };
     } catch (error) {

@@ -199,7 +199,7 @@ async function live(args) {
     if (event.type === "stage") console.log(`· ${event.message}`);
     if (event.type === "place") console.log(`· Matched in Qloo: ${event.name}${event.address ? `, ${event.address}` : ""} (${event.entityId})`);
     if (event.type === "progress") process.stdout.write(`\r· ${event.done}/${event.total} personas answered · ${event.mentions} mentions`);
-  }).catch((error) => fail(`\nAudit failed · ${error instanceof Error ? error.message : String(error)}`));
+  }, "cli").catch((error) => fail(`\nAudit failed · ${error instanceof Error ? error.message : String(error)}`));
   process.stdout.write("\n");
   const { responses } = await readRecorded(audit.id);
   const report = buildReport({ audit, responses, rawFiles: await hashRawFiles(audit.id), mode: "live", recordedAt: audit.createdAt ?? started, renderedAt: new Date().toISOString(), runtime: runtime() });

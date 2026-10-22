@@ -11,7 +11,7 @@ export type AuditInput = { brand: string; category: string; city: string; person
 
 // The whole live audit: resolve the venue in Qloo, build personas, ask every assistant as each
 // persona, extract with Nemotron, summarise, save. Used by POST /api/audits and scripts/live-audit.mjs.
-export async function runAudit(input: AuditInput, send: (event: AuditEvent) => void): Promise<Audit> {
+export async function runAudit(input: AuditInput, send: (event: AuditEvent) => void, origin: "web" | "cli" | "mcp" = "web"): Promise<Audit> {
   const started = Date.now();
   send({ type: "stage", stage: "resolve", message: `Resolving “${input.brand}” in Qloo` });
   const place = await resolvePlace(input.brand, input.city);
@@ -71,6 +71,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
     city: input.city,
     createdAt: new Date().toISOString(),
     personas,
+    origin,
     personaSource: taste.source,
     ...(taste.tagRefusal ? { personaSourceNote: taste.tagRefusal } : {}),
     qlooSignals: cross.signals,

@@ -42,5 +42,12 @@ export type ReportModel = {
 export function buildReportModel(audit: Audit): ReportModel;
 export function personaSourceOf(audit: Pick<Audit, "personaSource"> | null | undefined): "urn:tag" | "urn:entity";
 export function personaSourceText(source: "urn:tag" | "urn:entity"): string;
-export function summarizeAuditListing(audit: Audit): { id: string; brand: string; city: string; createdAt: string; share: number | null; answers: number };
+export type AuditListing = {
+  id: string; brand: string; city: string; category: string; createdAt: string; share: number | null; answers: number; personas: number;
+  personaSource: "urn:tag" | "urn:entity"; origin: "web" | "cli" | "mcp" | null;
+};
+export function summarizeAuditListing(audit: Audit): AuditListing;
+export const LISTING_PAGE: number;
+export const LISTING_MAX_PAGE: number;
+export function listAudits(audits: Audit[], options?: { featuredId?: string | null; limit?: number; offset?: number }): { items: (AuditListing & { featured: boolean })[]; total: number; featuredId: string | null };
 export function reportText(model: ReportModel): string;

@@ -67,6 +67,7 @@ npm run dev                  # http://localhost:3000
 | `NEBIUS_MAX_TOKENS` | no | Nemotron `max_tokens` (default 8192, so reasoning is not cut off). |
 | `NEBIUS_REASONING_EFFORT` | no | Sends Nebius's documented `reasoning_effort` (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). Unset sends nothing. |
 | `NEBIUS_THINKING` | no | `on` / `off` sends `chat_template_kwargs.enable_thinking` (from NVIDIA's model card, not the Nebius docs). Unset sends nothing. An invalid value of either is a setup error. |
+| `TASTEPROBE_FEATURED_AUDIT_ID` | no | The stored audit pinned first in the listing and opened by default (seed one real audit for judges). |
 | `TASTEPROBE_RUN_TOKEN` | no | Locks the paid routes: runs need this token in the `X-TasteProbe-Run-Token` header. Set it on any public deployment. |
 | `TASTEPROBE_MAX_PERSONAS`, `TASTEPROBE_AGENT_MAX_TRIES` / `_MAX_CALLS` / `_MAX_TOKENS` / `_MAX_TURNS`, `TASTEPROBE_RUNS_PER_IP_PER_HOUR`, `TASTEPROBE_DAILY_RUNS` | no | Server-side caps (defaults 200 personas; 5 copies, 480 calls, 400k tokens, 20 turns; 10 runs per address per hour; 100 runs a day). Client values are clamped to them. See [docs/hosting.md](docs/hosting.md#spend-guard-read-before-making-the-url-public). |
 

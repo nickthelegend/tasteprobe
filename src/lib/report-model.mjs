@@ -117,9 +117,31 @@ export function buildReportModel(audit) {
   };
 }
 
-// One line per audit for listings (MCP get_report without an id).
+// One line per audit for listings (GET /api/audits, MCP get_report without an id, the report
+// page). No personas, Qloo ids, affinities or answers: only what a list row shows.
 export function summarizeAuditListing(audit) {
-  return { id: audit.id, brand: audit.brand, city: audit.city, createdAt: audit.createdAt, share: round(audit.overall?.share), answers: audit.responseCount ?? 0 };
+  return {
+    id: audit.id, brand: audit.brand, city: audit.city, category: audit.category, createdAt: audit.createdAt,
+    share: round(audit.overall?.share), answers: audit.responseCount ?? 0, personas: audit.personas?.length ?? 0,
+    personaSource: personaSourceOf(audit), origin: audit.origin ?? null,
+  };
+}
+
+export const LISTING_PAGE = 12;
+export const LISTING_MAX_PAGE = 50;
+
+// The listing a visitor sees: the featured audit (TASTEPROBE_FEATURED_AUDIT_ID) pinned first
+// whatever else has been run since, then the rest newest first, one page of summaries.
+export function listAudits(audits, { featuredId = null, limit = LISTING_PAGE, offset = 0 } = {}) {
+  const featured = featuredId ? audits.find((audit) => audit.id === featuredId) : undefined;
+  const ordered = featured ? [featured, ...audits.filter((audit) => audit !== featured)] : audits;
+  const size = Math.max(1, Math.min(LISTING_MAX_PAGE, Math.floor(Number(limit)) || LISTING_PAGE));
+  const start = Math.max(0, Math.floor(Number(offset)) || 0);
+  return {
+    items: ordered.slice(start, start + size).map((audit) => ({ ...summarizeAuditListing(audit), featured: audit === featured })),
+    total: audits.length,
+    featuredId: featured ? featured.id : null,
+  };
 }
 
 const pct = (value) => (value === null || value === undefined ? "n/a" : `${Math.round(value * 100)}%`);

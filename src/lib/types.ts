@@ -99,6 +99,8 @@ export type Audit = {
   personaSource?: "urn:tag" | "urn:entity";
   // The 403 Qloo gave for urn:tag, when personaSource is urn:entity.
   personaSourceNote?: string;
+  // Where the audit was started: the web app, the CLI or the MCP server.
+  origin?: "web" | "cli" | "mcp";
   qlooSignals?: QlooSignals;
   overall: SegmentResult;
   segments: SegmentResult[];

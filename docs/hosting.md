@@ -73,14 +73,17 @@ For the public demo:
 - Use a **dedicated Nebius key** with a spend limit or a low prepaid balance in the Nebius Token Factory console. Do the same for the OpenAI (or `MODEL_2_*`) key.
 - Set `NEBIUS_INPUT_PRICE_PER_MILLION` and `NEBIUS_OUTPUT_PRICE_PER_MILLION` so the agent loop's dollar cap is enforced.
 - Set a usage limit on the Railway workspace so the container bill is capped too.
-- Seed the store with one real audit first, so judges can open the flight and `/audits/<id>/report` without spending anything.
+- Seed the store with one real audit first and set `TASTEPROBE_FEATURED_AUDIT_ID` to its id. The listing pins it first and the tasting room opens it by default, however many audits are run after it, so judges land on it and can open the flight and `/audits/<id>/report` without spending anything.
 
 How long an audit takes has **not been measured** (no live run yet). It is one assistant call per persona per assistant plus one Nemotron extraction per answer, at concurrency 4, so a 24-persona audit with one assistant is 24 assistant calls and 24 extractions. The NDJSON stream sends a heartbeat line so idle proxies keep it open.
 
 ## `/data` must be a private volume
 
 - `TASTEPROBE_DATA_DIR=/data` holds `audits.json` and every raw provider payload (`qloo.json`, assistant responses, counterfactual arms, agent traces). Without a volume they are lost on every redeploy.
-- **Qloo forbids publishing raw API payloads.** The app never serves them: the evidence API returns only the trimmed assistant answers, and the printable report says raw Qloo payloads stay on the server. Never attach `/data` to a public bucket or static host, and never commit or upload `.data/` (it is git-, docker- and railway-ignored).
+- **Qloo forbids publishing raw API payloads.** The app never serves the raw files under `raw/`. What it does serve, to anyone with the URL:
+  - `GET /api/audits`: one page of summaries per audit (venue, city, category, date, overall share, answer and persona counts, persona source, origin). No Qloo ids, affinities or answers.
+  - `GET /api/audits/<id>` and `/audits/<id>/report`: the stored audit, which includes values derived from Qloo: the venue's Qloo entity id and address, each persona's taste tags or entities with their Qloo ids and affinity scores, the cross-domain entity names and the demographic lean. Add `?evidence=1` and the assistants' answers (trimmed rows) come too.
+  Never attach `/data` to a public bucket or static host, and never commit or upload `.data/` (it is git-, docker- and railway-ignored).
 - The store is a single JSON file with in-process locking: run **one replica** per volume.
 
 ## Notes
