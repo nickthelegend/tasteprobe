@@ -4,5 +4,5 @@ export type CrossCheckSummary = {
   brandDisagreementRate: number | null; setDisagreementRate: number | null;
 };
 export function parseNumberedList(answer: string): string[];
-export function crossCheck(entities: string[], list: string[], brand: string): CrossCheck;
-export function summarizeCrossCheck(rows: { model: string; answer: string; entities: string[]; listEntities?: string[] }[], brand: string): CrossCheckSummary[];
+export function crossCheck(entities: string[], list: string[], brand: string, city?: string): CrossCheck;
+export function summarizeCrossCheck(rows: { model: string; answer: string; entities: string[]; listEntities?: string[] }[], brand: string, city?: string): CrossCheckSummary[];

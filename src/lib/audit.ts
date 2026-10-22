@@ -48,7 +48,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
       answered: result.rows.length,
       mentioned: result.rows.filter((row) => row.brand).length,
       failed: result.failures.length,
-      rivals: [...new Set(result.rows.flatMap((row) => row.entities))].filter((entity) => !matchesBrand(entity, place.name)).slice(0, 3),
+      rivals: [...new Set(result.rows.flatMap((row) => row.entities))].filter((entity) => !matchesBrand(entity, place.name, { city: input.city })).slice(0, 3),
     });
     send({ type: "progress", done, total: personas.length, mentions: rows.filter((row) => row.brand).length });
   });
@@ -57,7 +57,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
   if (!rows.length) throw new Error(`Every assistant call failed. First error: ${failures[0]?.error ?? "unknown"}`);
 
   send({ type: "stage", stage: "stats", message: "Computing share of voice and 95% intervals" });
-  const observations = toObservations(rows, place.name);
+  const observations = toObservations(rows, place.name, input.city);
   const overallRivals = summarizeObservations(observations.map((row) => ({ ...row, segment: "All personas" })))[0]?.competitors.map((item) => item.name) ?? [];
   send({ type: "stage", stage: "stats", message: `Checking ${overallRivals.length} top rivals in Qloo /search` });
   const systems = [...new Set(rows.map((row) => row.model))].sort();
@@ -88,7 +88,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
       unparseable: failures.filter((row) => row.kind === "unparseable").length,
       extraction: failures.filter((row) => row.kind === "extraction").length,
     },
-    extractionCheck: summarizeCrossCheck(rows, place.name),
+    extractionCheck: summarizeCrossCheck(rows, place.name, input.city),
     rivalChecks: await pool(overallRivals, 4, (name) => verifyRival(name, input.city)),
     extractionModel: nebiusModel(),
     extractionUsage: usage,

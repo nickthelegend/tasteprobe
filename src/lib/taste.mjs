@@ -1,20 +1,33 @@
 import { seededRandom, slug } from "./stats.mjs";
 
 const STOP_WORDS = new Set(["the", "a", "an", "restaurant", "cafe", "bar", "and"]);
+const ARTICLES = new Set(["the", "a", "an", "and"]);
 
+// Lower case, Latin accents and possessives removed, every run of characters that is not a
+// letter, digit or combining mark (in any script) turned into one space. Unicode-aware, so
+// "すきやばし次郎" and "Café Madras" keep their letters.
 export function normalizeName(value) {
   return String(value)
-    .normalize("NFKD").replace(/[̀-ͯ]/g, "")
+    .normalize("NFKD").replace(/[\u0300-\u036f]/g, "").normalize("NFC")
     .toLowerCase()
     .replace(/&/g, " and ")
-    .replace(/['’`]s\b/g, "")
+    .replace(/['’`]s(?![\p{L}\p{N}])/gu, "")
     .replace(/['’`]/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
+    .replace(/[^\p{L}\p{N}\p{M}]+/gu, " ")
     .trim();
 }
 
 function tokens(value) {
   return normalizeName(value).split(" ").filter((token) => token && !STOP_WORDS.has(token));
+}
+
+function coreTokens(value) {
+  return normalizeName(value).split(" ").filter((token) => token && !ARTICLES.has(token));
+}
+
+// "The Table, Colaba", "Trishna (Fort)", "Trishna – Fort" -> the name before the branch note.
+function withoutBranch(value) {
+  return String(value).replace(/\s*(?:[,(\[]|\s[-–—|]\s).*$/u, "");
 }
 
 function containsSequence(haystack, needle) {
@@ -27,12 +40,22 @@ function containsSequence(haystack, needle) {
 
 // True when an extracted entity name refers to the target brand. "The Bombay Canteen, Lower Parel" and
 // "Bombay Canteen" match; a bare generic word such as "Canteen" does not.
-export function matchesBrand(entity, brand) {
-  const entityTokens = tokens(entity);
+// A brand with one distinctive word or none ("The Table", "Trishna", "Cafe Madras", "すきやばし次郎")
+// is too short to look for inside other names: "Table Talk" and "Kitchen Table" are other venues.
+// Then the entity must be the brand itself, give or take articles, a branch note after a comma,
+// parenthesis or dash, and the words of `city` when it is given.
+export function matchesBrand(entity, brand, { city } = {}) {
   const brandTokens = tokens(brand);
-  if (!entityTokens.length || !brandTokens.length) return normalizeName(entity) === normalizeName(brand) && normalizeName(brand) !== "";
-  if (containsSequence(entityTokens, brandTokens)) return true;
-  return entityTokens.length >= 2 && containsSequence(brandTokens, entityTokens) && entityTokens.length / brandTokens.length >= 0.6;
+  if (brandTokens.length >= 2) {
+    const entityTokens = tokens(entity);
+    if (containsSequence(entityTokens, brandTokens)) return true;
+    return entityTokens.length >= 2 && containsSequence(brandTokens, entityTokens) && entityTokens.length / brandTokens.length >= 0.6;
+  }
+  const brandCore = coreTokens(brand);
+  if (!brandCore.length) return normalizeName(entity) === normalizeName(brand) && normalizeName(brand) !== "";
+  const cityWords = new Set(city ? coreTokens(city) : []);
+  const entityCore = coreTokens(withoutBranch(entity)).filter((token) => !cityWords.has(token));
+  return entityCore.length === brandCore.length && entityCore.every((token, index) => token === brandCore[index]);
 }
 
 function placeText(item) {
@@ -41,10 +64,17 @@ function placeText(item) {
     .filter((value) => typeof value === "string").join(" ");
 }
 
-// True when a Qloo place's address or geocode names the city (word match after normalising).
+// Scripts written without spaces between words: a city name there is matched as a substring.
+const UNSPACED_SCRIPT = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Thai}\p{Script=Lao}\p{Script=Khmer}\p{Script=Myanmar}]/u;
+
+// True when a Qloo place's address or geocode names the city (word match after normalising; a
+// substring match for cities written in a script without spaces, such as 東京).
 export function placeInCity(item, city) {
   const needle = normalizeName(city);
-  return Boolean(needle) && ` ${normalizeName(placeText(item))} `.includes(` ${needle} `);
+  if (!needle) return false;
+  const text = normalizeName(placeText(item));
+  if (UNSPACED_SCRIPT.test(needle)) return text.replace(/\s+/g, "").includes(needle.replace(/\s+/g, ""));
+  return ` ${text} `.includes(` ${needle} `);
 }
 
 function describePlace(item) {

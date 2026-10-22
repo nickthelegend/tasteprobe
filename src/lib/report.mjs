@@ -12,7 +12,7 @@ export function recompute(audit, responses) {
   const failures = responses?.failures ?? [];
   const observations = rows.map((row) => ({
     segment: row.segment, personaId: row.personaId, brand: Boolean(row.brand),
-    recommended: (row.entities ?? []).filter((entity) => !matchesBrand(entity, audit.brand)),
+    recommended: (row.entities ?? []).filter((entity) => !matchesBrand(entity, audit.brand, { city: audit.city })),
   }));
   const overall = summarizeObservations(
     observations.map((row) => ({ ...row, segment: "All personas" })),

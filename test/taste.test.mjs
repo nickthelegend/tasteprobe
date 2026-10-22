@@ -124,3 +124,34 @@ test("cross-domain signals are blended into personas and prompts without leaking
   assert.doesNotMatch(prompt, /Bombay Canteen/);
   assert.doesNotMatch(personaPrompt(plain[0], "restaurant", "Mumbai"), /Outside of food/);
 });
+
+test("one-word brands match only themselves: 'The Table' is not 'Table Talk' or 'Kitchen Table'", () => {
+  assert.equal(matchesBrand("Table Talk", "The Table"), false);
+  assert.equal(matchesBrand("Kitchen Table", "The Table"), false);
+  assert.equal(matchesBrand("Madras Bar", "Cafe Madras"), false);
+  // The brand itself, with articles, a branch note or the city name, still counts.
+  assert.equal(matchesBrand("The Table", "The Table"), true);
+  assert.equal(matchesBrand("Table", "The Table"), true);
+  assert.equal(matchesBrand("The Table, Colaba", "The Table"), true);
+  assert.equal(matchesBrand("The Table (Colaba)", "The Table"), true);
+  assert.equal(matchesBrand("The Table – Colaba", "The Table"), true);
+  assert.equal(matchesBrand("The Table Mumbai", "The Table", { city: "Mumbai" }), true);
+  assert.equal(matchesBrand("The Table Mumbai", "The Table"), false, "without the city, an extra word is another name");
+  assert.equal(matchesBrand("Trishna, Fort", "Trishna"), true);
+  assert.equal(matchesBrand("Trishna Kitchen", "Trishna"), false);
+});
+
+test("names in non-Latin scripts normalise and match", async () => {
+  const { normalizeName, placeInCity } = await import("../src/lib/taste.mjs");
+  assert.equal(normalizeName("すきやばし次郎"), "すきやばし次郎");
+  assert.equal(matchesBrand("すきやばし次郎", "すきやばし次郎"), true);
+  assert.equal(matchesBrand("すきやばし次郎 (本店)", "すきやばし次郎"), true);
+  assert.equal(matchesBrand("鮨 さいとう", "すきやばし次郎"), false);
+  assert.equal(matchesBrand("Café Москва", "Кафе Москва"), false);
+  assert.equal(matchesBrand("Кафе Москва", "кафе москва"), true);
+  assert.equal(matchesBrand("मुंबई कैफ़े", "मुंबई कैफ़े"), true);
+  // A city in a script without spaces is found inside the address.
+  assert.equal(placeInCity({ properties: { address: "東京都中央区銀座4-2-15" } }, "東京"), true);
+  assert.equal(placeInCity({ properties: { address: "大阪府大阪市北区" } }, "東京"), false);
+  assert.equal(placeInCity({ properties: { address: "12 Rue de Rivoli, Paris" } }, "Paris"), true);
+});

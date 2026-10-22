@@ -32,21 +32,21 @@ export function parseNumberedList(answer) {
 const covers = (list, name) => list.some((item) => matchesBrand(item, name) || matchesBrand(name, item));
 
 // Compares the two readings of one answer. `list` is empty when the answer had no numbered list.
-export function crossCheck(entities, list, brand) {
+export function crossCheck(entities, list, brand, city) {
   if (!list.length) return { listed: false, brandAgrees: true, setAgrees: true, onlyInList: [], onlyInExtraction: [] };
   const onlyInList = list.filter((name) => !covers(entities, name));
   const onlyInExtraction = entities.filter((name) => !covers(list, name));
-  const listBrand = list.some((name) => matchesBrand(name, brand));
-  const extractedBrand = entities.some((name) => matchesBrand(name, brand));
+  const listBrand = list.some((name) => matchesBrand(name, brand, { city }));
+  const extractedBrand = entities.some((name) => matchesBrand(name, brand, { city }));
   return { listed: true, brandAgrees: listBrand === extractedBrand, setAgrees: !onlyInList.length && !onlyInExtraction.length, onlyInList, onlyInExtraction };
 }
 
 // Per assistant: how often the deterministic parser and Nemotron disagree, over answers that had a list.
-export function summarizeCrossCheck(rows, brand) {
+export function summarizeCrossCheck(rows, brand, city) {
   const byModel = new Map();
   for (const row of rows) {
     const current = byModel.get(row.model) ?? { model: row.model, answers: 0, listed: 0, brandDisagreements: 0, setDisagreements: 0 };
-    const check = crossCheck(row.entities, row.listEntities ?? parseNumberedList(row.answer), brand);
+    const check = crossCheck(row.entities, row.listEntities ?? parseNumberedList(row.answer), brand, city);
     current.answers += 1;
     if (check.listed) {
       current.listed += 1;

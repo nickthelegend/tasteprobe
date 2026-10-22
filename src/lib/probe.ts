@@ -52,7 +52,7 @@ export async function probePersona(persona: Persona, prompt: string, brand: stri
         prompt,
         answer: result.answer,
         entities: extraction.entities,
-        brand: extraction.entities.some((entity) => matchesBrand(entity, brand)),
+        brand: extraction.entities.some((entity) => matchesBrand(entity, brand, { city })),
         listEntities: parseNumberedList(result.answer),
         extractionRaw: extraction.raw,
         usage: extraction.usage,
@@ -64,12 +64,12 @@ export async function probePersona(persona: Persona, prompt: string, brand: stri
   return { rows, failures };
 }
 
-export function toObservations(rows: ResponseRow[], brand: string) {
+export function toObservations(rows: ResponseRow[], brand: string, city?: string) {
   return rows.map((row) => ({
     segment: row.segment,
     personaId: row.personaId,
     brand: row.brand,
-    recommended: row.entities.filter((entity) => !matchesBrand(entity, brand)),
+    recommended: row.entities.filter((entity) => !matchesBrand(entity, brand, { city })),
   }));
 }
 

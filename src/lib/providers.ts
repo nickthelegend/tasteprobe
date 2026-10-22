@@ -58,7 +58,7 @@ export async function verifyRival(name: string, city: string): Promise<{ name: s
   try {
     const payload = await qloo("/search", { query: name, types: "urn:entity:place", take: "5" });
     const place = pickPlace(payload.results ?? payload.entities ?? [], name, city);
-    return matchesBrand(place.name, name) || matchesBrand(name, place.name)
+    return matchesBrand(place.name, name, { city }) || matchesBrand(name, place.name, { city })
       ? { name, status: "verified", qlooId: place.id }
       : { name, status: "unverified", detail: `closest Qloo listing in ${city} is ${place.name}` };
   } catch (error) {
