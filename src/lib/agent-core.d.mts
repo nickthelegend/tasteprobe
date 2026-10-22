@@ -12,7 +12,9 @@ export type CandidateStats = {
 export type StopReason = "lift_ci_above_zero" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished";
 
 export const DEFAULT_LIMITS: AgentLimits;
-export function normalizeLimits(input?: Partial<Record<keyof AgentLimits, unknown>>): AgentLimits;
+export type AgentCaps = { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number };
+export const DEFAULT_CAPS: AgentCaps;
+export function normalizeLimits(input?: Partial<Record<keyof AgentLimits, unknown>>, caps?: AgentCaps): AgentLimits;
 export function createBudget(): AgentBudget;
 export function tokenCostUsd(usage: Usage, prices: Prices): number | null;
 export function chargeBudget(budget: AgentBudget, spend: { assistantCalls?: number; nemotronCalls?: number; usage?: Usage; tries?: number; turns?: number }, prices: Prices): AgentBudget;

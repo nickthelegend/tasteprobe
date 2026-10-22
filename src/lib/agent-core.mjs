@@ -11,18 +11,24 @@ export const DEFAULT_LIMITS = Object.freeze({
   maxTurns: 12,           // agent reasoning turns
 });
 
-export function normalizeLimits(input = {}) {
-  const pick = (value, fallback, min, max) => {
+// Server-side caps a request is clamped to (see run-guard.mjs): the UI's maxima by default.
+export const DEFAULT_CAPS = Object.freeze({ maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400_000, maxTurns: 20 });
+
+// Client values are clamped to the hard bounds and then to `caps`, so a request body can lower a
+// budget but never raise it past what the server allows.
+export function normalizeLimits(input = {}, caps = DEFAULT_CAPS) {
+  const pick = (value, fallback, min, max, cap) => {
     const number = Number(value);
-    return value === undefined || value === null || value === "" || !Number.isFinite(number) ? fallback : Math.min(max, Math.max(min, Math.floor(number)));
+    const chosen = value === undefined || value === null || value === "" || !Number.isFinite(number) ? fallback : Math.min(max, Math.max(min, Math.floor(number)));
+    return Math.max(min, Math.min(chosen, cap ?? max));
   };
   const usd = Number(input.maxUsd);
   return {
-    maxTries: pick(input.maxTries, DEFAULT_LIMITS.maxTries, 1, 8),
-    maxAssistantCalls: pick(input.maxAssistantCalls, DEFAULT_LIMITS.maxAssistantCalls, 4, 1000),
+    maxTries: pick(input.maxTries, DEFAULT_LIMITS.maxTries, 1, 8, caps.maxTries),
+    maxAssistantCalls: pick(input.maxAssistantCalls, DEFAULT_LIMITS.maxAssistantCalls, 4, 1000, caps.maxAssistantCalls),
     maxUsd: input.maxUsd === undefined || input.maxUsd === null || input.maxUsd === "" || !Number.isFinite(usd) || usd <= 0 ? null : usd,
-    maxNemotronTokens: pick(input.maxNemotronTokens, DEFAULT_LIMITS.maxNemotronTokens, 10_000, 5_000_000),
-    maxTurns: pick(input.maxTurns, DEFAULT_LIMITS.maxTurns, 2, 40),
+    maxNemotronTokens: pick(input.maxNemotronTokens, DEFAULT_LIMITS.maxNemotronTokens, 10_000, 5_000_000, caps.maxNemotronTokens),
+    maxTurns: pick(input.maxTurns, DEFAULT_LIMITS.maxTurns, 2, 40, caps.maxTurns),
   };
 }
 

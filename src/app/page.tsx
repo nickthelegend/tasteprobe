@@ -16,7 +16,15 @@ import { Logo } from "@/components/Logo";
 import { personaSourceOf, personaSourceText } from "@/lib/report-model.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
-type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[] };
+type RunCaps = { locked: boolean; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
+type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[]; runs: RunCaps };
+const PERSONA_CHOICES = [16, 24, 48, 100, 200];
+
+// Persona counts this server allows: the usual choices up to the cap, plus the cap itself.
+function personaChoices(max: number) {
+  const allowed = PERSONA_CHOICES.filter((count) => count <= max);
+  return allowed.includes(max) || max > PERSONA_CHOICES[PERSONA_CHOICES.length - 1] ? allowed : [...allowed, max];
+}
 type Stage = "resolve" | "qloo" | "personas" | "query" | "stats";
 const STAGES: { id: Stage; label: string }[] = [
   { id: "resolve", label: "Resolve the venue in Qloo" },
@@ -60,6 +68,8 @@ export default function Home() {
   const [attemptId, setAttemptId] = useState<string | undefined>();
   // Per-persona outcomes from this session's live streams, so the tray of a just-finished audit stays filled.
   const [liveResults, setLiveResults] = useState<Record<string, Record<string, PersonaResult>>>({});
+  // Run token for a locked server (TASTEPROBE_RUN_TOKEN). Kept in memory only, sent as a header.
+  const [runToken, setRunToken] = useState("");
 
   function select(audit: Audit) {
     setActive(audit);
@@ -75,7 +85,16 @@ export default function Home() {
   }, []);
 
   const missing = missingConfig(status);
-  const ready = status !== null && missing.length === 0;
+  const locked = Boolean(status?.runs?.locked);
+  const unlocked = !locked || runToken.trim().length > 0;
+  const ready = status !== null && missing.length === 0 && unlocked;
+  const caps = status?.runs;
+  const choices = personaChoices(caps?.maxPersonas ?? 200);
+  const runHeaders: Record<string, string> = { "content-type": "application/json", ...(locked && runToken.trim() ? { "x-tasteprobe-run-token": runToken.trim() } : {}) };
+
+  useEffect(() => {
+    if (caps && form.personaCount > caps.maxPersonas) setForm((current) => ({ ...current, personaCount: personaChoices(caps.maxPersonas).slice(-1)[0] }));
+  }, [caps, form.personaCount]);
   const segment = useMemo(() => active?.segments.find((item) => item.id === segmentId) ?? active?.segments[0], [active, segmentId]);
   const assistants = status?.systems.length || 0;
   const answersPerRun = form.personaCount * assistants;
@@ -86,7 +105,7 @@ export default function Home() {
     setRun({ stage: "resolve", message: "Starting", brand: form.brand, personas: [], results: {}, rivals: [], done: 0, total: 0, mentions: 0 });
     let results: Record<string, PersonaResult> = {};
     try {
-      const response = await fetch("/api/audits", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(form) });
+      const response = await fetch("/api/audits", { method: "POST", headers: runHeaders, body: JSON.stringify(form) });
       if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error ?? `Audit request failed (${response.status}).`);
       let finished = false;
       await readNdjson<AuditEvent>(response, (message) => {
@@ -120,7 +139,7 @@ export default function Home() {
     if (!active) return;
     setFixing(true); setError("");
     try {
-      const response = await fetch(`/api/audits/${active.id}/fix`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ segment: segmentId }) });
+      const response = await fetch(`/api/audits/${active.id}/fix`, { method: "POST", headers: runHeaders, body: JSON.stringify({ segment: segmentId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Counterfactual re-test failed.");
       const updated: Audit = { ...active, counterfactuals: [...(active.counterfactuals ?? []), payload] };
@@ -179,6 +198,14 @@ export default function Home() {
         <div><strong>Nebius model check failed</strong><p>{status.nebius.detail}</p></div>
         <span />
       </div>}
+      {locked && <section className="locked" aria-labelledby="locked-title">
+        <div>
+          <h3 id="locked-title">Runs are disabled on the public demo</h3>
+          <p>Every audit, re-pour and agent run spends this server’s Qloo, Nebius and assistant keys, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.</p>
+        </div>
+        <label className="field"><span>Run token</span><input type="password" value={runToken} onChange={(event) => setRunToken(event.target.value)} autoComplete="off" placeholder="Only the owner has it" /></label>
+      </section>}
+
       {error && <div className="alert" role="alert">
         <span className="alert-mark" aria-hidden="true">!</span>
         <div><strong>That didn’t complete</strong><p>{error}</p></div>
@@ -196,12 +223,13 @@ export default function Home() {
           <label className="field"><span>City</span><input required minLength={2} value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} placeholder="e.g. Mumbai" /></label>
           <label className="field field-sm"><span>Personas</span>
             <select value={form.personaCount} onChange={(event) => setForm({ ...form, personaCount: Number(event.target.value) })}>
-              {[16, 24, 48, 100, 200].map((count) => <option key={count} value={count}>{count}</option>)}
+              {choices.map((count) => <option key={count} value={count}>{count}</option>)}
             </select>
           </label>
           <button className="tp-btn tp-btn-pink" type="submit" disabled={!ready || run !== null}>{run ? <><span className="spinner" /> Pouring</> : "Run audit"}</button>
         </form>
         <p className="order-note">{form.personaCount} personas × {assistants} {assistants === 1 ? "assistant" : "assistants"} = <b>{answersPerRun} live answers</b>, each read by Nemotron. At least {MIN_PERSONAS_PER_SEGMENT} personas per glass, so {form.personaCount} personas fill up to {maxSegmentsFor(form.personaCount)} {maxSegmentsFor(form.personaCount) === 1 ? "glass" : "glasses"}.{assistants === 0 ? " Configure an assistant to enable audits." : " Start small for demos."}</p>
+        {caps && <p className="order-caps">This server runs one flight at a time, caps an audit at <b>{caps.maxPersonas} personas</b> and the agent at {caps.agentCaps.maxTries} copies and {caps.agentCaps.maxAssistantCalls} assistant calls, and allows {caps.runsPerIpPerHour} runs an hour per visitor and {caps.dailyRuns} a day.{locked ? " Runs need the owner’s run token." : ""}</p>}
       </section>
 
       {run && <section className="panel pouring" id="board" aria-live="polite" aria-labelledby="pour-title">
@@ -299,7 +327,7 @@ export default function Home() {
         <section className="panel" id="repour-live" aria-labelledby="repour-live-title">
           <div className="panel-head"><div><h3 id="repour-live-title">Re-pour: baseline, placebo, fix</h3><p>Nemotron writes copy for one glass; the same personas re-ask every assistant three ways at once. Lift is fix minus placebo.</p></div><span className="stamp">placebo-controlled</span></div>
           <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={ready} onRun={runFix} selectedAttempt={attemptId} onAttempt={setAttemptId} />
-          <AgentLoop audit={active} segmentId={segmentId} ready={ready && !fixing} onRun={(agentRun) => {
+          <AgentLoop audit={active} segmentId={segmentId} ready={ready && !fixing} headers={runHeaders} caps={caps?.agentCaps} onRun={(agentRun) => {
             const updated: Audit = { ...active, agentRuns: [...(active.agentRuns ?? []), agentRun] };
             setActive(updated);
             setAudits((current) => (current ?? []).map((item) => item.id === updated.id ? updated : item));

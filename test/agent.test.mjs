@@ -21,10 +21,13 @@ function candidate(id, placeboHits, fixHits, personas = 8) {
 test("limits are clamped and defaulted", () => {
   assert.deepEqual(normalizeLimits(), { ...DEFAULT_LIMITS });
   const clamped = normalizeLimits({ maxTries: 99, maxAssistantCalls: 1, maxUsd: "-2", maxTurns: "abc" });
-  assert.equal(clamped.maxTries, 8);
+  assert.equal(clamped.maxTries, 5, "the server cap (the UI's maximum), not the client's 99");
   assert.equal(clamped.maxAssistantCalls, 4);
   assert.equal(clamped.maxUsd, null);
   assert.equal(clamped.maxTurns, DEFAULT_LIMITS.maxTurns);
+  // With caps above the hard bounds, the hard bounds still hold.
+  const loose = normalizeLimits({ maxTries: 99, maxAssistantCalls: 99_999, maxNemotronTokens: 1e9, maxTurns: 99 }, { maxTries: 99, maxAssistantCalls: 99_999, maxNemotronTokens: 1e9, maxTurns: 99 });
+  assert.deepEqual([loose.maxTries, loose.maxAssistantCalls, loose.maxNemotronTokens, loose.maxTurns], [8, 1000, 5_000_000, 40]);
 });
 
 test("budget accounting adds calls, tokens and cost; unpriced usage disables the dollar cap", () => {

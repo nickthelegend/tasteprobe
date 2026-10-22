@@ -52,13 +52,30 @@ railway up --detach
 
 Without keys the site still serves: the header pill is red, the **Setup required** panel names each missing variable, the Run buttons stay disabled and `POST /api/audits` answers `503`. Nothing is simulated.
 
-## Spend cap (read before making the URL public)
+## Spend guard (read before making the URL public)
 
-The public Run button spends the server's keys. There is no login or rate limit, so anyone with the URL can start an audit (up to 200 personas, about 5 minutes of calls).
-- Use a **dedicated Nebius key** for the hosted demo and set a spend limit / low prepaid balance on it in the Nebius Token Factory console. Do the same for the OpenAI (or `MODEL_2_*`) key.
+Every audit, re-pour and agent run spends the server's keys. The three paid routes (`POST /api/audits`, `/api/audits/<id>/fix`, `/api/audits/<id>/agent`) check these **before** the provider-key check, in this order, and refuse with a readable JSON error:
+
+| Check | Variable | Default | Refusal |
+|---|---|---|---|
+| Run token in the `X-TasteProbe-Run-Token` header (a header, not a cookie, so a cross-site form cannot send it) | `TASTEPROBE_RUN_TOKEN` | unset = runs open | 401 without it, 403 if wrong |
+| Body sent as `application/json` (a cross-site `text/plain` form POST is refused) | — | always on | 415 |
+| Personas per audit | `TASTEPROBE_MAX_PERSONAS` | 200 | 400 |
+| Agent budget: a request can ask for less, never more | `TASTEPROBE_AGENT_MAX_TRIES`, `_MAX_CALLS`, `_MAX_TOKENS`, `_MAX_TURNS` | 5 copies, 480 assistant calls, 400,000 Nemotron tokens, 20 turns (the UI's maxima) | clamped |
+| Runs per visitor address per hour (token bucket; the address is `X-Real-IP`, else the last `X-Forwarded-For` hop) | `TASTEPROBE_RUNS_PER_IP_PER_HOUR` | 10 | 429 |
+| Runs per day for the whole instance (UTC) | `TASTEPROBE_DAILY_RUNS` | 100 | 429 |
+| One run at a time per server process | — | always on | 429 "A flight is already pouring" |
+
+`/api/status` publishes the caps and whether runs are locked (never the token), and the tasting room shows them under the order form. With a run token set, the room says **Runs are disabled on the public demo** and offers a Run token field; stored flights and printable reports stay open to read.
+
+For the public demo:
+- Set `TASTEPROBE_RUN_TOKEN` (read it from stdin: `railway variable set TASTEPROBE_RUN_TOKEN --stdin --skip-deploys`), `TASTEPROBE_MAX_PERSONAS=24`, `TASTEPROBE_RUNS_PER_IP_PER_HOUR=3` and `TASTEPROBE_DAILY_RUNS=20`.
+- Use a **dedicated Nebius key** with a spend limit or a low prepaid balance in the Nebius Token Factory console. Do the same for the OpenAI (or `MODEL_2_*`) key.
 - Set `NEBIUS_INPUT_PRICE_PER_MILLION` and `NEBIUS_OUTPUT_PRICE_PER_MILLION` so the agent loop's dollar cap is enforced.
 - Set a usage limit on the Railway workspace so the container bill is capped too.
 - Seed the store with one real audit first, so judges can open the flight and `/audits/<id>/report` without spending anything.
+
+How long an audit takes has **not been measured** (no live run yet). It is one assistant call per persona per assistant plus one Nemotron extraction per answer, at concurrency 4, so a 24-persona audit with one assistant is 24 assistant calls and 24 extractions. The NDJSON stream sends a heartbeat line so idle proxies keep it open.
 
 ## `/data` must be a private volume
 

@@ -9,7 +9,9 @@ type Line = { key: string; kind: "step" | "tool" | "stop"; title: string; detail
 
 const tokens = (input: number, output: number) => `${(input + output).toLocaleString()} tok`;
 
-export function AgentLoop({ audit, segmentId, ready, onRun }: { audit: Audit; segmentId: string; ready: boolean; onRun: (run: AgentRun) => void }) {
+type Caps = { maxTries: number; maxAssistantCalls: number };
+
+export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { audit: Audit; segmentId: string; ready: boolean; headers: Record<string, string>; caps?: Caps; onRun: (run: AgentRun) => void }) {
   const [running, setRunning] = useState(false);
   const [tries, setTries] = useState(3);
   const [calls, setCalls] = useState(120);
@@ -23,7 +25,7 @@ export function AgentLoop({ audit, segmentId, ready, onRun }: { audit: Audit; se
     let count = 0;
     const push = (line: Omit<Line, "key">) => { const key = `l${count++}`; setLines((current) => [...current, { ...line, key }]); };
     try {
-      const response = await fetch(`/api/audits/${audit.id}/agent`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ segment: segmentId, maxTries: tries, maxAssistantCalls: calls }) });
+      const response = await fetch(`/api/audits/${audit.id}/agent`, { method: "POST", headers, body: JSON.stringify({ segment: segmentId, maxTries: tries, maxAssistantCalls: calls }) });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload.message ?? payload.error ?? `Agent request failed (${response.status}).`);
@@ -54,12 +56,12 @@ export function AgentLoop({ audit, segmentId, ready, onRun }: { audit: Audit; se
     <div className="cf-controls">
       <label className="field field-sm"><span>Copies to try</span>
         <select value={tries} onChange={(event) => setTries(Number(event.target.value))} disabled={running}>
-          {[1, 2, 3, 5].map((value) => <option key={value} value={value}>{value}</option>)}
+          {[1, 2, 3, 5].filter((value) => value <= (caps?.maxTries ?? 5)).map((value) => <option key={value} value={value}>{value}</option>)}
         </select>
       </label>
       <label className="field field-sm"><span>Assistant-call cap</span>
         <select value={calls} onChange={(event) => setCalls(Number(event.target.value))} disabled={running}>
-          {[48, 120, 240, 480].map((value) => <option key={value} value={value}>{value}</option>)}
+          {[48, 120, 240, 480].filter((value) => value <= (caps?.maxAssistantCalls ?? 480)).map((value) => <option key={value} value={value}>{value}</option>)}
         </select>
       </label>
       <button className="btn btn-ghost" onClick={start} disabled={running || !ready}>
