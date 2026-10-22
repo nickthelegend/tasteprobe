@@ -30,7 +30,7 @@ Rules read on 2026-10-21 from the official rules pages linked below. If a page c
 - [ ] Keep the demo free and available to judges until the judging period ends (Dec 15, 2026, 12:00 pm PT). That needs a key budget. **PENDING**.
 
 ### Qloo Agentic (rules section 4 and the event page's "What to submit")
-- [x] **Integrates the Qloo API and works as an agentic tool** (in code; no live call yet): a Nemotron tool-calling agent whose `qloo_insights` tool takes a Qloo entity type, the venue or a verified rival, and a city, plus an MCP server (`run_audit`, `run_fix`, `get_report`, `qloo_taste_profile`) that other agents can call.
+- [ ] **Integrates the Qloo API and works as an agentic tool**: in code, **PENDING KEYS**. Tick it only after the hosted demo shows a real Qloo-sourced flight. What is built: a Nemotron tool-calling agent whose `qloo_insights` tool takes a Qloo entity type, the venue or a verified rival, and a city, plus an MCP server (`run_audit`, `run_fix`, `get_report`, `qloo_taste_profile`) that other agents can call.
 - [ ] **Link to a functional demo application** that judges can try end to end. **PENDING: hosting**.
 - [ ] **Hosted and fully published externally.** The event page says submissions that only run locally or rely on private access do not qualify. **PENDING: hosting**.
 - [ ] **Public repo with an open-source license visible in About**. **PENDING: push** and an About check.
