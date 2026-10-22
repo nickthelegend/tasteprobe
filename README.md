@@ -207,7 +207,7 @@ Form drafts, tool feedback and checklists: [HACKATHON_SUBMISSION_FORM.md](HACKAT
 
 ## Tests
 
-`npm test` runs 128 tests in 18 files (Node's runner counts the MCP stdio suite's parent test too), including a seeded null simulation of the agent's stop rule and a two-process store test. The browser suite (`npm run test:e2e`, real Google Chrome, three servers with no keys) has 115 passing tests across six projects (9 skipped: the CLI and production-server checks run in one project each). Tables and what each file covers are in [TESTING.md](TESTING.md). The full check:
+`npm test` runs 155 tests in 25 files (Node's runner counts the MCP stdio suite's parent test too), including a seeded null simulation of the agent's stop rule and a two-process store test. The browser suite (`npm run test:e2e`, real Google Chrome, three servers with no keys) has 126 passing tests across six projects (12 skipped: the CLI, production-server and status-timeout checks run in one project each). Tables and what each file covers are in [TESTING.md](TESTING.md). The full check:
 
 ```sh
 npm test && npm run typecheck && npm run lint:no-mock && npm run build
