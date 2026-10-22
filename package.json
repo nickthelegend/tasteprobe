@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
-    "next": "14.2.31",
+    "next": "15.5.28",
     "openai": "^4.104.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -31,5 +31,8 @@
     "@types/react-dom": "^18.3.7",
     "typescript": "^5.8.3"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "overrides": {
+    "postcss": "8.5.31"
+  }
 }

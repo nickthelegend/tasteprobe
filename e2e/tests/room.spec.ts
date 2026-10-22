@@ -156,6 +156,15 @@ test.describe("tasting room with no keys", () => {
     expect(status.runs).toEqual({ locked: false, setupRequired: null, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, deadlineSeconds: 900, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
   });
 
+  test("the image optimizer is off: /_next/image answers 404 for any image", async ({ request }) => {
+    // images.unoptimized in next.config.mjs; the app uses no next/image, so the optimizer and its
+    // advisories are unreachable on every target.
+    for (const url of ["/_next/image?url=%2Ffavicon.ico&w=64&q=75", "/_next/image?url=%2Ficon.svg&w=64&q=75"]) {
+      expect((await request.get(url)).status(), url).toBe(404);
+    }
+    expect((await request.get("/favicon.ico")).status()).toBe(200);
+  });
+
   test('no control in the tasting room is labelled with "log"', async ({ page }) => {
     await openRoom(page);
     expect(await logControls(page)).toEqual([]);

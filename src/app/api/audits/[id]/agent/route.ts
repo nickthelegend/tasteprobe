@@ -14,7 +14,8 @@ export const maxDuration = 300;
 // Streams the agent loop as NDJSON (start, step, tool, stop, done | error).
 // Guarded like the audit route: run token, JSON only, quota, then keys, then one run at a time.
 // Budgets in the body are clamped to the server's caps (TASTEPROBE_AGENT_MAX_*).
-export async function POST(request: Request, context: { params: { id: string } }) {
+export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const opened = openRun(request);
   if (opened.refusal) return opened.refusal;
   const { policy, ip } = opened;
@@ -22,7 +23,7 @@ export async function POST(request: Request, context: { params: { id: string } }
   if (quota) return quota;
   const missing = missingKeys();
   if (missing.length) return NextResponse.json({ error: "setup_required", missing, message: missing.map((name) => `Setup required: ${name}`).join("; ") }, { status: 503 });
-  const audit = await findAudit(context.params.id);
+  const audit = await findAudit(id);
   if (!audit) return NextResponse.json({ error: "Audit not found." }, { status: 404 });
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
   const segment = typeof body.segment === "string"

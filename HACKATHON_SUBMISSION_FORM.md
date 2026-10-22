@@ -63,7 +63,7 @@ Do AI assistants recommend you to your own audience? A placebo-controlled audit 
 - **For other agents and for print.** An MCP server exposes `run_audit`, `run_fix`, `get_report` and `qloo_taste_profile`, and `/audits/<id>/report` is a printable report of any stored audit.
 
 ## How we built it
-- Next.js 14 app with streaming NDJSON APIs, a CLI (`npm run audit:live`) and a stdio MCP server (`npm run mcp`), all on the same pipeline.
+- Next.js 15 app with streaming NDJSON APIs, a CLI (`npm run audit:live`) and a stdio MCP server (`npm run mcp`), all on the same pipeline.
 - Qloo `/search` and `/v2/insights` with `urn:entity:*` types on the hackathon host (`urn:tag` and `urn:demographics` are tried, and a 403 switches the personas to entity segments or is recorded on the audit). No live call has run yet; update this after the first one. Nebius Token Factory through the OpenAI-compatible API: chat completions with `tools` for the agent, JSON extraction for every answer, and `/v1/models` to check the key's catalog. Assistants under test go through any OpenAI-compatible endpoint.
 - Statistics in plain JS with seeded tests:
   - Wilson interval on a Kish effective sample size;

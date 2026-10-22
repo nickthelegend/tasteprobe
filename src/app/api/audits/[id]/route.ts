@@ -9,8 +9,9 @@ const trim = (rows: ResponseRow[] = []) => rows.map(({ personaId, segment, model
 
 // Returns the audit plus the cached raw answers (?evidence=1) so every number can be traced to a response.
 // ?attempt=<id> picks a fix attempt; the latest one is returned by default.
-export async function GET(request: Request, context: { params: { id: string } }) {
-  const audit = await findAudit(context.params.id);
+export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
+  const audit = await findAudit(id);
   if (!audit) return NextResponse.json({ error: "Audit not found." }, { status: 404 });
   const query = new URL(request.url).searchParams;
   if (!query.has("evidence")) return NextResponse.json(audit);
