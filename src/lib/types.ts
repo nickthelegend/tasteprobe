@@ -54,7 +54,7 @@ export type AgentCandidateSummary = {
   liftCi: [number, number] | null;
   failed: number;
 };
-export type AgentBudgetSummary = { tries: number; turns: number; assistantCalls: number; nemotronCalls: number; inputTokens: number; outputTokens: number; usd: number; priced: boolean };
+export type AgentBudgetSummary = { tries: number; turns: number; assistantCalls: number; nemotronCalls: number; qlooCalls?: number; inputTokens: number; outputTokens: number; usd: number; priced: boolean };
 // The one confirmation probe of a screened copy, on held-out personas or a fresh re-ask.
 export type AgentConfirmation = {
   candidateId: string; mode: "holdout" | "rerun"; personas: number; placeboShare: number | null; fixShare: number | null;

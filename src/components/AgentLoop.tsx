@@ -50,7 +50,7 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, assistants, 
         if (event.type === "step") push({
           kind: "step", title: `Turn ${event.turn}${event.toolCalls.length ? ` → ${event.toolCalls.join(", ")}` : ""}`,
           detail: event.text || undefined,
-          meta: `${tokens(event.usage.inputTokens, event.usage.outputTokens)}${event.reasoningChars ? ` · ${event.reasoningChars.toLocaleString()} reasoning chars` : ""} · ${event.costUsd === null ? "cost unpriced" : `$${event.costUsd.toFixed(5)}`} · ${event.budget.assistantCalls} assistant calls so far`,
+          meta: `${tokens(event.usage.inputTokens, event.usage.outputTokens)}${event.reasoningChars ? ` · ${event.reasoningChars.toLocaleString()} reasoning chars` : ""} · ${event.costUsd === null ? "cost unpriced" : `$${event.costUsd.toFixed(5)}`} · ${event.budget.assistantCalls} assistant calls${event.budget.qlooCalls ? ` · ${event.budget.qlooCalls} Qloo calls` : ""} so far`,
         });
         if (event.type === "tool") push({ kind: "tool", title: event.summary, ok: event.ok });
         if (event.type === "confirm") push({ kind: "tool", title: event.summary, ok: event.passed, meta: `${event.budget.assistantCalls} assistant calls so far` });

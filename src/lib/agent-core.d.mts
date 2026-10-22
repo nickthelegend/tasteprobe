@@ -1,7 +1,7 @@
 import type { Usage } from "./types";
 
 export type AgentLimits = { maxTries: number; maxAssistantCalls: number; maxUsd: number | null; maxNemotronTokens: number; maxTurns: number };
-export type AgentBudget = { tries: number; turns: number; assistantCalls: number; nemotronCalls: number; inputTokens: number; outputTokens: number; usd: number; priced: boolean };
+export type AgentBudget = { tries: number; turns: number; assistantCalls: number; nemotronCalls: number; qlooCalls: number; inputTokens: number; outputTokens: number; usd: number; priced: boolean };
 export type Prices = { input: number; output: number } | null;
 export type CandidateRow = { personaId: string; brand: boolean };
 export type Candidate = { id: string; copy: string; rationale: string; placeboRows: CandidateRow[]; fixRows: CandidateRow[]; personasProbed: string[]; failed: number };
@@ -21,8 +21,10 @@ export type AgentCaps = { maxTries: number; maxAssistantCalls: number; maxNemotr
 export const DEFAULT_CAPS: AgentCaps;
 export function normalizeLimits(input?: Partial<Record<keyof AgentLimits, unknown>>, caps?: AgentCaps): AgentLimits;
 export function createBudget(): AgentBudget;
+export const DEFAULT_QLOO_CALLS: number;
+export function qlooCallCap(env?: Record<string, string | undefined>): number;
 export function tokenCostUsd(usage: Usage, prices: Prices): number | null;
-export function chargeBudget(budget: AgentBudget, spend: { assistantCalls?: number; nemotronCalls?: number; usage?: Usage; tries?: number; turns?: number }, prices: Prices): AgentBudget;
+export function chargeBudget(budget: AgentBudget, spend: { assistantCalls?: number; nemotronCalls?: number; qlooCalls?: number; usage?: Usage; tries?: number; turns?: number }, prices: Prices): AgentBudget;
 export function budgetExhausted(budget: AgentBudget, limits: AgentLimits): StopReason | null;
 export function affordablePersonas(budget: AgentBudget, limits: AgentLimits, requested: number, assistants: number): number;
 export function validateCopy(copy: unknown): string | null;

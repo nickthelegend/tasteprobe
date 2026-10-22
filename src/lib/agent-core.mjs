@@ -34,7 +34,17 @@ export function normalizeLimits(input = {}, caps = DEFAULT_CAPS) {
 }
 
 export function createBudget() {
-  return { tries: 0, turns: 0, assistantCalls: 0, nemotronCalls: 0, inputTokens: 0, outputTokens: 0, usd: 0, priced: true };
+  return { tries: 0, turns: 0, assistantCalls: 0, nemotronCalls: 0, qlooCalls: 0, inputTokens: 0, outputTokens: 0, usd: 0, priced: true };
+}
+
+// Live Qloo calls the agent's qloo_insights tool may make in one run (TASTEPROBE_AGENT_MAX_QLOO_CALLS).
+// Each distinct (type, entity, location) is a new call, so the model could otherwise loop on cities.
+export const DEFAULT_QLOO_CALLS = 12;
+export function qlooCallCap(env = {}) {
+  const raw = env.TASTEPROBE_AGENT_MAX_QLOO_CALLS;
+  if (raw === undefined || raw === null || String(raw).trim() === "") return DEFAULT_QLOO_CALLS;
+  const number = Math.floor(Number(raw));
+  return Number.isFinite(number) ? Math.min(50, Math.max(1, number)) : DEFAULT_QLOO_CALLS;
 }
 
 export function tokenCostUsd(usage, prices) {
@@ -44,7 +54,7 @@ export function tokenCostUsd(usage, prices) {
 
 // Returns a new budget with the spend added. Cost is only known when prices are configured;
 // once any charge is unpriced, `priced` stays false and the dollar cap cannot be enforced.
-export function chargeBudget(budget, { assistantCalls = 0, nemotronCalls = 0, usage = { inputTokens: 0, outputTokens: 0 }, tries = 0, turns = 0 }, prices) {
+export function chargeBudget(budget, { assistantCalls = 0, nemotronCalls = 0, qlooCalls = 0, usage = { inputTokens: 0, outputTokens: 0 }, tries = 0, turns = 0 }, prices) {
   const cost = tokenCostUsd(usage, prices);
   const hasTokens = usage.inputTokens + usage.outputTokens > 0;
   return {
@@ -52,6 +62,7 @@ export function chargeBudget(budget, { assistantCalls = 0, nemotronCalls = 0, us
     turns: budget.turns + turns,
     assistantCalls: budget.assistantCalls + assistantCalls,
     nemotronCalls: budget.nemotronCalls + nemotronCalls,
+    qlooCalls: (budget.qlooCalls ?? 0) + qlooCalls,
     inputTokens: budget.inputTokens + usage.inputTokens,
     outputTokens: budget.outputTokens + usage.outputTokens,
     usd: budget.usd + (cost ?? 0),

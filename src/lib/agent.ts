@@ -1,13 +1,14 @@
 import type OpenAI from "openai";
 import {
   affordablePersonas, agentBudgetPlan, budgetExhausted, candidateStats, chargeBudget, confirmationResult, createBudget, nextPersonas,
-  parseToolArguments, qlooFilterTypes, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, validateQlooToolArgs,
+  parseToolArguments, qlooCallCap, qlooFilterTypes, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, validateQlooToolArgs,
   type AgentBudget, type AgentLimits, type Candidate, type Confirmation, type StopReason,
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
 import { throwIfDeadline } from "./run-deadline.mjs";
 import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
-import { COPY_RULES, fetchPersonaSignals, getTestModels, nebiusModel, nebiusPrices, nemotronTurn, qlooOnHackathonHost, qlooTasteProfile } from "./providers.ts";
+import * as providers from "./providers.ts";
+import { COPY_RULES, getTestModels, nebiusModel, nebiusPrices, qlooOnHackathonHost } from "./providers.ts";
 import { placeboCopy, segmentLabel } from "./taste.mjs";
 import type { AgentCandidateSummary, AgentEvent, AgentRun, Audit, SegmentResult } from "./types";
 
@@ -97,7 +98,15 @@ export class AgentBudgetError extends Error {
 }
 
 // `trace` is filled in place, so a caller can still save the partial trace if a live call throws.
-export async function runAgent(audit: Audit, segment: SegmentResult, limits: AgentLimits, send: (event: AgentEvent) => void, trace: AgentTrace = emptyTrace()): Promise<{ run: AgentRun; trace: AgentTrace }> {
+// The live calls the loop makes. Always the real providers in the app; test/ passes stand-ins.
+export type AgentDeps = { nemotronTurn: typeof providers.nemotronTurn; qlooTasteProfile: typeof providers.qlooTasteProfile; fetchPersonaSignals: typeof providers.fetchPersonaSignals };
+const liveDeps: AgentDeps = { nemotronTurn: providers.nemotronTurn, qlooTasteProfile: providers.qlooTasteProfile, fetchPersonaSignals: providers.fetchPersonaSignals };
+
+export async function runAgent(audit: Audit, segment: SegmentResult, limits: AgentLimits, send: (event: AgentEvent) => void, trace: AgentTrace = emptyTrace(), deps: Partial<AgentDeps> = {}): Promise<{ run: AgentRun; trace: AgentTrace }> {
+  const { nemotronTurn, qlooTasteProfile, fetchPersonaSignals } = { ...liveDeps, ...deps };
+  // Live Qloo calls from qloo_insights: one per turn, at most qlooCap per run.
+  const qlooCap = qlooCallCap(process.env);
+  let qlooThisTurn = 0;
   const runId = crypto.randomUUID();
   const model = nebiusModel();
   const prices = nebiusPrices();
@@ -146,6 +155,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
 
   async function execute(name: string, args: Record<string, unknown>): Promise<{ ok: boolean; result: unknown; summary: string }> {
     if (name === "qloo_insights") {
+      if (qlooThisTurn++ > 0) return { ok: false, result: { error: "One qloo_insights call per turn. Read this result, then ask again next turn." }, summary: "Rejected: one qloo_insights call per turn" };
       const checked = validateQlooToolArgs(args, { rivals, hackathonHost, city: audit.city });
       if (!checked.ok) return { ok: false, result: { error: checked.error }, summary: `Rejected qloo_insights: ${checked.error}` };
       const { filterType, entity, location } = checked.value;
@@ -154,6 +164,8 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
         const key = `${filterType}|${entity.kind === "venue" ? audit.qlooEntityId : entity.id}|${location}`;
         const cached = qlooCalls.get(key);
         if (cached) return { ok: true, result: cached, summary: `Qloo ${filterType} for ${whose} in ${location} (already read this run)` };
+        if ((budget.qlooCalls ?? 0) >= qlooCap) return { ok: false, result: { error: `Qloo call budget spent: ${qlooCap} live calls per run. Work with what you have read.` }, summary: `Rejected: Qloo call budget spent (${qlooCap} per run)` };
+        budget = chargeBudget(budget, { qlooCalls: 1 }, prices);
         const profile = await qlooTasteProfile({ entityId: entity.kind === "venue" ? audit.qlooEntityId : entity.id, filterType, location });
         trace.qlooCalls = [...(trace.qlooCalls ?? []), { filterType, entity: key.split("|")[1], location, payload: profile.raw }];
         const result = { filter_type: filterType, entity: whose, location, top: profile.items.map((item) => ({ name: item.name, affinity: round(item.affinity) })) };
@@ -161,6 +173,8 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
         return { ok: true, result, summary: `Qloo ${filterType} for ${whose} in ${location}: ${profile.items.length} results${profile.items[0] ? `, top ${profile.items.slice(0, 3).map((item) => item.name).join(", ")}` : ""}` };
       }
       if (!qlooCache) {
+        if ((budget.qlooCalls ?? 0) >= qlooCap) return { ok: false, result: { error: `Qloo call budget spent: ${qlooCap} live calls per run.` }, summary: `Rejected: Qloo call budget spent (${qlooCap} per run)` };
+        budget = chargeBudget(budget, { qlooCalls: 1 }, prices);
         // Same fallback as the audit: urn:tag, or urn:entity affinities when the key refuses urn:tag.
         const { tags, raw, source } = await fetchPersonaSignals(audit.qlooEntityId, audit.city, audit.brand);
         trace.qloo = raw;
@@ -282,6 +296,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
       reason = await decide("agent_finished");
       break;
     }
+    qlooThisTurn = 0;
     for (const call of toolCalls) {
       const parsed = parseToolArguments(call.function.arguments);
       const outcome = parsed.ok ? await execute(call.function.name, parsed.value) : { ok: false, result: { error: parsed.error }, summary: `Rejected: ${parsed.error}` };

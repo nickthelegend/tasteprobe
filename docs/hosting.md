@@ -64,6 +64,7 @@ Every audit, re-pour and agent run spends the server's keys. The three paid rout
 | Agent budget: a request can ask for less, never more | `TASTEPROBE_AGENT_MAX_TRIES`, `_MAX_CALLS`, `_MAX_TOKENS`, `_MAX_TURNS` | 5 copies, 480 assistant calls, 400,000 Nemotron tokens, 20 turns (the UI's maxima) | clamped |
 | Runs per visitor address per hour (token bucket). The address is read only from the header named in `TASTEPROBE_TRUSTED_IP_HEADER` (for `X-Forwarded-For`, the last hop). Unset, every caller shares one bucket, so a client cannot pick its own by sending a header. Buckets that refill are dropped and the map holds at most 10,000 addresses | `TASTEPROBE_RUNS_PER_IP_PER_HOUR`, `TASTEPROBE_TRUSTED_IP_HEADER` | 10; no trusted header | 429 |
 | Runs per day for the whole instance (UTC) | `TASTEPROBE_DAILY_RUNS` | 100 | 429 |
+| Live Qloo calls from the agent's `qloo_insights` tool: one per turn, at most N per run (counted in the step events' budget) | `TASTEPROBE_AGENT_MAX_QLOO_CALLS` | 12 | the tool call is rejected; the run goes on |
 | One run at a time per server process | — | always on | 429 "A flight is already pouring" |
 | Wall-clock deadline per audit, fix or agent run: past it the run's signal aborts every Qloo, Nebius and assistant call in flight, the pool and agent loops stop, answers already paid for stay in `raw/<id>`, and the run slot is freed | `TASTEPROBE_RUN_DEADLINE_SECONDS` | 900 | a "Deadline: ..." error event (504 for the fix route) |
 
