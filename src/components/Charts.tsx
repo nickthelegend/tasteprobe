@@ -32,7 +32,7 @@ export function Heatmap({ audit, selected, onSelect }: { audit: Audit; selected?
         <thead><tr><th>Taste segment</th><th>All assistants</th>{audit.systems.map((system) => <th key={system}>{system}</th>)}</tr></thead>
         <tbody>
           {audit.segments.map((segment) => <tr key={segment.id} className={segment.id === selected ? "selected" : ""}>
-            <th><button onClick={() => onSelect(segment.id)}>{segment.name}<small>{segment.personas} personas{dropped(segment) ? ` · ${failureText(segment)}` : ""}</small></button></th>
+            <th><button type="button" aria-pressed={segment.id === selected} onClick={() => onSelect(segment.id)}>{segment.name}<small>{segment.personas} personas{dropped(segment) ? ` · ${failureText(segment)}` : ""}</small></button></th>
             <td><Cell result={segment} /></td>
             {audit.systems.map((system) => <td key={system}><Cell result={audit.modelSegments.find((group) => group.model === system)?.segments.find((item) => item.id === segment.id)} /></td>)}
           </tr>)}

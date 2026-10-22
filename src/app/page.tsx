@@ -277,7 +277,7 @@ export default function Home() {
         {caps && <p className="order-caps">This server runs one flight at a time, caps an audit at <b>{caps.maxPersonas} personas</b> and the agent at {caps.agentCaps.maxTries} copies and {caps.agentCaps.maxAssistantCalls} assistant calls, and allows {caps.runsPerIpPerHour} runs an hour per visitor and {caps.dailyRuns} a day.{locked ? " Runs need the owner’s run token." : ""}</p>}
       </section>
 
-      {run && <section className="panel pouring" id="board" aria-live="polite" aria-labelledby="pour-title">
+      {run && <section className="panel pouring" id="board" aria-labelledby="pour-title">
         <div className="panel-head">
           <div><h3 id="pour-title">Pouring {run.brand || "the flight"}</h3><p>{run.place ? `Matched in Qloo: ${run.place}` : run.message}</p></div>
           <span className="stamp stamp-live">live</span>
@@ -289,6 +289,8 @@ export default function Home() {
         </ol>
         <PersonaTray live brand={run.brand} personas={run.personas} results={run.results} />
         <div className="pour-foot">
+          {/* The one live region while pouring: it changes only when the stage changes, not per persona. */}
+          <span className="sr-only" role="status" aria-live="polite">{`Stage ${Math.max(1, stageIndex + 1)} of ${STAGES.length}: ${STAGES[Math.max(0, stageIndex)].label}`}</span>
           <span>{run.total ? `${run.done}/${run.total} personas answered · ${run.mentions} mentions of ${run.brand}` : run.message}</span>
           {run.rivals.length > 0 && <span className="rivals-live">Poured instead: {run.rivals.slice(0, 5).map((name) => <b key={name}>{name}</b>)}</span>}
         </div>

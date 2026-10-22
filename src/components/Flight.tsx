@@ -93,8 +93,9 @@ export function FlightBoard({ items, selected, onSelect, size = 92, caption, sta
             {item.detail && <span className="placard-detail">{item.detail}</span>}
           </span>
         </>;
+        // A list item that holds a real button: the button keeps its role and aria-pressed.
         return onSelect
-          ? <button key={item.id} role="listitem" type="button" className={`board-slot ${item.id === selected ? "is-selected" : ""}`} aria-pressed={item.id === selected} onClick={() => onSelect(item.id)}>{body}</button>
+          ? <div key={item.id} role="listitem" className="board-item"><button type="button" className={`board-slot ${item.id === selected ? "is-selected" : ""}`} aria-pressed={item.id === selected} onClick={() => onSelect(item.id)}>{body}</button></div>
           : <div key={item.id} className="board-slot">{body}</div>;
       })}
     </div>
