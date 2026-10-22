@@ -11,7 +11,10 @@
     "lint:no-mock": "node scripts/check-no-mock.mjs",
     "audit:live": "node scripts/live-audit.mjs",
     "mcp": "node src/mcp/server.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts",
+    "e2e:stack": "e2e/stack.sh",
+    "e2e:stack:stop": "e2e/stack.sh stop"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.32.1",
@@ -22,6 +25,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18.3.7",

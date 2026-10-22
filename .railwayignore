@@ -10,3 +10,5 @@ node_modules/
 dist/
 *.tsbuildinfo
 CLAUDE.md
+# Browser E2E suite and its run output (servers copy, videos, traces) stay local.
+e2e/

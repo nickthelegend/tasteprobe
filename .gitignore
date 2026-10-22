@@ -7,3 +7,7 @@ dist/
 .data/
 *.tsbuildinfo
 next-env.d.ts
+e2e/.run/
+e2e/test-results/
+e2e/playwright-report/
+e2e/test-results.json
