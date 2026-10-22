@@ -2,6 +2,7 @@ import { summarizeCrossCheck } from "./extract.mjs";
 import { estimateCost, pool, probePersona, sumUsage, toObservations, type FailedRow, type ResponseRow } from "./probe.ts";
 import { ASSISTANT_TEMPERATURE, assistantsMeta, EXTRACTION_SYSTEM_PROMPT, fetchCrossDomainSignals, fetchPersonaSignals, nebiusModel, nemotronSettings, resolvePlace, verifyRival } from "./providers.ts";
 import { LIFT_BOOTSTRAP_SEED, summarizeObservations } from "./stats.mjs";
+import { coalescingWriter } from "./filestore.mjs";
 import { saveAudit, writeRaw } from "./storage.ts";
 import { buildPersonas, matchesBrand, PERSONA_SEED, personaPrompt } from "./taste.mjs";
 import type { Audit, AuditEvent } from "./types";
@@ -31,11 +32,15 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
   const rows: ResponseRow[] = [];
   const failures: FailedRow[] = [];
   let done = 0;
+  // Answers already paid for reach disk as they arrive (complete: false), so a crash or a killed
+  // process leaves the partial rows in raw/<id>/responses.json instead of losing them.
+  const progress = coalescingWriter(() => writeRaw(auditId, "responses", { complete: false, personasDone: done, personasTotal: personas.length, rows, failures }));
   await pool(personas, 4, async (persona) => {
     const result = await probePersona(persona, personaPrompt(persona, input.category, input.city), place.name, input.category, input.city);
     rows.push(...result.rows);
     failures.push(...result.failures);
     done++;
+    progress.schedule().catch(() => undefined);
     send({
       type: "answer",
       personaId: persona.id,
@@ -47,7 +52,8 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
     });
     send({ type: "progress", done, total: personas.length, mentions: rows.filter((row) => row.brand).length });
   });
-  await writeRaw(auditId, "responses", { rows, failures });
+  await progress.drain();
+  await writeRaw(auditId, "responses", { complete: true, rows, failures });
   if (!rows.length) throw new Error(`Every assistant call failed. First error: ${failures[0]?.error ?? "unknown"}`);
 
   send({ type: "stage", stage: "stats", message: "Computing share of voice and 95% intervals" });

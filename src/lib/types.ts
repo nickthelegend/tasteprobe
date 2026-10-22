@@ -83,6 +83,7 @@ export type AgentEvent =
   | { type: "confirm"; candidateId: string; mode: "holdout" | "rerun"; personas: number; passed: boolean; summary: string; budget: AgentBudgetSummary }
   | { type: "stop"; reason: string; detail: string }
   | { type: "done"; run: AgentRun }
+  | { type: "heartbeat"; at: string }
   | { type: "error"; message: string };
 export type Audit = {
   id: string;
@@ -134,4 +135,5 @@ export type AuditEvent =
   | { type: "answer"; personaId: string; segmentId: string; answered: number; mentioned: number; failed: number; rivals: string[] }
   | { type: "progress"; done: number; total: number; mentions: number }
   | { type: "done"; audit: Audit }
+  | { type: "heartbeat"; at: string }
   | { type: "error"; message: string };

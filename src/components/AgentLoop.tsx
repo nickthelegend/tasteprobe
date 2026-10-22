@@ -44,7 +44,7 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { a
         if (event.type === "error") throw new Error(event.message);
         if (event.type === "done") { finished = true; onRun(event.run); }
       });
-      if (!finished) throw new Error("The agent stream ended before a result arrived. Check the server log.");
+      if (!finished) throw new Error("The connection closed before the result arrived. The agent run keeps going on the server and is saved with this audit when it finishes; reload in a few minutes.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Agent loop failed.");
     } finally {

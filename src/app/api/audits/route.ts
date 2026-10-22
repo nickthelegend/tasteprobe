@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { runAudit } from "@/lib/audit";
 import { openRun, quotaRefusal, refuse, startRun } from "@/lib/http-guard";
+import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
 import { requireKeys } from "@/lib/providers";
 import { checkPersonaCap } from "@/lib/run-guard.mjs";
 import { readAudits } from "@/lib/storage";
@@ -45,20 +46,13 @@ export async function POST(request: Request) {
   const slot = startRun(ip, policy, "audit");
   if ("refusal" in slot) return slot.refusal;
 
-  const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    async start(controller) {
-      const send = (event: AuditEvent) => controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
-      try {
-        const audit = await runAudit(input, send);
-        send({ type: "done", audit });
-      } catch (error) {
-        send({ type: "error", message: error instanceof Error ? error.message : "Audit failed unexpectedly." });
-      } finally {
-        slot.release();
-        controller.close();
-      }
-    },
+  // The audit runs to the end and is saved even if the client disconnects; see ndjson-stream.mjs.
+  const { stream } = createNdjsonStream<AuditEvent>(async (send) => {
+    const audit = await runAudit(input, send);
+    send({ type: "done", audit });
+  }, {
+    onError: (error) => ({ type: "error", message: error instanceof Error ? error.message : "Audit failed unexpectedly." }),
+    onSettled: () => slot.release(),
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store" } });
 }

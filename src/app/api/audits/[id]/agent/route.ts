@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { normalizeLimits } from "@/lib/agent-core.mjs";
 import { emptyTrace, runAgent } from "@/lib/agent";
 import { openRun, quotaRefusal, startRun } from "@/lib/http-guard";
+import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
 import { missingKeys } from "@/lib/providers";
 import { findAudit, updateAudit, writeRaw } from "@/lib/storage";
 import type { AgentEvent } from "@/lib/types";
@@ -31,25 +32,22 @@ export async function POST(request: Request, context: { params: { id: string } }
   const slot = startRun(ip, policy, "agent");
   if ("refusal" in slot) return slot.refusal;
 
-  const encoder = new TextEncoder();
-  const stream = new ReadableStream({
-    async start(controller) {
-      const send = (event: AgentEvent) => controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
-      const trace = emptyTrace();
-      try {
-        const { run } = await runAgent(audit, segment, limits, send, trace);
-        await writeRaw(audit.id, `agent-${run.id}`, { run, trace });
-        await updateAudit(audit.id, (current) => { current.agentRuns = [...(current.agentRuns ?? []), run]; });
-        send({ type: "done", run });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : "Agent loop failed.";
-        await writeRaw(audit.id, `agent-failed-${Date.now()}`, { error: message, trace }).catch(() => undefined);
-        send({ type: "error", message });
-      } finally {
-        slot.release();
-        controller.close();
-      }
-    },
+  // The run continues and is saved even if the client disconnects; see ndjson-stream.mjs.
+  const trace = emptyTrace();
+  const { stream } = createNdjsonStream<AgentEvent>(async (send) => {
+    try {
+      const { run } = await runAgent(audit, segment, limits, send, trace);
+      await writeRaw(audit.id, `agent-${run.id}`, { run, trace });
+      await updateAudit(audit.id, (current) => { current.agentRuns = [...(current.agentRuns ?? []), run]; });
+      send({ type: "done", run });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Agent loop failed.";
+      await writeRaw(audit.id, `agent-failed-${Date.now()}`, { error: message, trace }).catch(() => undefined);
+      throw error;
+    }
+  }, {
+    onError: (error) => ({ type: "error", message: error instanceof Error ? error.message : "Agent loop failed." }),
+    onSettled: () => slot.release(),
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store" } });
 }

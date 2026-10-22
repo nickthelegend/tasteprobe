@@ -127,7 +127,7 @@ export default function Home() {
           select(message.audit);
         }
       });
-      if (!finished) throw new Error("The audit stream ended before results arrived. Check the server log.");
+      if (!finished) throw new Error("The connection closed before the results arrived. The audit keeps running on the server and appears under Past flights when it finishes; reload in a few minutes.");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Audit failed.");
     } finally {

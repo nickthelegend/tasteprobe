@@ -51,3 +51,27 @@ export function updateJsonFile(file, fallback, mutate) {
     return next;
   });
 }
+
+// Runs `write` again whenever schedule() was called since the last run, never two at once, so the
+// file on disk catches up with the latest state without one write per event. drain() waits for
+// the last scheduled write to finish.
+export function coalescingWriter(write) {
+  let running = null;
+  let dirty = false;
+  const loop = async () => {
+    while (dirty) {
+      dirty = false;
+      await write();
+    }
+  };
+  return {
+    schedule() {
+      dirty = true;
+      if (!running) running = loop().finally(() => { running = null; });
+      return running;
+    },
+    async drain() {
+      while (running) await running.catch(() => undefined);
+    },
+  };
+}
