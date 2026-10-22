@@ -207,6 +207,7 @@ CI (`.github/workflows/ci.yml`) runs all four on Node 22. GitHub Actions last ra
 ## Limitations
 
 - Personas are composites of Qloo taste signals, not real individuals or a representative panel.
+- With `urn:entity` personas, a "Place taste" persona names a place it likes in the city (never the venue under test). An assistant may recommend that place back, which raises its share among the rivals; the venue's own share is unaffected.
 - Assistants are queried through their APIs at temperature 0.7 without web browsing. Consumer apps with live search may answer differently.
 - The fix experiment is prompt-level: it shows whether assistants would use the copy if they retrieved it, not whether a published change would be crawled.
 - Intervals cover sampling over personas and answers. They don't cover extraction errors (the cross-check reports those separately) or the choice of prompt template.
