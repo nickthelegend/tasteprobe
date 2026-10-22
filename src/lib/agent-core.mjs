@@ -140,9 +140,10 @@ export function selectBest(candidates) {
 // probe (optional stopping) across up to maxTries copies (multiple comparisons). A seeded null
 // simulation (scripts/null-sim.mjs) puts the false "lift above zero" rate of that rule at 8.9-16.4% at 3 copies,
 // against a nominal 2.5%. So the search only SCREENS. A copy that clears the screen gets ONE
-// confirmation probe on personas the search never used (held-out personas when the segment has
-// at least 16; otherwise a fresh re-ask of the same personas, whose answers are new draws), and
-// only that confirmation's interval can declare a win. One confirmation per run, then the run stops.
+// confirmation probe: on held-out personas the search never used when the segment has at least 16
+// (lift_confirmed), otherwise a fresh re-ask of the same personas, whose answers are new draws but
+// whose personas are not independent of the search (lift_reconfirmed). Only that confirmation's
+// interval can declare a win. One confirmation per run, then the run stops.
 
 // Splits a segment's personas into the search's selection set and the confirmation set.
 export function planConfirmation(personaIds) {
@@ -192,7 +193,9 @@ export function confirmationResult({ candidateId, mode, placeboRows, fixRows, fa
 // out). After the confirmation the run stops either way; a screened copy asks for the confirmation;
 // otherwise the run stops when any budget dimension runs out or every allowed copy is fully probed.
 export function stopDecision(candidates, budget, limits, selectionSize, confirmation = null) {
-  if (confirmation) return { stop: true, reason: confirmation.passed ? "lift_confirmed" : "confirmation_failed", confirm: null };
+  // A re-ask of the same personas (segments under 16) is not independent of the search, so its win
+  // has its own reason and never reads as a held-out confirmation.
+  if (confirmation) return { stop: true, reason: confirmation.passed ? (confirmation.mode === "rerun" ? "lift_reconfirmed" : "lift_confirmed") : "confirmation_failed", confirm: null };
   const screened = screenedCandidate(candidates, selectionSize);
   if (screened) return { stop: false, reason: null, confirm: screened.candidate.id };
   const exhausted = budgetExhausted(budget, limits);
@@ -204,7 +207,8 @@ export function stopDecision(candidates, budget, limits, selectionSize, confirma
 }
 
 export const STOP_REASONS = {
-  lift_confirmed: "A copy cleared the screen, then beat the placebo again on a confirmation probe the search never used: its nominal 95% lift interval is above zero.",
+  lift_confirmed: "A copy cleared the screen, then beat the placebo again on held-out personas the search never used: the confirmation's nominal 95% lift interval is above zero.",
+  lift_reconfirmed: "A copy cleared the screen, then beat the placebo again when the same personas were re-asked (the segment has fewer than 16 personas, so none could be held out): the re-ask's nominal 95% lift interval is above zero. The re-ask is fresh answers, not independent personas.",
   confirmation_failed: "A copy cleared the screen, but its confirmation probe's lift interval included zero, so no win is declared.",
   budget_assistant_calls: "The assistant-call budget for the search is spent.",
   budget_nemotron_tokens: "The Nemotron token budget is spent.",

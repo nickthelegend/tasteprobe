@@ -73,6 +73,8 @@ test.describe("landing: the tasting sheet", () => {
     const notebook = repour.getByRole("article", { name: "How the sommelier's notebook works" });
     await expect(notebook.locator("header")).toContainText("rules, not a run");
     await expect(notebook.locator("li b")).toHaveText(["Tools", "Probe", "Stop", "Enforced"]);
+    // The stop rule says what the code does in small segments: a re-ask, not unseen personas.
+    await expect(notebook.locator("li").nth(2)).toHaveText("Stop after one confirmation probe once a copy clears the screen: on held-out personas the search never used, or, in segments under 16 personas, a fresh re-ask of the same personas; or when tries, calls, tokens or dollars run out");
     await repour.scrollIntoViewIfNeeded();
     await repour.screenshot({ path: test.info().outputPath("05-three-flights.png"), animations: "disabled" });
   });

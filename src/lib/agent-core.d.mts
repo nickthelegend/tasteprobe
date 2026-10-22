@@ -9,7 +9,7 @@ export type CandidateStats = {
   personas: number; placeboShare: number | null; fixShare: number | null; lift: number | null;
   liftCi: [number, number] | null; placeboCi: [number, number] | null; fixCi: [number, number] | null; failed: number;
 };
-export type StopReason = "lift_confirmed" | "confirmation_failed" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished" | "budget_too_small";
+export type StopReason = "lift_confirmed" | "lift_reconfirmed" | "confirmation_failed" | "budget_assistant_calls" | "budget_nemotron_tokens" | "budget_usd" | "budget_turns" | "budget_tries" | "agent_finished" | "budget_too_small";
 export type ConfirmationPlan = { mode: "holdout" | "rerun"; selection: string[]; confirmation: string[] };
 export type Confirmation = {
   candidateId: string; mode: "holdout" | "rerun"; personas: number; placeboShare: number | null; fixShare: number | null;

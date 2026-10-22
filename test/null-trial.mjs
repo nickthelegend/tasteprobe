@@ -46,7 +46,8 @@ export function nullTrial(seed, segmentSize, assistants, maxTries = 3) {
       const decision = stopDecision(candidates, budget, search, plan.selection.length);
       if (decision.confirm) {
         const confirmation = confirmationResult({ candidateId: decision.confirm, mode: plan.mode, ...draw(plan.confirmation) });
-        return { screened: true, confirmed: stopDecision(candidates, budget, search, plan.selection.length, confirmation).reason === "lift_confirmed" };
+        const reason = stopDecision(candidates, budget, search, plan.selection.length, confirmation).reason;
+        return { screened: true, confirmed: reason === "lift_confirmed" || reason === "lift_reconfirmed" };
       }
       if (decision.stop) return { screened: false, confirmed: false };
       if (!(candidateStats(current).lift > 0)) break;

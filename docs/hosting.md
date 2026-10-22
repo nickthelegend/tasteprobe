@@ -77,6 +77,7 @@ Every audit, re-pour and agent run spends the server's keys. The three paid rout
 
 For the public demo:
 - Set `TASTEPROBE_RUN_TOKEN` (read it from stdin: `railway variable set TASTEPROBE_RUN_TOKEN --stdin --skip-deploys`), `TASTEPROBE_MAX_PERSONAS=24`, `TASTEPROBE_RUNS_PER_IP_PER_HOUR=3` and `TASTEPROBE_DAILY_RUNS=20`.
+- 24 personas make 3 segments of 8, so every agent confirmation there re-asks the same personas (`lift_reconfirmed`, not independent of the search). To demo a held-out confirmation, seed the featured audit with **96 personas or more** (6 segments of 16, a third of each held out); the owner can run it with the run token if `TASTEPROBE_MAX_PERSONAS` allows it, then lower the cap again.
 - Set `TASTEPROBE_TRUSTED_IP_HEADER=x-real-ip`. Railway's networking specs list `X-Real-IP` "for identifying client's remote IP"; they do not say whether a client-sent value is replaced, so check it once after the deploy (send a made-up `X-Real-IP` and confirm the bucket does not move to it). They do not document `X-Forwarded-For`.
 - A private Docker run with no token needs `TASTEPROBE_RUNS_OPEN=1`; without it the production server answers 503 Setup required for every paid route.
 - Use a **dedicated Nebius key** with a spend limit or a low prepaid balance in the Nebius Token Factory console. With the two-key setup that one Nebius key also pays for the assistant under test, so size its limit for both; an OpenAI key, if you add one, gets its own limit.

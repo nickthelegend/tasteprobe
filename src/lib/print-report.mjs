@@ -143,7 +143,7 @@ export function PrintReport({ model, actions = null }) {
             h("span", null, h("b", null, `Fix − placebo: ${pts(fix.lift.fixVsPlacebo?.delta)}`), ` (95% ${ptsRange(fix.lift.fixVsPlacebo?.ci)}${fix.lift.fixVsPlacebo?.clearsZero ? ", clears zero" : ", does not clear zero"})`),
             h("span", { className: "sub" }, `Name exposure (placebo − baseline): ${pts(fix.lift.placeboVsBaseline?.delta)}, 95% ${ptsRange(fix.lift.placeboVsBaseline?.ci)}. Placebo snippet: “${fix.placebo}”. Copy by ${fix.model}.`))))),
 
-    model.agentRuns.length > 0 && h(Section, { no: next(), title: "Agent runs", note: "Nemotron tool-calling loop; the code, not the model, decides when to stop. Search intervals are nominal and only screen (several looks at several copies); a win needs the one confirmation probe on personas the search never used." },
+    model.agentRuns.length > 0 && h(Section, { no: next(), title: "Agent runs", note: "Nemotron tool-calling loop; the code, not the model, decides when to stop. Search intervals are nominal and only screen (several looks at several copies); a win needs the one confirmation probe: on held-out personas the search never used (segments of 16 or more), or a fresh re-ask of the same personas, which is not independent of the search (smaller segments)." },
       h(Table, {
         caption: "Agent runs",
         columns: ["Segment", "Stopped because", "Search", "Best copy", "Search lift (nominal 95%)", "Confirmation (nominal 95%)", "Budget used"],
@@ -151,7 +151,7 @@ export function PrintReport({ model, actions = null }) {
           run.segment, `${run.stopReason}: ${run.stopDetail}`,
           run.search ? `${run.search.looks} looks · ${run.search.candidates} copies · ${run.search.personas} personas` : `${run.candidates} copies`,
           run.best?.copy ?? "—", run.best ? `${pts(run.best.lift)} (${ptsRange(run.best.liftCi)})` : "—",
-          run.confirmation ? `${pts(run.confirmation.lift)} (${ptsRange(run.confirmation.liftCi)}) on ${run.confirmation.personas} ${run.confirmation.mode === "holdout" ? "held-out" : "re-asked"} personas · ${run.confirmation.passed ? "confirmed" : "not confirmed"}` : "none run",
+          run.confirmation ? `${pts(run.confirmation.lift)} (${ptsRange(run.confirmation.liftCi)}) on ${run.confirmation.personas} ${run.confirmation.mode === "holdout" ? "held-out" : "re-asked (same)"} personas · ${run.confirmation.passed ? (run.confirmation.mode === "holdout" ? "confirmed" : "re-confirmed, not independent") : "not confirmed"}` : "none run",
           `${run.budget.assistantCalls} assistant calls · ${run.budget.inputTokens + run.budget.outputTokens} Nemotron tokens${run.budget.priced ? ` · $${run.budget.usd.toFixed(4)}` : ""}`,
         ]),
       })),

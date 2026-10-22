@@ -103,3 +103,19 @@ test("the printable report stamps a synthetic fixture as not a live run", () => 
   assert.match(live, /<p class="rp-prov prov-live">Live run<\/p>/);
   assert.doesNotMatch(live, /Synthetic fixture/);
 });
+
+test("a re-ask confirmation is reported as re-confirmed on the same personas, not as held-out", () => {
+  const run = {
+    id: "r2", segment: "Place keyword", model: "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B", stopReason: "lift_reconfirmed", stopDetail: "re-ask",
+    best: { id: "c1", copy: "Synthetic copy", rationale: "", personas: 8, placeboShare: 0.1, fixShare: 0.6, lift: 0.5, liftCi: [0.2, 0.8], failed: 0 },
+    candidates: [{}], budget: { tries: 1, turns: 4, assistantCalls: 64, nemotronCalls: 40, inputTokens: 1000, outputTokens: 500, usd: 0, priced: false },
+    limits: { maxTries: 3, maxAssistantCalls: 120, maxUsd: null, maxNemotronTokens: 400000, maxTurns: 12 }, steps: 4,
+    search: { personas: 8, looks: 1, candidates: 1 },
+    confirmation: { candidateId: "c1", mode: "rerun", personas: 8, placeboShare: 0.1, fixShare: 0.6, lift: 0.5, liftCi: [0.2, 0.8], failed: 0, passed: true },
+    createdAt: "2026-10-22T12:00:00.000Z",
+  };
+  const html = render(createElement(PrintReport, { model: buildReportModel({ ...audit, agentRuns: [run] }) }));
+  assert.match(html, /on 8 re-asked \(same\) personas · re-confirmed, not independent/);
+  assert.match(html, /a fresh re-ask of the same personas, which is not independent of the search/);
+  assert.doesNotMatch(html, /a win needs the one confirmation probe on personas the search never used/);
+});

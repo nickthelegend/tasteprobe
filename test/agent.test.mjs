@@ -118,6 +118,24 @@ test("stop rule: a search interval above zero only screens; one confirmation dec
   const failed = confirmationResult({ candidateId: "c1", mode: "holdout", placeboRows: rows(8, 3, 100), fixRows: rows(8, 3, 100) });
   assert.equal(failed.passed, false);
   assert.deepEqual(stopDecision([candidate("c1", 1, 7)], budget, limits, 16, failed), { stop: true, reason: "confirmation_failed", confirm: null });
+  // A segment under 16 personas re-asks the same personas: a pass is "lift_reconfirmed", never
+  // described as personas the search never used.
+  const reasked = confirmationResult({ candidateId: "c1", mode: "rerun", placeboRows: rows(8, 1, 100), fixRows: rows(8, 7, 100) });
+  assert.equal(reasked.passed, true);
+  assert.deepEqual(stopDecision([candidate("c1", 1, 7)], budget, limits, 8, reasked), { stop: true, reason: "lift_reconfirmed", confirm: null });
+  assert.match(STOP_REASONS.lift_confirmed, /held-out personas the search never used/);
+  assert.match(STOP_REASONS.lift_reconfirmed, /same personas were re-asked/);
+  assert.doesNotMatch(STOP_REASONS.lift_reconfirmed, /never used/);
+  const failedReask = confirmationResult({ candidateId: "c1", mode: "rerun", placeboRows: rows(8, 3, 100), fixRows: rows(8, 3, 100) });
+  assert.equal(stopDecision([candidate("c1", 1, 7)], budget, limits, 8, failedReask).reason, "confirmation_failed");
+});
+
+test("at the public demo's cap (24 personas, so 3 segments of 8) every confirmation is a re-ask; 96 personas give held-out ones", async () => {
+  const { maxSegmentsFor } = await import("../src/lib/taste.mjs");
+  const ids = (count) => Array.from({ length: count }, (_, index) => `p${index}`);
+  assert.equal(maxSegmentsFor(24), 3);
+  assert.equal(planConfirmation(ids(24 / maxSegmentsFor(24))).mode, "rerun");
+  assert.equal(planConfirmation(ids(96 / maxSegmentsFor(96))).mode, "holdout");
 });
 
 test("confirmation plan: held-out personas from 16 up, a fresh re-ask below; its calls are reserved", () => {
