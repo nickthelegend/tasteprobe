@@ -141,6 +141,17 @@ test.describe("tasting room with no keys", () => {
     await shot(page, "11-room-full-page");
   });
 
+  test("an open server: no lock, its caps listed under the order, and a non-JSON POST refused before the key check", async ({ page, request }) => {
+    const room = await openRoom(page);
+    await expect(room.locator(".locked")).toHaveCount(0);
+    await expect(room.locator(".order-caps")).toHaveText("This server runs one flight at a time, caps an audit at 200 personas and the agent at 5 copies and 480 assistant calls, and allows 10 runs an hour per visitor and 100 a day.");
+    const form = await request.post("/api/audits", { data: JSON.stringify({ brand: "ab", category: "cd", city: "ef" }), headers: { "content-type": "text/plain" } });
+    expect(form.status()).toBe(415);
+    expect(await form.json()).toEqual({ code: "json_required", error: "Send the request as JSON (Content-Type: application/json)." });
+    const status = await (await request.get("/api/status")).json();
+    expect(status.runs).toEqual({ locked: false, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
+  });
+
   test('no control in the tasting room is labelled with "log"', async ({ page }) => {
     await openRoom(page);
     expect(await logControls(page)).toEqual([]);
