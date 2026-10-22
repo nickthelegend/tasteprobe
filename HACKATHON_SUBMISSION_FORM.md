@@ -26,7 +26,7 @@ Rules read on 2026-10-21 from the official rules pages linked below. If a page c
 - [ ] **Demo video under 3 minutes, public on YouTube**, showing the project working. **Required.** **PENDING**: not recorded; it needs keys and must be recorded from a live run before Oct 30. The script is in `docs/demo.md`.
 - [x] Track named: Best Apps and Agents.
 - [x] **Feedback on Token Factory, AI Cloud and NVIDIA tools**: section below. The rules also list a "Most Valuable Feedback" bonus prize for this section.
-- [x] New project: first commit 2026-10-20, inside the submission period (Aug 26 – Oct 30, 2026). No "significantly updated" explanation needed.
+- [x] New project: first commit 2026-10-19 21:11 UTC (Oct 20 IST), inside the submission period (Aug 26 – Oct 30, 2026). No "significantly updated" explanation needed.
 - [ ] Keep the demo free and available to judges until the judging period ends (Dec 15, 2026, 12:00 pm PT). That needs a key budget. **PENDING**.
 
 ### Qloo Agentic (rules section 4 and the event page's "What to submit")
@@ -36,7 +36,7 @@ Rules read on 2026-10-21 from the official rules pages linked below. If a page c
 - [ ] **Public repo with an open-source license visible in About**. **PENDING: push** and an About check.
 - [x] Text description: below.
 - [x] No video required ("Demo videos are not required").
-- [x] New project: first commit 2026-10-20, inside the period (Sep 30 – Oct 30, 2026).
+- [x] New project: first commit 2026-10-19 21:11 UTC (Oct 20 IST), inside the period (Sep 30 – Oct 30, 2026).
 - Note: Qloo hackathon keys stay active through the end of judging (Nov 16), per the developer guide. Don't put Qloo response data in a public repo (Qloo FAQ). `.data/` is git-ignored.
 
 ## Hosting (PENDING; nothing has been deployed)
@@ -64,7 +64,7 @@ Do AI assistants recommend you to your own audience? A placebo-controlled audit 
 
 ## How we built it
 - Next.js 14 app with streaming NDJSON APIs, a CLI (`npm run audit:live`) and a stdio MCP server (`npm run mcp`), all on the same pipeline.
-- Qloo `/search` and `/v2/insights` (`urn:tag`, `urn:entity:*`, `urn:demographics`) on the hackathon host. Nebius Token Factory through the OpenAI-compatible API: chat completions with `tools` for the agent, JSON extraction for every answer, and `/v1/models` to check the key's catalog. Assistants under test go through any OpenAI-compatible endpoint.
+- Qloo `/search` and `/v2/insights` with `urn:entity:*` types on the hackathon host (`urn:tag` and `urn:demographics` are tried, and a 403 switches the personas to entity segments or is recorded on the audit). No live call has run yet; update this after the first one. Nebius Token Factory through the OpenAI-compatible API: chat completions with `tools` for the agent, JSON extraction for every answer, and `/v1/models` to check the key's catalog. Assistants under test go through any OpenAI-compatible endpoint.
 - Statistics in plain JS with seeded tests:
   - Wilson interval on a Kish effective sample size;
   - paired persona bootstrap for lift;
