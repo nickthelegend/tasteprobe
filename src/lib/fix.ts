@@ -13,8 +13,9 @@ export class FixLookupError extends Error {
 // One placebo-controlled fix attempt: Nemotron writes copy for a segment (the weakest one by
 // default), then baseline, placebo and fix arms re-ask every assistant as the same personas.
 // Used by POST /api/audits/[id]/fix and the MCP run_fix tool.
-export async function runFix(auditId: string, segmentId?: string): Promise<Counterfactual> {
-  requireKeys();
+// Finds the audit, segment and personas a fix would re-test, or throws FixLookupError. Reads only:
+// the fix route calls it before spending a run, so a bad id never costs quota.
+export async function findFixTarget(auditId: string, segmentId?: string) {
   const audit = await findAudit(auditId);
   if (!audit) throw new FixLookupError("Audit not found.", 404);
   // Default to the weakest segment: lowest share, then the one where competitors are most visible.
@@ -24,6 +25,12 @@ export async function runFix(auditId: string, segmentId?: string): Promise<Count
   if (!segment) throw new FixLookupError("That taste segment is not part of this audit.", 400);
   const personas = audit.personas.filter((persona) => persona.segment === segment.name);
   if (!personas.length) throw new FixLookupError("This segment has no personas to re-test.", 400);
+  return { audit, segment, personas };
+}
+
+export async function runFix(auditId: string, segmentId?: string): Promise<Counterfactual> {
+  requireKeys();
+  const { audit, segment, personas } = await findFixTarget(auditId, segmentId);
 
   const tastes = [...new Set(personas.flatMap((persona) => persona.affinities.map((tag) => tag.name)))].slice(0, 8);
   const suggestion = await suggestContentChange({

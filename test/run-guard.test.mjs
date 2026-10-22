@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { DEFAULT_CAPS, normalizeLimits } from "../src/lib/agent-core.mjs";
-import { checkJsonContentType, checkPersonaCap, checkRunToken, clientAddress, publicPolicy, RunGate, runPolicy } from "../src/lib/run-guard.mjs";
+import { checkJsonContentType, checkPersonaCap, checkRunToken, clientAddress, MAX_BUCKETS, publicPolicy, RunGate, runPolicy } from "../src/lib/run-guard.mjs";
 
 const headers = (entries = {}) => new Headers(entries);
 
@@ -93,8 +93,60 @@ test("daily quota per instance, reset at UTC midnight", () => {
   assert.equal(typeof gate.start("c", policy, "audit").release, "function");
 });
 
-test("client address: X-Real-IP, else the proxy's last X-Forwarded-For hop, else local", () => {
-  assert.equal(clientAddress(headers({ "x-real-ip": "5.5.5.5", "x-forwarded-for": "1.1.1.1" })), "5.5.5.5");
-  assert.equal(clientAddress(headers({ "x-forwarded-for": "6.6.6.6, 7.7.7.7" })), "7.7.7.7");
-  assert.equal(clientAddress(headers()), "local");
+test("client address comes only from the header named in TASTEPROBE_TRUSTED_IP_HEADER; a client-set X-Real-IP is ignored otherwise", () => {
+  const spoofed = headers({ "x-real-ip": "5.5.5.5", "x-forwarded-for": "1.1.1.1, 7.7.7.7" });
+  // No trusted header configured: every caller shares one bucket rather than trusting what it sent.
+  assert.equal(clientAddress(spoofed, runPolicy({})), "untrusted");
+  assert.equal(runPolicy({}).trustedIpHeader, null);
+  // Railway documents X-Real-IP as the client's remote IP; the deploy guide sets this.
+  const railway = runPolicy({ TASTEPROBE_TRUSTED_IP_HEADER: "X-Real-IP" });
+  assert.equal(railway.trustedIpHeader, "x-real-ip");
+  assert.equal(clientAddress(spoofed, railway), "5.5.5.5");
+  // X-Forwarded-For: the last hop, the one the trusted proxy appended.
+  assert.equal(clientAddress(spoofed, runPolicy({ TASTEPROBE_TRUSTED_IP_HEADER: "x-forwarded-for" })), "7.7.7.7");
+  assert.equal(clientAddress(headers(), railway), "untrusted");
+});
+
+test("in production with no run token, paid routes answer 503 Setup required unless TASTEPROBE_RUNS_OPEN=1", () => {
+  const prod = runPolicy({ NODE_ENV: "production" });
+  const refused = checkRunToken(headers(), prod);
+  assert.equal(refused.status, 503);
+  assert.equal(refused.body.code, "setup_required");
+  assert.match(refused.body.error, /^Setup required: TASTEPROBE_RUN_TOKEN/);
+  assert.equal(publicPolicy(prod).setupRequired, "TASTEPROBE_RUN_TOKEN");
+  // An explicit opt-in keeps a production server open (local Docker); dev stays open by default.
+  assert.equal(checkRunToken(headers(), runPolicy({ NODE_ENV: "production", TASTEPROBE_RUNS_OPEN: "1" })), null);
+  assert.equal(checkRunToken(headers(), runPolicy({ NODE_ENV: "development" })), null);
+  assert.equal(publicPolicy(runPolicy({})).setupRequired, null);
+  // With a token, production is locked the usual way.
+  assert.equal(checkRunToken(headers(), runPolicy({ NODE_ENV: "production", TASTEPROBE_RUN_TOKEN: "s3cret" })).status, 401);
+});
+
+test("the per-IP bucket map stays bounded: checks spend nothing and full buckets are dropped", () => {
+  let now = Date.parse("2026-10-22T10:00:00Z");
+  const gate = new RunGate(() => now);
+  const policy = runPolicy({ TASTEPROBE_DAILY_RUNS: "1000000" });
+  for (let index = 0; index < 100_000; index += 1) gate.checkQuota(`1.2.${index >> 8}.${index & 255}`, policy);
+  assert.equal(gate.buckets.size, 0, "a quota check stores nothing for a full bucket");
+  gate.start("9.9.9.9", policy, "audit").release();
+  assert.equal(gate.buckets.size, 1);
+  now += 2 * 3_600_000; // refilled
+  gate.checkQuota("9.9.9.9", policy);
+  assert.equal(gate.buckets.size, 0, "a refilled bucket is deleted");
+  // Hard cap: spending runs from many addresses never grows the map past MAX_BUCKETS.
+  for (let index = 0; index < MAX_BUCKETS + 50; index += 1) gate.start(`10.0.${index >> 8}.${index & 255}`, policy, "audit").release();
+  assert.ok(gate.buckets.size <= MAX_BUCKETS);
+  // The newest address is kept; the oldest was evicted.
+  assert.ok(gate.buckets.has(`10.0.${(MAX_BUCKETS + 49) >> 8}.${(MAX_BUCKETS + 49) & 255}`));
+  assert.ok(!gate.buckets.has("10.0.0.0"));
+});
+
+test("running state is public: kind and start time, for an explainable busy 429", () => {
+  const now = Date.parse("2026-10-22T10:00:00Z");
+  const gate = new RunGate(() => now);
+  assert.deepEqual(gate.snapshot(), { running: null, runsToday: 0 });
+  const slot = gate.start("1.1.1.1", runPolicy({}), "agent");
+  assert.deepEqual(gate.snapshot(), { running: { kind: "agent", startedAt: "2026-10-22T10:00:00.000Z" }, runsToday: 1 });
+  slot.release();
+  assert.equal(gate.snapshot().running, null);
 });

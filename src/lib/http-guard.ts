@@ -12,7 +12,7 @@ export function openRun(request: Request): { policy: RunPolicy; ip: string; refu
   const policy = runPolicy();
   const refusal = checkRunToken(request.headers, policy) ?? checkJsonContentType(request.headers);
   if (refusal) return { refusal: refuse(refusal) };
-  return { policy, ip: clientAddress(request.headers), refusal: null };
+  return { policy, ip: clientAddress(request.headers, policy), refusal: null };
 }
 
 // Out of runs for this address or for today? Spends nothing.

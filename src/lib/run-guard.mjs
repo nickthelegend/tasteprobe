@@ -2,11 +2,14 @@
 // Every check runs before the provider-key check, so a locked or over-limit request never reaches
 // Qloo, Nebius or an assistant:
 //   1. run token: when TASTEPROBE_RUN_TOKEN is set, the request must send it in the
-//      X-TasteProbe-Run-Token header (a header, not a cookie, so a cross-site form cannot send it);
+//      X-TasteProbe-Run-Token header (a header, not a cookie, so a cross-site form cannot send it).
+//      In production (NODE_ENV=production, as the Dockerfile sets) with no token, paid routes
+//      answer 503 "Setup required: TASTEPROBE_RUN_TOKEN" unless TASTEPROBE_RUNS_OPEN=1 is set;
 //   2. Content-Type must be application/json (a cross-site text/plain form POST is refused);
 //   3. persona cap (TASTEPROBE_MAX_PERSONAS) and agent budget caps, clamped on the server;
 //   4. per-IP token bucket (TASTEPROBE_RUNS_PER_IP_PER_HOUR) and a daily quota per instance
-//      (TASTEPROBE_DAILY_RUNS);
+//      (TASTEPROBE_DAILY_RUNS). The address comes only from the header named in
+//      TASTEPROBE_TRUSTED_IP_HEADER (x-real-ip on Railway); without it every caller shares one bucket;
 //   5. one run at a time per process ("a flight is already pouring").
 // Refusals are readable 401/403/415/400/429 JSON answers, never a success. Reads stay open.
 import { timingSafeEqual } from "node:crypto";
@@ -20,6 +23,9 @@ export const DEFAULT_DAILY_RUNS = 100;
 // agent-core.mjs.
 export const DEFAULT_AGENT_CAPS = DEFAULT_CAPS;
 export const RUN_TOKEN_HEADER = "x-tasteprobe-run-token";
+// The per-IP bucket map never holds more than this many addresses (least recently used go first).
+export const MAX_BUCKETS = 10_000;
+const UNTRUSTED_ADDRESS = "untrusted";
 
 const positiveInt = (value, fallback, min, max) => {
   if (value === undefined || value === null || String(value).trim() === "") return fallback;
@@ -29,8 +35,13 @@ const positiveInt = (value, fallback, min, max) => {
 
 export function runPolicy(env = process.env) {
   const token = typeof env.TASTEPROBE_RUN_TOKEN === "string" && env.TASTEPROBE_RUN_TOKEN.trim() ? env.TASTEPROBE_RUN_TOKEN.trim() : null;
+  const header = typeof env.TASTEPROBE_TRUSTED_IP_HEADER === "string" ? env.TASTEPROBE_TRUSTED_IP_HEADER.trim().toLowerCase() : "";
+  // A production server with no token fails closed unless the owner opts in to open runs.
+  const setupRequired = !token && env.NODE_ENV === "production" && env.TASTEPROBE_RUNS_OPEN !== "1" ? "TASTEPROBE_RUN_TOKEN" : null;
   return {
     token,
+    setupRequired,
+    trustedIpHeader: header || null,
     maxPersonas: positiveInt(env.TASTEPROBE_MAX_PERSONAS, HARD_MAX_PERSONAS, 8, HARD_MAX_PERSONAS),
     runsPerIpPerHour: positiveInt(env.TASTEPROBE_RUNS_PER_IP_PER_HOUR, DEFAULT_RUNS_PER_IP_PER_HOUR, 1, 10_000),
     dailyRuns: positiveInt(env.TASTEPROBE_DAILY_RUNS, DEFAULT_DAILY_RUNS, 1, 1_000_000),
@@ -45,7 +56,7 @@ export function runPolicy(env = process.env) {
 
 // What /api/status may show: the caps and whether runs are locked, never the token.
 export function publicPolicy(policy) {
-  return { locked: policy.token !== null, maxPersonas: policy.maxPersonas, runsPerIpPerHour: policy.runsPerIpPerHour, dailyRuns: policy.dailyRuns, agentCaps: policy.agentCaps, oneAtATime: true };
+  return { locked: policy.token !== null, setupRequired: policy.setupRequired ?? null, maxPersonas: policy.maxPersonas, runsPerIpPerHour: policy.runsPerIpPerHour, dailyRuns: policy.dailyRuns, agentCaps: policy.agentCaps, oneAtATime: true };
 }
 
 const refusal = (status, code, error, extra = {}) => ({ status, body: { error, code, ...extra } });
@@ -58,6 +69,7 @@ function sameSecret(given, expected) {
 
 // `headers` is a Fetch Headers object (or anything with get()).
 export function checkRunToken(headers, policy) {
+  if (policy.setupRequired) return refusal(503, "setup_required", "Setup required: TASTEPROBE_RUN_TOKEN. This production server has no run token, so paid runs are refused. Set TASTEPROBE_RUN_TOKEN (or TASTEPROBE_RUNS_OPEN=1 for a private server). Stored audits stay open to read.");
   if (!policy.token) return null;
   const given = headers.get(RUN_TOKEN_HEADER);
   if (!given) return refusal(401, "run_locked", "Runs are disabled on this server: it needs the run token (TASTEPROBE_RUN_TOKEN) in the X-TasteProbe-Run-Token header. Stored audits stay open to read.");
@@ -76,13 +88,15 @@ export function checkPersonaCap(personaCount, policy) {
     : null;
 }
 
-// Client address for the per-IP bucket. X-Real-IP, else the last X-Forwarded-For hop (the one the
-// platform's proxy appended; earlier hops are whatever the client sent), else "local".
-export function clientAddress(headers) {
-  const real = headers.get("x-real-ip");
-  if (real && real.trim()) return real.trim();
-  const forwarded = (headers.get("x-forwarded-for") ?? "").split(",").map((item) => item.trim()).filter(Boolean);
-  return forwarded.length ? forwarded[forwarded.length - 1] : "local";
+// Client address for the per-IP bucket, read only from the header the deployment trusts
+// (TASTEPROBE_TRUSTED_IP_HEADER): its proxy sets it, so a client cannot pick its own bucket. For
+// X-Forwarded-For the last hop is used (the one the proxy appended). With no trusted header every
+// caller shares one "untrusted" bucket, which fails closed.
+export function clientAddress(headers, policy = {}) {
+  const name = policy.trustedIpHeader;
+  if (!name) return UNTRUSTED_ADDRESS;
+  const hops = (headers.get(name) ?? "").split(",").map((item) => item.trim()).filter(Boolean);
+  return hops.length ? hops[hops.length - 1] : UNTRUSTED_ADDRESS;
 }
 
 const HOUR = 3_600_000;
@@ -98,14 +112,30 @@ export class RunGate {
     this.dailyCount = 0;
   }
 
+  // The address's current bucket, refilled to now. Not stored: only start() stores a spent bucket.
   bucket(ip, policy) {
     const time = this.now();
     const capacity = policy.runsPerIpPerHour;
-    const current = this.buckets.get(ip) ?? { tokens: capacity, at: time };
+    const current = this.buckets.get(ip);
+    if (!current) return { tokens: capacity, at: time };
     const tokens = Math.min(capacity, current.tokens + ((time - current.at) / HOUR) * capacity);
-    const next = { tokens, at: time };
-    this.buckets.set(ip, next);
-    return next;
+    // A bucket that is back to full is the same as no bucket: drop it so the map stays small.
+    if (tokens >= capacity) this.buckets.delete(ip);
+    return { tokens, at: time };
+  }
+
+  // Stores a spent bucket as the most recently used; evicts the least recently used past MAX_BUCKETS.
+  spend(ip, policy) {
+    const next = this.bucket(ip, policy);
+    this.buckets.delete(ip);
+    this.buckets.set(ip, { tokens: next.tokens - 1, at: next.at });
+    while (this.buckets.size > MAX_BUCKETS) this.buckets.delete(this.buckets.keys().next().value);
+  }
+
+  // What /api/status shows: what is running (kind and start time) and the runs spent today.
+  snapshot() {
+    this.rollDay();
+    return { running: this.running ? { kind: this.running.kind, startedAt: new Date(this.running.at).toISOString() } : null, runsToday: this.dailyCount };
   }
 
   rollDay() {
@@ -133,7 +163,7 @@ export class RunGate {
     if (this.running) return refusal(429, "busy", `A flight is already pouring on this server (${this.running.kind} started ${Math.round((this.now() - this.running.at) / 1000)}s ago). Try again when it finishes.`);
     const slot = { kind, at: this.now() };
     this.running = slot;
-    this.bucket(ip, policy).tokens -= 1;
+    this.spend(ip, policy);
     this.dailyCount += 1;
     let released = false;
     return { release: () => { if (!released) { released = true; if (this.running === slot) this.running = null; } } };

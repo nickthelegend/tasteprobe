@@ -1,5 +1,6 @@
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { mkdtemp, rm } from "node:fs/promises";
+import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -50,5 +51,53 @@ test("the standalone entrypoint refuses to start when the data dir is not writab
   } finally {
     await run("chmod", ["700", locked]);
     await rm(locked, { recursive: true, force: true });
+  }
+});
+
+async function freePort() {
+  return new Promise<number>((resolve, reject) => {
+    const server = createServer();
+    server.once("error", reject);
+    server.listen(0, "127.0.0.1", () => {
+      const { port } = server.address() as { port: number };
+      server.close(() => resolve(port));
+    });
+  });
+}
+
+test("a production server with no run token refuses paid runs with Setup required: TASTEPROBE_RUN_TOKEN", async ({ page }, info) => {
+  test.skip(info.project.name !== "desktop-standalone", "production check runs once, with the standalone build");
+  const data = await mkdtemp(path.join(tmpdir(), "tasteprobe-prod-"));
+  const port = await freePort();
+  const base = `http://127.0.0.1:${port}`;
+  // The same standalone build e2e/stack.sh assembled, started like the Dockerfile with no run token
+  // and no TASTEPROBE_RUNS_OPEN. Killed by its own PID below.
+  const server = spawn("node", [path.join(ROOT, "e2e/.run/standalone/server.js")], {
+    cwd: ROOT, stdio: "ignore",
+    env: { ...cleanEnv, NODE_ENV: "production", NEXT_TELEMETRY_DISABLED: "1", HOSTNAME: "127.0.0.1", PORT: String(port), TASTEPROBE_DATA_DIR: data },
+  });
+  try {
+    await expect.poll(async () => fetch(`${base}/api/status`).then((response) => response.status, () => 0), { timeout: 30_000 }).toBe(200);
+    const status = await (await fetch(`${base}/api/status`)).json();
+    expect(status.runs.setupRequired).toBe("TASTEPROBE_RUN_TOKEN");
+    for (const route of ["/api/audits", "/api/audits/00000000-0000-4000-8000-000000000000/fix", "/api/audits/00000000-0000-4000-8000-000000000000/agent"]) {
+      const response = await fetch(`${base}${route}`, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+      expect(response.status, route).toBe(503);
+      const body = await response.json();
+      expect(body.code, route).toBe("setup_required");
+      expect(body.error, route).toMatch(/^Setup required: TASTEPROBE_RUN_TOKEN/);
+    }
+    expect((await (await fetch(`${base}/api/status`)).json()).gate.runsToday).toBe(0);
+    // The room names it with the missing keys and keeps Run audit disabled.
+    await page.goto(`${base}/#room`);
+    const setup = page.locator(".setup");
+    await expect(setup.locator("li strong")).toHaveText([
+      "Setup required: QLOO_API_KEY", "Setup required: NEBIUS_API_KEY",
+      "Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID", "Setup required: TASTEPROBE_RUN_TOKEN",
+    ]);
+    await expect(page.getByRole("button", { name: "Run audit" })).toBeDisabled();
+  } finally {
+    server.kill();
+    await rm(data, { recursive: true, force: true });
   }
 });

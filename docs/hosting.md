@@ -58,18 +58,20 @@ Every audit, re-pour and agent run spends the server's keys. The three paid rout
 
 | Check | Variable | Default | Refusal |
 |---|---|---|---|
-| Run token in the `X-TasteProbe-Run-Token` header (a header, not a cookie, so a cross-site form cannot send it) | `TASTEPROBE_RUN_TOKEN` | unset = runs open | 401 without it, 403 if wrong |
+| Run token in the `X-TasteProbe-Run-Token` header (a header, not a cookie, so a cross-site form cannot send it) | `TASTEPROBE_RUN_TOKEN` | unset: open under `next dev`; **refused in production** (`NODE_ENV=production`, which the Dockerfile sets) unless `TASTEPROBE_RUNS_OPEN=1` | 401 without it, 403 if wrong; 503 "Setup required: TASTEPROBE_RUN_TOKEN" on a production server with neither |
 | Body sent as `application/json` (a cross-site `text/plain` form POST is refused) | — | always on | 415 |
 | Personas per audit | `TASTEPROBE_MAX_PERSONAS` | 200 | 400 |
 | Agent budget: a request can ask for less, never more | `TASTEPROBE_AGENT_MAX_TRIES`, `_MAX_CALLS`, `_MAX_TOKENS`, `_MAX_TURNS` | 5 copies, 480 assistant calls, 400,000 Nemotron tokens, 20 turns (the UI's maxima) | clamped |
-| Runs per visitor address per hour (token bucket; the address is `X-Real-IP`, else the last `X-Forwarded-For` hop) | `TASTEPROBE_RUNS_PER_IP_PER_HOUR` | 10 | 429 |
+| Runs per visitor address per hour (token bucket). The address is read only from the header named in `TASTEPROBE_TRUSTED_IP_HEADER` (for `X-Forwarded-For`, the last hop). Unset, every caller shares one bucket, so a client cannot pick its own by sending a header. Buckets that refill are dropped and the map holds at most 10,000 addresses | `TASTEPROBE_RUNS_PER_IP_PER_HOUR`, `TASTEPROBE_TRUSTED_IP_HEADER` | 10; no trusted header | 429 |
 | Runs per day for the whole instance (UTC) | `TASTEPROBE_DAILY_RUNS` | 100 | 429 |
 | One run at a time per server process | — | always on | 429 "A flight is already pouring" |
 
-`/api/status` publishes the caps and whether runs are locked (never the token), and the tasting room shows them under the order form. With a run token set, the room says **Runs are disabled on the public demo** and offers a Run token field; stored flights and printable reports stay open to read.
+`/api/status` publishes the caps, whether runs are locked or need setup (never the token), what is running now (`gate.running`: kind and start time, so a "busy" 429 is explainable) and the runs spent today (`gate.runsToday`). The tasting room shows the caps under the order form. The fix route looks up the audit and segment before it spends a run, as the agent route does, so a bad id answers 404/400 without costing quota. With a run token set, the room says **Runs are disabled on the public demo** and offers a Run token field; stored flights and printable reports stay open to read.
 
 For the public demo:
 - Set `TASTEPROBE_RUN_TOKEN` (read it from stdin: `railway variable set TASTEPROBE_RUN_TOKEN --stdin --skip-deploys`), `TASTEPROBE_MAX_PERSONAS=24`, `TASTEPROBE_RUNS_PER_IP_PER_HOUR=3` and `TASTEPROBE_DAILY_RUNS=20`.
+- Set `TASTEPROBE_TRUSTED_IP_HEADER=x-real-ip`. Railway's networking specs list `X-Real-IP` "for identifying client's remote IP"; they do not say whether a client-sent value is replaced, so check it once after the deploy (send a made-up `X-Real-IP` and confirm the bucket does not move to it). They do not document `X-Forwarded-For`.
+- A private Docker run with no token needs `TASTEPROBE_RUNS_OPEN=1`; without it the production server answers 503 Setup required for every paid route.
 - Use a **dedicated Nebius key** with a spend limit or a low prepaid balance in the Nebius Token Factory console. Do the same for the OpenAI (or `MODEL_2_*`) key.
 - Set `NEBIUS_INPUT_PRICE_PER_MILLION` and `NEBIUS_OUTPUT_PRICE_PER_MILLION` so the agent loop's dollar cap is enforced.
 - Set a usage limit on the Railway workspace so the container bill is capped too.

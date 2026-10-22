@@ -17,7 +17,7 @@ import { personaSourceOf, personaSourceText, summarizeAuditListing, tagScopeText
 import { latestOnly, mergeIfCurrent, roomControls } from "@/lib/ui-state.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
-type RunCaps = { locked: boolean; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
+type RunCaps = { locked: boolean; setupRequired?: string | null; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
 type Status = { qloo: boolean; nebius: { configured: boolean; ok: boolean; model: string; detail: string }; systems: string[]; runs: RunCaps };
 const PERSONA_CHOICES = [16, 24, 48, 100, 200];
 type Listing = AuditListing & { featured: boolean };
@@ -42,6 +42,7 @@ function missingConfig(status: Status | null) {
   if (!status.qloo) missing.push("QLOO_API_KEY: Qloo key not configured, so personas cannot be built from real taste data.");
   if (!status.nebius.configured) missing.push("NEBIUS_API_KEY: Nebius key not configured, so NVIDIA Nemotron extraction cannot run.");
   if (!status.systems.length) missing.push("OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID: there is no assistant to test.");
+  if (status.runs?.setupRequired) missing.push(`${status.runs.setupRequired}: this production server has no run token, so paid runs are refused (TASTEPROBE_RUNS_OPEN=1 opens a private server).`);
   return missing;
 }
 

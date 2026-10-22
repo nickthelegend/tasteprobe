@@ -122,9 +122,12 @@ test.describe("tasting room with no keys", () => {
       error: "setup_required", missing: ["QLOO_API_KEY", "NEBIUS_API_KEY", "OPENAI_API_KEY"],
       message: "Setup required: QLOO_API_KEY; Setup required: NEBIUS_API_KEY; Setup required: OPENAI_API_KEY",
     });
+    // The fix route looks the audit up before the key check and before spending a run.
+    const before = (await (await request.get("/api/status")).json()).gate;
     const fix = await request.post(`/api/audits/${id}/fix`, { data: {} });
-    expect([404, 503]).toContain(fix.status());
-    expect((await fix.json()).error).toMatch(/not found|QLOO_API_KEY|key not configured/i);
+    expect(fix.status()).toBe(404);
+    expect(await fix.json()).toEqual({ error: "Audit not found." });
+    expect((await (await request.get("/api/status")).json()).gate).toEqual({ running: null, runsToday: before.runsToday });
     const audit = await request.get(`/api/audits/${id}`);
     expect(audit.status()).toBe(404);
     expect(await audit.json()).toEqual({ error: "Audit not found." });
@@ -149,7 +152,8 @@ test.describe("tasting room with no keys", () => {
     expect(form.status()).toBe(415);
     expect(await form.json()).toEqual({ code: "json_required", error: "Send the request as JSON (Content-Type: application/json)." });
     const status = await (await request.get("/api/status")).json();
-    expect(status.runs).toEqual({ locked: false, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
+    expect(status.gate).toEqual({ running: null, runsToday: 0 });
+    expect(status.runs).toEqual({ locked: false, setupRequired: null, maxPersonas: 200, runsPerIpPerHour: 10, dailyRuns: 100, agentCaps: { maxTries: 5, maxAssistantCalls: 480, maxNemotronTokens: 400000, maxTurns: 20 }, oneAtATime: true });
   });
 
   test('no control in the tasting room is labelled with "log"', async ({ page }) => {

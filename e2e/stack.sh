@@ -4,7 +4,8 @@
 # key can leak in and every key is honestly missing.
 #   3101  next dev                                   (npm run dev, the README's local path), empty store
 #   3102  node server.js from .next/standalone        (started through scripts/docker-entrypoint.sh,
-#         assembled exactly like the Dockerfile: standalone + .next/static), empty store
+#         assembled exactly like the Dockerfile: standalone + .next/static), empty store, with
+#         TASTEPROBE_RUNS_OPEN=1 (a private server; without it or a run token, production refuses runs)
 #   3103  the same standalone build configured as a public demo: TASTEPROBE_RUN_TOKEN (a random
 #         test token written to e2e/.run/run-token, mode 600), TASTEPROBE_MAX_PERSONAS=24 and
 #         TASTEPROBE_FEATURED_AUDIT_ID, with a test-only store seeded by e2e/seed.mjs from the
@@ -52,7 +53,7 @@ start() { # name cmd...
 start dev env -i PATH="$PATH" HOME="$HOME" NEXT_TELEMETRY_DISABLED=1 TASTEPROBE_DATA_DIR="$PWD/$RUN/data-dev" \
   node node_modules/next/dist/bin/next dev -H 127.0.0.1 -p "$DEV_PORT"
 start standalone env -i PATH="$PATH" HOME="$HOME" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=127.0.0.1 PORT="$STANDALONE_PORT" \
-  TASTEPROBE_DATA_DIR="$PWD/$RUN/data-standalone" scripts/docker-entrypoint.sh node "$RUN/standalone/server.js"
+  TASTEPROBE_RUNS_OPEN=1 TASTEPROBE_DATA_DIR="$PWD/$RUN/data-standalone" scripts/docker-entrypoint.sh node "$RUN/standalone/server.js"
 start public env -i PATH="$PATH" HOME="$HOME" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=127.0.0.1 PORT="$PUBLIC_PORT" \
   TASTEPROBE_DATA_DIR="$PWD/$RUN/data-public" TASTEPROBE_RUN_TOKEN="$(cat "$RUN/run-token")" TASTEPROBE_MAX_PERSONAS=24 \
   TASTEPROBE_FEATURED_AUDIT_ID=00000000-0000-4000-8000-000000000001 scripts/docker-entrypoint.sh node "$RUN/standalone/server.js"
