@@ -84,7 +84,7 @@ How long an audit takes has **not been measured** (no live run yet). It is one a
   - `GET /api/audits`: one page of summaries per audit (venue, city, category, date, overall share, answer and persona counts, persona source, origin). No Qloo ids, affinities or answers.
   - `GET /api/audits/<id>` and `/audits/<id>/report`: the stored audit, which includes values derived from Qloo: the venue's Qloo entity id and address, each persona's taste tags or entities with their Qloo ids and affinity scores, the cross-domain entity names and the demographic lean. Add `?evidence=1` and the assistants' answers (trimmed rows) come too.
   Never attach `/data` to a public bucket or static host, and never commit or upload `.data/` (it is git-, docker- and railway-ignored).
-- The store is a single JSON file with in-process locking: run **one replica** per volume.
+- The store is a single JSON file. Updates are locked across processes with a lock file, but the spend guard's one-run-at-a-time slot and quotas live in each process: run **one replica** per volume.
 
 ## Notes
 

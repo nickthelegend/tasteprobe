@@ -3,3 +3,6 @@ export function writeFileAtomic(file: string, data: string, mode?: number): Prom
 export function readJsonFile<T>(file: string, fallback: T): Promise<T>;
 export function updateJsonFile<T>(file: string, fallback: T, mutate: (current: T) => T | void | Promise<T | void>): Promise<T>;
 export function coalescingWriter(write: () => Promise<unknown>): { schedule(): Promise<void>; drain(): Promise<void> };
+export const LOCK_STALE_MS: number;
+export const LOCK_TIMEOUT_MS: number;
+export function acquireFileLock(file: string, options?: { timeoutMs?: number }): Promise<() => Promise<void>>;

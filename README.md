@@ -87,7 +87,7 @@ npm run audit:live -- --replay <run id>
 
 ## MCP server
 
-`npm run mcp` starts a stdio [Model Context Protocol](https://modelcontextprotocol.io) server (`src/mcp/server.mjs`), so any MCP client or agent can use TasteProbe, and Qloo through it, as a tool. Run it from the repo root so it finds `.env.local` and `.data/`.
+`npm run mcp` starts a stdio [Model Context Protocol](https://modelcontextprotocol.io) server (`src/mcp/server.mjs`), so any MCP client or agent can use TasteProbe, and Qloo through it, as a tool. Run it from the repo root so it finds `.env.local` and `.data/`; it can run alongside `npm run dev` on the same `.data/` (store writes are locked across processes).
 
 | Tool | Input | What it does | Keys |
 |---|---|---|---|
@@ -206,7 +206,7 @@ CI (`.github/workflows/ci.yml`) runs all four on Node 22. The fixtures in `test/
 - Intervals cover sampling over personas and answers. They don't cover extraction errors (the cross-check reports those separately) or the choice of prompt template.
 - The agent's dollar cap covers Nemotron tokens at your configured rates. Assistant calls are capped by count.
 - Intervals are nominal. The agent corrects for its own repeated looks with a confirmation probe; repeated manual fix attempts on one audit are not corrected (each attempt says which attempt it is, and asks for a re-pour before a win is relied on). The confirmation in a segment under 16 personas re-asks the same personas, so it guards against answer noise, not against those personas being unusual.
-- Storage is a local JSON file under `.data/` (mode 600). Writes are serialised in-process and atomic. Run one server per data directory. Serverless hosts need `TASTEPROBE_DATA_DIR` on a persistent volume and roughly 5-minute requests.
+- Storage is a local JSON file under `.data/` (mode 600). Every store update holds an in-process queue and a `<file>.lock` lock file (created exclusively, taken over when its process is gone or it is over 30 s old), and writes atomically, so the web app, the MCP server and the CLI can share one data dir: a test with two processes making 60 updates each keeps all 120 (without the lock file, 62). The run limits (one run at a time, quotas) are per process, so a public deployment should still be one replica. Serverless hosts need `TASTEPROBE_DATA_DIR` on a persistent volume and long-running requests (audit length is not measured yet).
 
 ## License
 
