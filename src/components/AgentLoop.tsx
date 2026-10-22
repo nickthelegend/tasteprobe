@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AgentEvent, AgentRun, Audit } from "@/lib/types";
 import { ci, pct, signedPts } from "./format";
 import { readNdjson } from "./ndjson";
@@ -11,8 +11,14 @@ const tokens = (input: number, output: number) => `${(input + output).toLocaleSt
 
 type Caps = { maxTries: number; maxAssistantCalls: number };
 
-export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { audit: Audit; segmentId: string; ready: boolean; headers: Record<string, string>; caps?: Caps; onRun: (run: AgentRun) => void }) {
-  const [running, setRunning] = useState(false);
+export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun, onRunningChange }: {
+  audit: Audit; segmentId: string; ready: boolean; headers: Record<string, string>; caps?: Caps; onRun: (run: AgentRun) => void; onRunningChange?: (running: boolean) => void;
+}) {
+  const [running, setRunningState] = useState(false);
+  const setRunning = (value: boolean) => { setRunningState(value); onRunningChange?.(value); };
+  // Leaving the page (or this audit) stops reading the stream; the run itself continues on the server.
+  const controller = useRef<AbortController | null>(null);
+  useEffect(() => () => controller.current?.abort(), [audit.id]);
   const [tries, setTries] = useState(3);
   const [calls, setCalls] = useState(120);
   const [lines, setLines] = useState<Line[]>([]);
@@ -25,7 +31,9 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { a
     let count = 0;
     const push = (line: Omit<Line, "key">) => { const key = `l${count++}`; setLines((current) => [...current, { ...line, key }]); };
     try {
-      const response = await fetch(`/api/audits/${audit.id}/agent`, { method: "POST", headers, body: JSON.stringify({ segment: segmentId, maxTries: tries, maxAssistantCalls: calls }) });
+      controller.current?.abort();
+      controller.current = new AbortController();
+      const response = await fetch(`/api/audits/${audit.id}/agent`, { method: "POST", headers, body: JSON.stringify({ segment: segmentId, maxTries: tries, maxAssistantCalls: calls }), signal: controller.current.signal });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload.message ?? payload.error ?? `Agent request failed (${response.status}).`);
@@ -46,6 +54,7 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun }: { a
       });
       if (!finished) throw new Error("The connection closed before the result arrived. The agent run keeps going on the server and is saved with this audit when it finishes; reload in a few minutes.");
     } catch (caught) {
+      if (controller.current?.signal.aborted) return;
       setError(caught instanceof Error ? caught.message : "Agent loop failed.");
     } finally {
       setRunning(false);

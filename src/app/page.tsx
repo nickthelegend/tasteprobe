@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { CompetitorBars, Heatmap, failureText } from "@/components/Charts";
 import { AgentLoop } from "@/components/AgentLoop";
 import { CounterfactualPanel } from "@/components/Counterfactual";
@@ -14,6 +14,7 @@ import { PersonaTray, type PersonaResult } from "@/components/Tray";
 import { Landing } from "@/components/Landing";
 import { Logo } from "@/components/Logo";
 import { personaSourceOf, personaSourceText, summarizeAuditListing, tagScopeText, type AuditListing } from "@/lib/report-model.mjs";
+import { latestOnly, mergeIfCurrent, roomControls } from "@/lib/ui-state.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
 type RunCaps = { locked: boolean; maxPersonas: number; runsPerIpPerHour: number; dailyRuns: number; agentCaps: { maxTries: number; maxAssistantCalls: number; maxNemotronTokens: number; maxTurns: number }; oneAtATime: boolean };
@@ -69,6 +70,9 @@ export default function Home() {
   const [form, setForm] = useState({ brand: "", category: "restaurant", city: "", personaCount: 24 });
   const [segmentId, setSegmentId] = useState("");
   const [fixing, setFixing] = useState(false);
+  const [agentRunning, setAgentRunning] = useState(false);
+  // Only the latest "open this audit" request may change the view; earlier ones are aborted.
+  const opens = useRef(latestOnly());
   const [attemptId, setAttemptId] = useState<string | undefined>();
   // Per-persona outcomes from this session's live streams, so the tray of a just-finished audit stays filled.
   const [liveResults, setLiveResults] = useState<Record<string, Record<string, PersonaResult>>>({});
@@ -82,17 +86,32 @@ export default function Home() {
   }
 
   async function select(id: string) {
+    const { token, signal } = opens.current.start();
     setOpening(id);
     try {
-      const response = await fetch(`/api/audits/${id}`);
+      const response = await fetch(`/api/audits/${id}`, { signal });
       if (!response.ok) throw new Error((await response.json().catch(() => ({}))).error ?? `Could not open the audit (${response.status}).`);
-      show(await response.json());
+      const audit: Audit = await response.json();
+      if (opens.current.isLatest(token)) show(audit);
     } catch (caught) {
+      if (signal.aborted) return;
       setError(caught instanceof Error ? caught.message : "Could not open the audit.");
     } finally {
-      setOpening(null);
+      if (opens.current.isLatest(token)) setOpening(null);
     }
   }
+
+  // After a fix or an agent run the server's copy is the truth: re-read it, and show it only if
+  // the user is still on that audit.
+  async function refresh(id: string) {
+    const response = await fetch(`/api/audits/${id}`);
+    if (!response.ok) return null;
+    const fresh: Audit = await response.json();
+    setActive((current) => mergeIfCurrent(current, id, fresh));
+    return fresh;
+  }
+
+  useEffect(() => () => opens.current.abort(), []);
 
   useEffect(() => {
     fetch("/api/status").then((response) => response.json()).then(setStatus)
@@ -117,6 +136,9 @@ export default function Home() {
   useEffect(() => {
     if (caps && form.personaCount > caps.maxPersonas) setForm((current) => ({ ...current, personaCount: personaChoices(caps.maxPersonas).slice(-1)[0] }));
   }, [caps, form.personaCount]);
+  const controls = roomControls({ ready, pouring: run !== null, fixing, agentRunning });
+  const activeId = useRef<string | null>(null);
+  activeId.current = active?.id ?? null;
   const segment = useMemo(() => active?.segments.find((item) => item.id === segmentId) ?? active?.segments[0], [active, segmentId]);
   const assistants = status?.systems.length || 0;
   const answersPerRun = form.personaCount * assistants;
@@ -161,14 +183,14 @@ export default function Home() {
 
   async function runFix() {
     if (!active) return;
+    const auditId = active.id;
     setFixing(true); setError("");
     try {
-      const response = await fetch(`/api/audits/${active.id}/fix`, { method: "POST", headers: runHeaders, body: JSON.stringify({ segment: segmentId }) });
+      const response = await fetch(`/api/audits/${auditId}/fix`, { method: "POST", headers: runHeaders, body: JSON.stringify({ segment: segmentId }) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Counterfactual re-test failed.");
-      const updated: Audit = { ...active, counterfactuals: [...(active.counterfactuals ?? []), payload] };
-      setActive(updated);
-      setAttemptId(payload.id);
+      const fresh = await refresh(auditId);
+      if (fresh && activeId.current === auditId) setAttemptId(payload.id);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Counterfactual re-test failed.");
     } finally {
@@ -249,7 +271,7 @@ export default function Home() {
               {choices.map((count) => <option key={count} value={count}>{count}</option>)}
             </select>
           </label>
-          <button className="tp-btn tp-btn-pink" type="submit" disabled={!ready || run !== null}>{run ? <><span className="spinner" /> Pouring</> : "Run audit"}</button>
+          <button className="tp-btn tp-btn-pink" type="submit" disabled={!controls.canRunAudit}>{run ? <><span className="spinner" /> Pouring</> : "Run audit"}</button>
         </form>
         <p className="order-note">{form.personaCount} personas × {assistants} {assistants === 1 ? "assistant" : "assistants"} = <b>{answersPerRun} live answers</b>, each read by Nemotron. At least {MIN_PERSONAS_PER_SEGMENT} personas per glass, so {form.personaCount} personas fill up to {maxSegmentsFor(form.personaCount)} {maxSegmentsFor(form.personaCount) === 1 ? "glass" : "glasses"}.{assistants === 0 ? " Configure an assistant to enable audits." : " Start small for demos."}</p>
         {caps && <p className="order-caps">This server runs one flight at a time, caps an audit at <b>{caps.maxPersonas} personas</b> and the agent at {caps.agentCaps.maxTries} copies and {caps.agentCaps.maxAssistantCalls} assistant calls, and allows {caps.runsPerIpPerHour} runs an hour per visitor and {caps.dailyRuns} a day.{locked ? " Runs need the owner’s run token." : ""}</p>}
@@ -349,11 +371,9 @@ export default function Home() {
 
         <section className="panel" id="repour-live" aria-labelledby="repour-live-title">
           <div className="panel-head"><div><h3 id="repour-live-title">Re-pour: baseline, placebo, fix</h3><p>Nemotron writes copy for one glass; the same personas re-ask every assistant three ways at once. Lift is fix minus placebo.</p></div><span className="stamp">placebo-controlled</span></div>
-          <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={ready} onRun={runFix} selectedAttempt={attemptId} onAttempt={setAttemptId} />
-          <AgentLoop audit={active} segmentId={segmentId} ready={ready && !fixing} headers={runHeaders} caps={caps?.agentCaps} onRun={(agentRun) => {
-            const updated: Audit = { ...active, agentRuns: [...(active.agentRuns ?? []), agentRun] };
-            setActive(updated);
-          }} />
+          <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={controls.canFix || fixing} onRun={runFix} selectedAttempt={attemptId} onAttempt={setAttemptId} />
+          <AgentLoop audit={active} segmentId={segmentId} ready={controls.canRunAgent || agentRunning} headers={runHeaders} caps={caps?.agentCaps}
+            onRunningChange={setAgentRunning} onRun={() => { void refresh(active.id); }} />
         </section>
 
         <div className="split split-wide">
@@ -384,7 +404,7 @@ export default function Home() {
 
       {audits && audits.length > 0 && <nav className="cellar-book" aria-label="Saved audits">
         <span className="label">Past flights</span>
-        <div>{audits.map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit.id)} disabled={run !== null}>
+        <div>{audits.map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit.id)} disabled={!controls.canSwitchAudit}>
           <strong>{audit.featured && <em className="featured">Featured</em>}{audit.brand}</strong><small>{audit.city} · {audit.share === null ? "—" : pct(audit.share)} · {new Date(audit.createdAt).toLocaleDateString()}{audit.origin ? ` · ${audit.origin}` : ""}</small>
         </button>)}</div>
         {auditTotal !== null && auditTotal > audits.length && <small className="cellar-more">{auditTotal - audits.length} older {auditTotal - audits.length === 1 ? "flight" : "flights"} not listed</small>}
