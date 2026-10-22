@@ -10,6 +10,7 @@ type ReportArm = { share: number | null; mentions: number; answers: number; fail
 type ReportLift = { delta: number | null; ci: Interval; clearsZero: boolean } | null;
 export type ReportModel = {
   id: string;
+  provenance: "live" | "synthetic" | "unrecorded";
   venue: { brand: string; category: string; city: string; address: string | null; qlooEntityId: string };
   createdAt: string;
   durationSeconds: number;
@@ -41,15 +42,18 @@ export type ReportModel = {
   reproducibility: NonNullable<Audit["meta"]> | null;
 };
 export function buildReportModel(audit: Audit): ReportModel;
+export type Provenance = "live" | "synthetic" | "unrecorded";
+export function provenanceOf(audit: Pick<Audit, "live" | "_fixture"> | null | undefined): Provenance;
+export const PROVENANCE_TEXT: Record<Provenance, string>;
 export function personaSourceOf(audit: Pick<Audit, "personaSource"> | null | undefined): "urn:tag" | "urn:entity";
 export function personaSourceText(source: "urn:tag" | "urn:entity"): string;
 export function tagScopeText(scope: { city: number; global: number } | null | undefined): string;
 export type AuditListing = {
   id: string; brand: string; city: string; category: string; createdAt: string; share: number | null; answers: number; personas: number;
-  personaSource: "urn:tag" | "urn:entity"; origin: "web" | "cli" | "mcp" | null;
+  personaSource: "urn:tag" | "urn:entity"; origin: "web" | "cli" | "mcp" | null; provenance: Provenance;
 };
 export function summarizeAuditListing(audit: Audit): AuditListing;
 export const LISTING_PAGE: number;
 export const LISTING_MAX_PAGE: number;
-export function listAudits(audits: Audit[], options?: { featuredId?: string | null; limit?: number; offset?: number }): { items: (AuditListing & { featured: boolean })[]; total: number; featuredId: string | null };
+export function listAudits(audits: Audit[], options?: { featuredId?: string | null; limit?: number; offset?: number }): { items: (AuditListing & { featured: boolean })[]; total: number; live: number; featuredId: string | null };
 export function reportText(model: ReportModel): string;

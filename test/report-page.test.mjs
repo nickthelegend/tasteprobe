@@ -94,3 +94,12 @@ test("the report says how many persona tags came from Qloo's global neighbourhoo
   assert.match(html, /Qloo urn:tag taste tags\. 4 of 7 tags come from Qloo&#x27;s global neighbourhood \(the city had 3, fewer than 6\)\./);
   assert.doesNotMatch(render(createElement(PrintReport, { model: buildReportModel(audit) })), /global neighbourhood/);
 });
+
+test("the printable report stamps a synthetic fixture as not a live run", () => {
+  const html = render(createElement(PrintReport, { model: buildReportModel(audit) }));
+  assert.match(html, /<p class="rp-prov prov-synthetic">Synthetic fixture, not a live run<\/p>/);
+  const { _fixture, ...unmarked } = audit;
+  const live = render(createElement(PrintReport, { model: buildReportModel({ ...unmarked, live: true }) }));
+  assert.match(live, /<p class="rp-prov prov-live">Live run<\/p>/);
+  assert.doesNotMatch(live, /Synthetic fixture/);
+});

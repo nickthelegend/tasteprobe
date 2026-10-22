@@ -29,14 +29,21 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     await expect(glasses.first()).toHaveClass(/current/);
     await expect(glasses.nth(1)).toContainText("Visitor Venue 1 (synthetic)");
     await expect(flights.locator(".cellar-more")).toHaveText("2 older flights not listed");
-    await expect(page.locator(".masthead-live")).toContainText("14 flights poured here");
+    await expect(page.locator(".masthead-live")).toContainText("14 flights stored here, none from a live run");
+    expect(response.headers()["x-live-count"]).toBe("0");
+    // Every stored flight here is a synthetic fixture, and the room says so wherever one is shown.
+    await expect(flights.locator(".prov-note")).toHaveCount(12);
+    for (const note of await flights.locator(".prov-note").all()) await expect(note).toHaveText("Synthetic fixture, not a live run");
+    await expect(room.locator(".result-id .prov")).toHaveText("Synthetic fixture, not a live run");
+    await expect(room.locator(".kicker").first()).toHaveText("The tasting room · a run makes live calls only, nothing is simulated");
+    await expect(page.locator(".colophon")).not.toContainText("Live data only");
     // No pre-live copy once the store has audits: no "unverified until first live run" stamp, and
     // the FAQ answers from the store (here the SYNTHETIC test store, so this checks the copy logic).
     await expect(page.getByText("unverified until first live run")).toHaveCount(0);
     const faq = page.locator("#label details").filter({ hasText: "Has it run end to end?" });
     await faq.locator("summary").click();
-    await expect(faq.locator("p")).toHaveText(`Yes, on this server: 14 audits stored, each saved by a live run (Qloo, Nemotron on Nebius and the assistants under test); the featured one is ${FEATURED_NAME}. Open one in the tasting room to read every answer behind it. Every glass above the tasting room is an example.`);
-    await expect(faq).not.toContainText("Not yet");
+    await expect(faq.locator("p")).toHaveText("Not on this server: 14 audits stored, none saved by a live run. Each one is stamped in the tasting room as a synthetic fixture or as having no recorded provenance. Every glass above the tasting room is an example.");
+    await expect(faq).not.toContainText("saved by a live run (");
     await expectNoHorizontalScroll(page);
     await shot(page, "13-public-featured-results");
   });
@@ -69,7 +76,7 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     const listing = await request.get("/api/audits");
     const items = await listing.json();
     for (const item of items) {
-      expect(Object.keys(item).sort()).toEqual(["answers", "brand", "category", "city", "createdAt", "featured", "id", "origin", "personaSource", "personas", "share"]);
+      expect(Object.keys(item).sort()).toEqual(["answers", "brand", "category", "city", "createdAt", "featured", "id", "origin", "personaSource", "personas", "provenance", "share"]);
       expect(typeof item.personas).toBe("number");
     }
     const full = await (await request.get(`/api/audits/${FEATURED}`)).text();
@@ -181,6 +188,7 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
   test("the featured audit's printable report renders, with its persona source", async ({ page }) => {
     await page.goto(`/audits/${FEATURED}/report`);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(FEATURED_NAME);
+    await expect(page.locator(".rp-prov")).toHaveText("Synthetic fixture, not a live run");
     await expect(page.locator(".rp-repro")).toContainText("Persona sourceQloo urn:tag taste tags.");
     await expectNoHorizontalScroll(page);
   });

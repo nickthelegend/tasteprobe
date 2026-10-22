@@ -13,7 +13,7 @@ import { FlightBoard, Glass } from "@/components/Flight";
 import { PersonaTray, type PersonaResult } from "@/components/Tray";
 import { Landing } from "@/components/Landing";
 import { Logo } from "@/components/Logo";
-import { personaSourceOf, personaSourceText, summarizeAuditListing, tagScopeText, type AuditListing } from "@/lib/report-model.mjs";
+import { personaSourceOf, personaSourceText, provenanceOf, PROVENANCE_TEXT, summarizeAuditListing, tagScopeText, type AuditListing } from "@/lib/report-model.mjs";
 import { latestOnly, mergeIfCurrent, roomControls } from "@/lib/ui-state.mjs";
 import type { Audit, AuditEvent, Persona } from "@/lib/types";
 
@@ -64,6 +64,8 @@ export default function Home() {
   // Summaries only (GET /api/audits); the selected audit is fetched in full by id.
   const [audits, setAudits] = useState<Listing[] | null>(null);
   const [auditTotal, setAuditTotal] = useState<number | null>(null);
+  // How many stored audits were saved by a live run (x-live-count); fixtures never count.
+  const [liveTotal, setLiveTotal] = useState<number | null>(null);
   const [opening, setOpening] = useState<string | null>(null);
   const [active, setActive] = useState<Audit | null>(null);
   const [run, setRun] = useState<Run | null>(null);
@@ -139,9 +141,10 @@ export default function Home() {
     fetch("/api/audits").then(async (response) => {
       const list: Listing[] = await response.json();
       setAuditTotal(Number(response.headers.get("x-total-count") ?? list.length));
+      setLiveTotal(Number(response.headers.get("x-live-count") ?? list.filter((item) => item.provenance === "live").length));
       setAudits(list);
       if (list[0]) select(list[0].id);
-    }).catch(() => { setAudits([]); setAuditTotal(0); setError("Could not load saved audits."); });
+    }).catch(() => { setAudits([]); setAuditTotal(0); setLiveTotal(0); setError("Could not load saved audits."); });
   }, []);
 
   const missing = missingConfig(status);
@@ -189,6 +192,7 @@ export default function Home() {
           const listing: Listing = { ...summarizeAuditListing(message.audit), featured: false };
           setAudits((current) => [...(current ?? []).filter((item) => item.featured), listing, ...(current ?? []).filter((item) => !item.featured && item.id !== listing.id)]);
           setAuditTotal((current) => (current ?? 0) + 1);
+          if (listing.provenance === "live") setLiveTotal((current) => (current ?? 0) + 1);
           show(message.audit);
         }
       });
@@ -222,12 +226,12 @@ export default function Home() {
   const showResults = Boolean(active && !run);
 
   return <main>
-    <Landing status={status} auditCount={auditTotal} featured={audits?.[0]?.featured ? audits[0].brand : null} />
+    <Landing status={status} auditCount={auditTotal} liveCount={liveTotal} featured={audits?.[0]?.featured ? { brand: audits[0].brand, live: audits[0].provenance === "live" } : null} />
 
     <section className="room" id="room" aria-labelledby="room-title">
       <div className="room-head">
         <div>
-          <p className="kicker">The tasting room · live calls only, nothing is simulated</p>
+          <p className="kicker">The tasting room · a run makes live calls only, nothing is simulated</p>
           <h2 id="room-title">Pour a flight</h2>
         </div>
         <div className="cellar" aria-label="Connections">
@@ -330,6 +334,7 @@ export default function Home() {
           <div className="result-id">
             <p className="kicker">{new Date(active.createdAt).toLocaleString()} · {Math.round(active.durationMs / 1000)}s · Qloo <code>{active.qlooEntityId}</code></p>
             <h3 id="result-title">{active.brand}</h3>
+            <span className={`stamp prov prov-${provenanceOf(active)}`}>{PROVENANCE_TEXT[provenanceOf(active)]}</span>
             <p>{active.category} · {active.city}{active.qlooAddress ? ` · ${active.qlooAddress}` : ""}</p>
             <a className="tp-btn tp-btn-line report-link" href={`/audits/${active.id}/report`}>Printable report</a>
           </div>
@@ -426,6 +431,7 @@ export default function Home() {
         <span className="label">Past flights</span>
         <div className="cellar-flights">{audits.map((audit) => <button key={audit.id} className={audit.id === active?.id ? "current" : ""} onClick={() => select(audit.id)} disabled={!controls.canSwitchAudit}>
           <strong>{audit.featured && <em className="featured">Featured</em>}{audit.brand}</strong><small>{audit.city} · {audit.share === null ? "—" : pct(audit.share)} · {new Date(audit.createdAt).toLocaleDateString()}{audit.origin ? ` · ${audit.origin}` : ""}</small>
+          {audit.provenance !== "live" && <span className={`prov-note prov-${audit.provenance}`}>{PROVENANCE_TEXT[audit.provenance]}</span>}
         </button>)}</div>
         {auditTotal !== null && auditTotal > audits.length && <div className="cellar-more-row">
           <small className="cellar-more">{auditTotal - audits.length} older {auditTotal - audits.length === 1 ? "flight" : "flights"} not listed</small>
@@ -436,7 +442,7 @@ export default function Home() {
 
     <footer className="colophon">
       <Logo href="#top" ring="#fbf3f6" dot="#ff6ec7" />
-      <span>Qloo Taste AI × NVIDIA Nemotron on Nebius. Live data only; every number traces to a cached response.</span>
+      <span>Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.</span>
       <span><a href="https://github.com/nickthelegend/tasteprobe">github.com/nickthelegend/tasteprobe</a> · MIT · Copyright (c) 2026 Nivesh Gajengi</span>
     </footer>
   </main>;

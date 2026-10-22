@@ -3,7 +3,7 @@
 // so the same module renders in Next and in node:test (react-dom/server) without a build step.
 // React escapes every string, so stored copy and Qloo names are never injected as HTML.
 import { createElement as h, Fragment } from "react";
-import { personaSourceText, tagScopeText } from "./report-model.mjs";
+import { PROVENANCE_TEXT, personaSourceText, tagScopeText } from "./report-model.mjs";
 
 const pct = (value) => (value === null || value === undefined ? "—" : `${Math.round(value * 100)}%`);
 const range = (ci) => (ci ? `${Math.round(ci[0] * 100)}–${Math.round(ci[1] * 100)}%` : "—");
@@ -86,6 +86,7 @@ export function PrintReport({ model, actions = null }) {
     h("header", { className: "rp-head" },
       h("p", { className: "kicker" }, `${when(model.createdAt)} · ${model.durationSeconds}s · Qloo ${venue.qlooEntityId}`),
       h("h1", { id: "rp-title" }, venue.brand),
+      h("p", { className: `rp-prov prov-${model.provenance}` }, PROVENANCE_TEXT[model.provenance]),
       h("p", { className: "rp-venue" }, [venue.category, venue.city, venue.address].filter(Boolean).join(" · "))),
 
     h("div", { className: "rp-summary" },

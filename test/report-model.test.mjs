@@ -30,7 +30,7 @@ test("report text and listing", () => {
   assert.match(text, /Restaurant genre: 33% \(5\/15, 95% 15–58%, 8 personas\); poured most instead: Rival One \(synthetic\)/);
   assert.deepEqual(summarizeAuditListing(audit), {
     id: audit.id, brand: audit.brand, city: "Testville", category: "restaurant", createdAt: audit.createdAt, share: 0.2, answers: 30,
-    personas: audit.personas.length, personaSource: "urn:tag", origin: null,
+    personas: audit.personas.length, personaSource: "urn:tag", origin: null, provenance: "synthetic",
   });
   assert.throws(() => buildReportModel(null), /needs a stored audit/);
 });
@@ -60,4 +60,21 @@ test("the listing pins the featured audit first even after 13 newer runs, and ca
   assert.deepEqual(listAudits(store, { featuredId: audit.id, offset: 12, limit: 12 }).items.map((item) => item.id), [newer[11].id, newer[12].id]);
   assert.equal(listAudits(store, { limit: 500 }).items.length, 14);
   assert.equal(listAudits(store, { featuredId: "missing" }).featuredId, null);
+});
+
+test("provenance: the synthetic fixture is never counted or described as a live run", () => {
+  const { _fixture, ...unmarked } = audit;
+  assert.ok(_fixture);
+  const live = { ...unmarked, id: "live-1", live: true };
+  const old = { ...unmarked, id: "old-1" };
+  assert.equal(summarizeAuditListing(audit).provenance, "synthetic");
+  assert.equal(summarizeAuditListing(live).provenance, "live");
+  assert.equal(summarizeAuditListing(old).provenance, "unrecorded");
+  // A fixture that also says live: true is still synthetic.
+  assert.equal(summarizeAuditListing({ ...audit, live: true }).provenance, "synthetic");
+  assert.equal(listAudits([audit, audit, old]).live, 0);
+  assert.equal(listAudits([live, audit, old]).live, 1);
+  assert.equal(buildReportModel(audit).provenance, "synthetic");
+  assert.match(reportText(buildReportModel(audit)), /^Synthetic fixture, not a live run\.$/m);
+  assert.doesNotMatch(reportText(buildReportModel(live)), /Synthetic fixture|Provenance not recorded/);
 });

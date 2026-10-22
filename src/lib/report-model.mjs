@@ -30,6 +30,16 @@ function lift(value) {
   return value ? { delta: round(value.delta), ci: interval(value.ci), clearsZero: Array.isArray(value.ci) && value.ci[0] > 0 } : null;
 }
 
+// Where a stored audit came from. runAudit stamps `live: true` on every audit it saves after a
+// live run; the synthetic test fixtures carry `_fixture`; anything else was saved before the stamp
+// existed and its provenance is not recorded. Only "live" may be described as a live run.
+export function provenanceOf(audit) {
+  if (audit?._fixture) return "synthetic";
+  return audit?.live === true ? "live" : "unrecorded";
+}
+
+export const PROVENANCE_TEXT = { live: "Live run", synthetic: "Synthetic fixture, not a live run", unrecorded: "Provenance not recorded" };
+
 // Older audits have no personaSource; they were built from urn:tag before the fallback existed.
 export const personaSourceOf = (audit) => (audit?.personaSource === "urn:entity" ? "urn:entity" : "urn:tag");
 
@@ -51,6 +61,7 @@ export function buildReportModel(audit) {
   const failedByKind = audit.failedByKind ?? { assistant: 0, unparseable: 0, extraction: 0 };
   return {
     id: audit.id,
+    provenance: provenanceOf(audit),
     venue: { brand: audit.brand, category: audit.category, city: audit.city, address: audit.qlooAddress ?? null, qlooEntityId: audit.qlooEntityId },
     createdAt: audit.createdAt,
     durationSeconds: Math.round((audit.durationMs ?? 0) / 1000),
@@ -131,7 +142,7 @@ export function summarizeAuditListing(audit) {
   return {
     id: audit.id, brand: audit.brand, city: audit.city, category: audit.category, createdAt: audit.createdAt,
     share: round(audit.overall?.share), answers: audit.responseCount ?? 0, personas: audit.personas?.length ?? 0,
-    personaSource: personaSourceOf(audit), origin: audit.origin ?? null,
+    personaSource: personaSourceOf(audit), origin: audit.origin ?? null, provenance: provenanceOf(audit),
   };
 }
 
@@ -148,6 +159,7 @@ export function listAudits(audits, { featuredId = null, limit = LISTING_PAGE, of
   return {
     items: ordered.slice(start, start + size).map((audit) => ({ ...summarizeAuditListing(audit), featured: audit === featured })),
     total: audits.length,
+    live: audits.filter((audit) => provenanceOf(audit) === "live").length,
     featuredId: featured ? featured.id : null,
   };
 }
@@ -159,6 +171,7 @@ const range = (ci) => (ci ? `${Math.round(ci[0] * 100)}–${Math.round(ci[1] * 1
 export function reportText(model) {
   const lines = [
     `${model.venue.brand} (${model.venue.category}, ${model.venue.city}) · audit ${model.id} · ${model.createdAt}`,
+    ...(model.provenance === "live" ? [] : [`${PROVENANCE_TEXT[model.provenance]}.`]),
     `Personas from ${personaSourceText(model.personaSource)}.`,
     `Whole flight: ${pct(model.overall.share)} of ${model.answers.usable} usable answers recommend it (95% ${range(model.overall.ci)}); ${model.answers.dropped} of ${model.answers.attempted} dropped (${model.answers.droppedByKind.assistant} call errors, ${model.answers.droppedByKind.unparseable} unparseable, ${model.answers.droppedByKind.extraction} extraction errors).`,
     ...model.segments.map((item) => `- ${item.name}: ${pct(item.share)} (${item.mentions}/${item.answers}, 95% ${range(item.ci)}, ${item.personas} personas)${item.rivals[0] ? `; poured most instead: ${item.rivals[0].name}` : ""}`),

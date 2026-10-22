@@ -32,30 +32,37 @@ const COURSES: { title: string; body: React.ReactNode; tag: string }[] = [
   { title: "Keep the sommelier’s notebook", tag: "tool calling", body: <>A Nemotron agent revises copy with four tools under a budget. Every attempt is written down. Its intervals only screen; a win needs one confirmation probe on held-out personas, and the stop rule runs in code, not in the model.</> },
 ];
 
-function cellarLine(status: CellarStatus, auditCount: number | null) {
+function cellarLine(status: CellarStatus, auditCount: number | null, liveCount: number | null) {
   if (!status) return "Checking the cellar…";
   const keys = [
     status.qloo ? "Qloo key set" : "Qloo key missing",
     status.nebius.configured ? (status.nebius.ok ? "Nebius model reachable" : "Nebius check failed") : "Nebius key missing",
     status.systems.length ? `${status.systems.length} ${status.systems.length === 1 ? "assistant" : "assistants"}` : "no assistant",
   ];
-  const poured = auditCount === null ? "" : auditCount === 0 ? " · no flights poured on this server" : ` · ${auditCount} ${auditCount === 1 ? "flight" : "flights"} poured here`;
+  const live = liveCount === null ? "" : liveCount === 0 ? ", none from a live run" : liveCount === auditCount ? ", all from live runs" : `, ${liveCount} from live runs`;
+  const poured = auditCount === null ? "" : auditCount === 0 ? " · no flights poured on this server" : ` · ${auditCount} ${auditCount === 1 ? "flight" : "flights"} stored here${live}`;
   return `${keys.join(" · ")}${poured}`;
 }
 
-// The "Has it run end to end?" answer, from this server's store: every stored audit was saved by a
-// live run (the app has no other way to create one).
-function liveRunAnswer(auditCount: number | null, featured: string | null) {
-  if (auditCount === null) return "Checking this server’s audit store…";
+export type FeaturedFlight = { brand: string; live: boolean } | null;
+
+// The "Has it run end to end?" answer, from this server's store. Only audits that runAudit stamped
+// as live count as live runs; synthetic fixtures and audits with no recorded provenance never do.
+export function liveRunAnswer(auditCount: number | null, liveCount: number | null, featured: FeaturedFlight) {
+  if (auditCount === null || liveCount === null) return "Checking this server’s audit store…";
   if (auditCount === 0) return "Not on this server: no audit has been stored here yet. Every glass above the tasting room is an example; the tasting room fills only from a live run, and that run’s raw provider payloads are kept with it for checking.";
-  return `Yes, on this server: ${auditCount} ${auditCount === 1 ? "audit" : "audits"} stored, each saved by a live run (Qloo, Nemotron on Nebius and the assistants under test)${featured ? `; the featured one is ${featured}` : ""}. Open one in the tasting room to read every answer behind it. Every glass above the tasting room is an example.`;
+  const stored = `${auditCount} ${auditCount === 1 ? "audit" : "audits"} stored`;
+  if (liveCount === 0) return `Not on this server: ${stored}, none saved by a live run. Each one is stamped in the tasting room as a synthetic fixture or as having no recorded provenance. Every glass above the tasting room is an example.`;
+  const others = auditCount - liveCount;
+  const featuredText = featured ? (featured.live ? `; the featured one is ${featured.brand}` : `; the featured one, ${featured.brand}, is not a live run`) : "";
+  return `Yes, on this server: ${stored}, ${liveCount === auditCount ? (auditCount === 1 ? "saved" : "each saved") : `${liveCount} saved`} by a live run (Qloo, Nemotron on Nebius and the assistants under test)${others ? ` and ${others} stamped as not live` : ""}${featuredText}. Open one in the tasting room to read every answer behind it. Every glass above the tasting room is an example.`;
 }
 
-export function Landing({ status, auditCount, featured = null }: { status: CellarStatus; auditCount: number | null; featured?: string | null }) {
+export function Landing({ status, auditCount, liveCount, featured = null }: { status: CellarStatus; auditCount: number | null; liveCount: number | null; featured?: FeaturedFlight }) {
   return <div className="sheet" id="top">
     <div className="masthead">
       <span className="masthead-title">TasteProbe tasting sheet</span>
-      <span className="masthead-live" aria-live="polite"><i className={status ? (status.qloo && status.nebius.ok && status.systems.length ? "ok" : "bad") : ""} />{cellarLine(status, auditCount)}</span>
+      <span className="masthead-live" aria-live="polite"><i className={status ? (status.qloo && status.nebius.ok && status.systems.length ? "ok" : "bad") : ""} />{cellarLine(status, auditCount, liveCount)}</span>
     </div>
 
     <header className="sheet-head">
@@ -158,7 +165,7 @@ export function Landing({ status, auditCount, featured = null }: { status: Cella
         <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Lift is a paired bootstrap over personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
         <details><summary>What does a fix change?</summary><p>Nothing on your site. The copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled. The baseline is re-asked in the same run, so model drift since the audit does not count as lift, and every attempt is kept.</p></details>
         <details><summary>What do I need to run it?</summary><p><code>QLOO_API_KEY</code>, <code>NEBIUS_API_KEY</code>, and <code>OPENAI_API_KEY</code> or a <code>MODEL_2_*</code> OpenAI-compatible endpoint in <code>.env.local</code>. Without them the tasting room says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
-        <details><summary>Has it run end to end?</summary><p>{liveRunAnswer(auditCount, featured)}</p></details>
+        <details><summary>Has it run end to end?</summary><p>{liveRunAnswer(auditCount, liveCount, featured)}</p></details>
       </div>
       <p className="label-foot"><a href={REPO}>Source on GitHub</a> · <a href={`${REPO}#how-the-numbers-are-made`}>How the numbers are made</a> · MIT</p>
     </section>

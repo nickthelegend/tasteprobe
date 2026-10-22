@@ -73,6 +73,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
     createdAt: new Date().toISOString(),
     personas,
     origin,
+    live: true,
     personaSource: taste.source,
     tagScope: taste.tagScope,
     ...(taste.tagRefusal ? { personaSourceNote: taste.tagRefusal } : {}),

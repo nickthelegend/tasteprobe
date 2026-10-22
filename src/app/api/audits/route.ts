@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     limit: Number(query.get("limit") ?? LISTING_PAGE),
     offset: Number(query.get("offset") ?? 0),
   });
-  return NextResponse.json(listing.items, { headers: { "x-total-count": String(listing.total), ...(listing.featuredId ? { "x-featured-audit": listing.featuredId } : {}) } });
+  return NextResponse.json(listing.items, { headers: { "x-total-count": String(listing.total), "x-live-count": String(listing.live), ...(listing.featuredId ? { "x-featured-audit": listing.featuredId } : {}) } });
 }
 
 // The spend guard (run token, JSON only, persona cap, per-IP and daily quota, one run at a time)

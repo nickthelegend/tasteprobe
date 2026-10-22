@@ -105,6 +105,10 @@ export type Audit = {
   tagScope?: { city: number; global: number };
   // Where the audit was started: the web app, the CLI or the MCP server.
   origin?: "web" | "cli" | "mcp";
+  // Set by runAudit on every audit saved after a live run. Missing on older audits.
+  live?: boolean;
+  // Present only on the synthetic test fixtures (test/fixtures), never on a saved run.
+  _fixture?: string;
   qlooSignals?: QlooSignals;
   overall: SegmentResult;
   segments: SegmentResult[];
