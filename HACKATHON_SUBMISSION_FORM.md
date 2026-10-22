@@ -70,7 +70,7 @@ Do AI assistants recommend you to your own audience? A placebo-controlled audit 
   - paired persona bootstrap for lift;
   - a coverage simulation.
 - A local JSON store with a cross-process lock file and atomic writes. Raw responses are written as they arrive, kept and hashed (SHA-256) in each run report. A replay mode re-derives every number offline.
-- 116 unit tests (`npm test`) and 112 passing browser tests in real Chrome (`npm run test:e2e`), a typecheck, a no-mock lint and a production build. The CI workflow runs the unit tests, typecheck, lint and build; GitHub Actions has not run on the current commits yet because they are not pushed.
+- 128 unit tests (`npm test`) and 115 passing browser tests in real Chrome (`npm run test:e2e`), a typecheck, a no-mock lint and a production build. The CI workflow runs the unit tests, typecheck, lint and build; GitHub Actions has not run on the current commits yet because they are not pushed.
 
 ## Challenges
 - **Separating name exposure from copy.** Injecting any snippet that names the venue raises mentions, so a placebo arm was needed.
