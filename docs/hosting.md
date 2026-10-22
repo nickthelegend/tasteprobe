@@ -11,7 +11,7 @@ Qloo requires a hosted, externally published demo ("local-only entries do not qu
 
 Nothing has been deployed. Nobody has created a Railway project or set variables yet.
 
-## One-time setup (Nick, from the repo root)
+## One-time setup (the owner, from the repo root)
 
 ```sh
 railway login
@@ -88,6 +88,6 @@ How long an audit takes has **not been measured** (no live run yet). It is one a
 
 ## Notes
 
-- Audits stream NDJSON for several minutes. A long-running container fits that; short serverless function timeouts don't.
+- Audits stream NDJSON (with a heartbeat line every 15 s) for as long as the calls take; that length is not measured yet. A long-running container fits that; short serverless function timeouts don't (the routes' `maxDuration = 300` only matters on Vercel). If the client disconnects, the audit still finishes and is saved.
 - Railway marks `railway.json` / `railway.toml` (Config as Code) deprecated; its docs say existing files stop being read on **2026-12-01**, before the Nebius Dec 15 window ends. The Dockerfile at the repo root is still picked up without it. A deploy after Dec 1 loses only the healthcheck and restart settings, unless they are re-created in the service settings or with `railway config migrate`.
 - Verified locally (no Docker installed): `next build` with `output: "standalone"`, then `node server.js` from a copy of `.next/standalone` + `.next/static` with an empty environment, started through `scripts/docker-entrypoint.sh`. `/` returned 200 and rendered **Setup required**, `/api/status` reported every key missing, and `POST /api/audits` answered 503. The Docker image itself has not been built here.

@@ -19,3 +19,7 @@ e2e/test-results.json
 *.webm
 test-results/
 playwright-report/
+
+# Internal notes kept out of the public tree (history keeps the old copies)
+CLAUDE.md
+docs/PLAN.md

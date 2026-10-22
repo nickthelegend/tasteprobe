@@ -4,7 +4,13 @@
 
 > **Status: not yet run end to end against live keys.** No Qloo, Nebius or assistant keys were available while building, so every live path ends at "Setup required: VAR" (HTTP 503 in the app, a tool error over MCP, exit code 1 in the CLI). Nothing is simulated. What the docs confirm and what still needs a live call is listed in [API facts: confirmed vs unverified](#api-facts-confirmed-vs-unverified).
 >
-> Hosted demo: _not deployed yet; needs Nick: hosting_ (Qloo requires an externally hosted demo). The production `Dockerfile` and `railway.json` are ready: one-time setup, then `railway up --detach` ([docs/hosting.md](docs/hosting.md)). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
+> Hosted demo: _not deployed yet_ (Qloo requires an externally hosted demo). The production `Dockerfile` and `railway.json` are ready, and the paid routes sit behind a spend guard (run token, persona and agent caps, quotas): one-time setup, then `railway up --detach` ([docs/hosting.md](docs/hosting.md)). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
+
+| The landing (every glass above the tasting room is stamped as an example) | The tasting room without keys |
+|---|---|
+| ![Landing hero: a flight of four glasses stamped "Example, not a real audit"](docs/screenshots/landing-example-flight.png) | ![Tasting room: Setup required names QLOO_API_KEY, NEBIUS_API_KEY and an assistant key; the flight is empty](docs/screenshots/setup-required.png) |
+
+Both screenshots are from the Playwright E2E run in Chrome at 1280 px (`e2e/tests/landing.spec.ts`, `e2e/tests/room.spec.ts`), with no keys set.
 
 ## Architecture
 
@@ -80,7 +86,7 @@ npm run audit:live -- --brand "Exact listing name" --city Mumbai [--category res
 npm run audit:live -- --replay <run id>
 ```
 
-1. **Preflight.** Each missing variable prints `Setup required: VAR` and the script exits 1 before any API call. Otherwise it makes the cheapest real call per key: Qloo `/search` with `take=1`, Nebius `/models` (the configured model must be listed), and each assistant's `/models` (or a 1-token completion).
+1. **Preflight.** Each missing variable prints `Setup required: VAR` and the script exits 1 before any API call. Otherwise it makes the cheapest real call per key: Qloo `/search` (resolving the place in the city), one 1-tag `/v2/insights?filter.type=urn:tag` call on that place (the line says whether the key gets `urn:tag` or the personas will come from `urn:entity` types), Nebius `/models` (the configured model must be listed), and each assistant's `/models` (or a 1-token completion).
 2. **Run.** The same pipeline as the web app, with progress on stdout.
 3. **Report.** `.data/reports/<id>.json` and `.html` record model IDs and hosts, temperature, Nemotron `max_tokens` and thinking setting, the persona and bootstrap seeds, the extraction prompt, every persona prompt, failure rates by cause and the SHA-256 of every raw file.
 4. **Replay.** `--replay <id>` recomputes the numbers from the cached responses (no API calls), checks the raw-file hashes against the live report, and writes `<id>.replay.html` under a banner: "Replay of run <id> recorded <time>".
@@ -184,19 +190,19 @@ Checked against the live docs on **2026-10-21**, without keys. "Confirmed" means
 | Event | Deadline (official rules) | Entry | Status |
 |---|---|---|---|
 | [Nebius x NVIDIA Global AI Hackathon](https://nebiusglobalaihackathon.devpost.com/rules) | **Oct 30, 2026, 10:00 am PT = 17:00 UTC** | Best Apps and Agents Track | Code ready. Needs keys for a runtime Token Factory call, a demo URL, and a YouTube video under 3 minutes |
-| [Qloo Agentic Hackathon](https://qloo.devpost.com/rules) | **Oct 30, 2026, 11:45 pm ET = Oct 31, 03:45 UTC** | Agentic tool (Nemotron tool-calling agent + MCP server) | Code ready. Needs keys and **needs Nick: hosting**: Qloo requires a demo hosted and published externally; local-only entries don't qualify |
+| [Qloo Agentic Hackathon](https://qloo.devpost.com/rules) | **Oct 30, 2026, 11:45 pm ET = Oct 31, 03:45 UTC** | Agentic tool (Nemotron tool-calling agent + MCP server) | Code ready. Needs keys and **hosting**: Qloo requires a demo hosted and published externally; local-only entries don't qualify |
 
 Form drafts, tool feedback and checklists: [HACKATHON_SUBMISSION_FORM.md](HACKATHON_SUBMISSION_FORM.md).
 
 ## Tests
 
-`npm test` runs 77 tests (Node's runner counts the MCP stdio suite's parent test too). The table and what each file covers are in [TESTING.md](TESTING.md). The full check:
+`npm test` runs 116 tests in 16 files (Node's runner counts the MCP stdio suite's parent test too), including a seeded null simulation of the agent's stop rule and a two-process store test. The browser suite (`npm run test:e2e`, real Google Chrome, three servers with no keys) has 112 passing tests across six projects. Tables and what each file covers are in [TESTING.md](TESTING.md). The full check:
 
 ```sh
 npm test && npm run typecheck && npm run lint:no-mock && npm run build
 ```
 
-CI (`.github/workflows/ci.yml`) runs all four on Node 22. The fixtures in `test/fixtures` are hand-written, used only by tests, and labelled as such. The Qloo ones follow the documented shapes; `audit-synthetic.json` is a made-up stored audit for the report and MCP tests. `lint:no-mock` fails if `src/` imports them.
+CI (`.github/workflows/ci.yml`) runs all four on Node 22. GitHub Actions last ran on `0d10e9e` (Oct 20); it has not run on the current commits because they are not pushed yet. The fixtures in `test/fixtures` are hand-written, used only by tests, and labelled as such. The Qloo ones follow the documented shapes; `audit-synthetic.json` is a made-up stored audit for the report and MCP tests. `lint:no-mock` fails if `src/` imports them.
 
 ## Limitations
 
