@@ -84,11 +84,19 @@ function describePlace(item) {
 
 // Picks the Qloo /search result for the venue. Only places in the requested city qualify; if none
 // does, this throws and lists what Qloo did find instead of auditing a namesake in another city.
-export function pickPlace(candidates, brand, city) {
+// By default (strict) the in-city listing must also match the name: otherwise this throws and lists
+// the in-city candidates rather than auditing a different venue. { strict: false } takes the first
+// in-city listing; only verifyRival uses it, and it reports a name mismatch as unverified.
+export function pickPlace(candidates, brand, city, { strict = true } = {}) {
   const list = (Array.isArray(candidates) ? candidates : []).filter((item) => item && (item.entity_id ?? item.id));
   if (!list.length) throw new Error(`Qloo found no place called “${brand}”. Try the exact listing name as it appears on maps.`);
   const local = list.filter((item) => placeInCity(item, city));
-  const match = local.find((item) => matchesBrand(item.name ?? "", brand)) ?? local[0];
+  const named = local.find((item) => matchesBrand(item.name ?? "", brand));
+  if (!named && strict && local.length) {
+    const shown = local.slice(0, 5).map(describePlace).join("; ");
+    throw new Error(`Qloo has no listing named “${brand}” in ${city}. In ${city} it found: ${shown}. Use the exact listing name as it appears on maps.`);
+  }
+  const match = named ?? local[0];
   if (!match) {
     const shown = list.slice(0, 5).map(describePlace).join("; ");
     throw new Error(`Qloo has no “${brand}” in ${city}. It found ${list.length} listing${list.length === 1 ? "" : "s"} elsewhere: ${shown}. Check the city spelling or use the exact listing name.`);

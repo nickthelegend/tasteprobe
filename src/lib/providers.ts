@@ -46,8 +46,8 @@ async function qloo(path: string, params: Record<string, string>) {
   return readQlooResponse({ path, params, status: response.status, body: await response.text(), baseUrl: QLOO_BASE_URL() });
 }
 
-// Resolves the venue in its city. Never falls back to a namesake elsewhere: pickPlace throws with
-// the candidate list when no result is in the requested city.
+// Resolves the venue in its city. Never falls back to a namesake elsewhere or to another venue in
+// the same city: pickPlace throws with the candidate list when no in-city listing matches the name.
 export async function resolvePlace(brand: string, city: string) {
   const payload = await qloo("/search", { query: brand, types: "urn:entity:place", take: "15" });
   return { ...pickPlace(payload.results ?? payload.entities ?? [], brand, city), raw: payload };
@@ -57,7 +57,7 @@ export async function resolvePlace(brand: string, city: string) {
 export async function verifyRival(name: string, city: string): Promise<{ name: string; status: "verified" | "unverified"; qlooId?: string; detail?: string }> {
   try {
     const payload = await qloo("/search", { query: name, types: "urn:entity:place", take: "5" });
-    const place = pickPlace(payload.results ?? payload.entities ?? [], name, city);
+    const place = pickPlace(payload.results ?? payload.entities ?? [], name, city, { strict: false });
     return matchesBrand(place.name, name, { city }) || matchesBrand(name, place.name, { city })
       ? { name, status: "verified", qlooId: place.id }
       : { name, status: "unverified", detail: `closest Qloo listing in ${city} is ${place.name}` };

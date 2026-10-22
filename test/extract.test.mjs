@@ -25,6 +25,16 @@ test("pickPlace never falls back to a namesake in another city; it lists the can
   assert.throws(() => pickPlace([{ name: "No id" }], "No id", "Mumbai"), /found no place/);
 });
 
+test("pickPlace refuses to audit a different venue in the same city when no listing name matches", () => {
+  assert.throws(() => pickPlace([otherMumbai], "The Bombay Canteen", "Mumbai"), (error) => {
+    assert.match(error.message, /no listing named “The Bombay Canteen” in Mumbai/);
+    assert.match(error.message, /Canteen Café \(Bandra West, Mumbai, India\)/);
+    return true;
+  });
+  // Rival verification may take the closest in-city listing; verifyRival then reports the mismatch.
+  assert.equal(pickPlace([otherMumbai], "The Bombay Canteen", "Mumbai", { strict: false }).id, "C3");
+});
+
 test("city matching is a word match, not a substring", () => {
   assert.ok(placeInCity(canteenMumbai, "Mumbai"));
   assert.ok(!placeInCity({ properties: { address: "Navi Mumbaikar Road, Pune" } }, "Mumbai"));
