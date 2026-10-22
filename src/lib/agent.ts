@@ -6,7 +6,7 @@ import {
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
 import { throwIfDeadline } from "./run-deadline.mjs";
-import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
+import { probePersona, sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
 import * as providers from "./providers.ts";
 import { COPY_RULES, getTestModels, nebiusModel, nebiusPrices, qlooOnHackathonHost } from "./providers.ts";
 import { placeboCopy, segmentLabel } from "./taste.mjs";
@@ -71,7 +71,7 @@ function remaining(budget: AgentBudget, limits: AgentLimits) {
 
 export type AgentTrace = {
   messages: OpenAI.Chat.ChatCompletionMessageParam[];
-  probes: { candidateId: string; personas: string[]; confirmation?: boolean; placebo: { rows: ResponseRow[]; failures: FailedRow[] }; fix: { rows: ResponseRow[]; failures: FailedRow[] } }[];
+  probes: { candidateId: string; personas: string[]; confirmation?: boolean; complete?: boolean; placebo: { rows: ResponseRow[]; failures: FailedRow[] }; fix: { rows: ResponseRow[]; failures: FailedRow[] } }[];
   qloo?: unknown;
   // Every qloo_insights call with arguments: what was asked and the raw payload (kept server-side).
   qlooCalls?: { filterType: string; entity: string; location: string; payload: unknown }[];
@@ -99,11 +99,11 @@ export class AgentBudgetError extends Error {
 
 // `trace` is filled in place, so a caller can still save the partial trace if a live call throws.
 // The live calls the loop makes. Always the real providers in the app; test/ passes stand-ins.
-export type AgentDeps = { nemotronTurn: typeof providers.nemotronTurn; qlooTasteProfile: typeof providers.qlooTasteProfile; fetchPersonaSignals: typeof providers.fetchPersonaSignals };
-const liveDeps: AgentDeps = { nemotronTurn: providers.nemotronTurn, qlooTasteProfile: providers.qlooTasteProfile, fetchPersonaSignals: providers.fetchPersonaSignals };
+export type AgentDeps = { nemotronTurn: typeof providers.nemotronTurn; qlooTasteProfile: typeof providers.qlooTasteProfile; fetchPersonaSignals: typeof providers.fetchPersonaSignals; probePersona: typeof probePersona };
+const liveDeps: AgentDeps = { nemotronTurn: providers.nemotronTurn, qlooTasteProfile: providers.qlooTasteProfile, fetchPersonaSignals: providers.fetchPersonaSignals, probePersona };
 
 export async function runAgent(audit: Audit, segment: SegmentResult, limits: AgentLimits, send: (event: AgentEvent) => void, trace: AgentTrace = emptyTrace(), deps: Partial<AgentDeps> = {}): Promise<{ run: AgentRun; trace: AgentTrace }> {
-  const { nemotronTurn, qlooTasteProfile, fetchPersonaSignals } = { ...liveDeps, ...deps };
+  const { nemotronTurn, qlooTasteProfile, fetchPersonaSignals, probePersona: probePersonaDep } = { ...liveDeps, ...deps };
   // Live Qloo calls from qloo_insights: one per turn, at most qlooCap per run.
   const qlooCap = qlooCallCap(process.env);
   let qlooThisTurn = 0;
@@ -207,8 +207,12 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
       const affordable = affordablePersonas(budget, searchLimits, fresh.length, assistants);
       if (!affordable) return { ok: false, result: { error: "The assistant-call budget cannot cover one more persona." }, summary: "Rejected: assistant-call budget spent" };
       const chosen = personas.filter((persona) => fresh.slice(0, affordable).includes(persona.id));
-      const outcome = await runArms(venue, chosen, candidate.copy, ["placebo", "fix"]);
-      trace.probes.push({ candidateId: candidate.id, personas: chosen.map((persona) => persona.id), placebo: outcome.placebo, fix: outcome.fix });
+      // In the trace before the calls start and filled as answers arrive, so a run that fails or
+      // hits the deadline mid-probe still saves the answers already paid for (complete: false).
+      const entry: AgentTrace["probes"][number] = { candidateId: candidate.id, personas: chosen.map((persona) => persona.id), complete: false, placebo: { rows: [], failures: [] }, fix: { rows: [], failures: [] } };
+      trace.probes.push(entry);
+      const outcome = await runArms(venue, chosen, candidate.copy, ["placebo", "fix"], { probe: probePersonaDep, onProgress: (current) => { entry.placebo = current.placebo; entry.fix = current.fix; } });
+      Object.assign(entry, { complete: true, placebo: outcome.placebo, fix: outcome.fix });
       const rows = [...outcome.placebo.rows, ...outcome.fix.rows];
       const failures = [...outcome.placebo.failures, ...outcome.fix.failures];
       budget = chargeBudget(budget, {
@@ -239,8 +243,10 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
   async function confirm(candidateId: string) {
     const candidate = candidates.find((item) => item.id === candidateId) as Candidate;
     const chosen = personas.filter((persona) => plan.confirmation.includes(persona.id));
-    const outcome = await runArms(venue, chosen, candidate.copy, ["placebo", "fix"]);
-    trace.probes.push({ candidateId, personas: chosen.map((persona) => persona.id), confirmation: true, placebo: outcome.placebo, fix: outcome.fix });
+    const entry: AgentTrace["probes"][number] = { candidateId, personas: chosen.map((persona) => persona.id), confirmation: true, complete: false, placebo: { rows: [], failures: [] }, fix: { rows: [], failures: [] } };
+    trace.probes.push(entry);
+    const outcome = await runArms(venue, chosen, candidate.copy, ["placebo", "fix"], { probe: probePersonaDep, onProgress: (current) => { entry.placebo = current.placebo; entry.fix = current.fix; } });
+    Object.assign(entry, { complete: true, placebo: outcome.placebo, fix: outcome.fix });
     const rows = [...outcome.placebo.rows, ...outcome.fix.rows];
     const failures = [...outcome.placebo.failures, ...outcome.fix.failures];
     budget = chargeBudget(budget, {

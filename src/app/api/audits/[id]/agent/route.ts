@@ -3,7 +3,7 @@ import { agentBudgetPlan, normalizeLimits } from "@/lib/agent-core.mjs";
 import { emptyTrace, runAgent } from "@/lib/agent";
 import { openRun, quotaRefusal, readJsonObject, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
-import { runWithDeadline } from "@/lib/run-deadline.mjs";
+import { deadlineMessage, RunDeadlineError, runWithDeadline } from "@/lib/run-deadline.mjs";
 import { getTestModels, missingKeys } from "@/lib/providers";
 import { findAudit, updateAudit, writeRaw } from "@/lib/storage";
 import type { AgentEvent } from "@/lib/types";
@@ -56,11 +56,12 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       send({ type: "done", run });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Agent loop failed.";
+      // The trace holds every probe started, including the one in flight (complete: false).
       await writeRaw(audit.id, `agent-failed-${Date.now()}`, { error: message, trace }).catch(() => undefined);
       throw error;
     }
   }, {
-    onError: (error) => ({ type: "error", message: error instanceof Error ? error.message : "Agent loop failed." }),
+    onError: (error) => ({ type: "error", message: error instanceof RunDeadlineError ? deadlineMessage(error, audit.id) : error instanceof Error ? error.message : "Agent loop failed." }),
     onSettled: () => slot.release(),
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store" } });

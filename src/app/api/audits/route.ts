@@ -3,7 +3,7 @@ import { z } from "zod";
 import { runAudit } from "@/lib/audit";
 import { openRun, quotaRefusal, refuse, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
-import { runWithDeadline } from "@/lib/run-deadline.mjs";
+import { deadlineMessage, RunDeadlineError, runWithDeadline } from "@/lib/run-deadline.mjs";
 import { requireKeys } from "@/lib/providers";
 import { checkPersonaCap } from "@/lib/run-guard.mjs";
 import { LISTING_PAGE, listAudits } from "@/lib/report-model.mjs";
@@ -58,11 +58,15 @@ export async function POST(request: Request) {
   if ("refusal" in slot) return slot.refusal;
 
   // The audit runs to the end and is saved even if the client disconnects; see ndjson-stream.mjs.
+  let auditId: string | null = null;
   const { stream } = createNdjsonStream<AuditEvent>(async (send) => {
-    const audit = await runWithDeadline(slot.signal, () => runAudit(input, send));
+    const audit = await runWithDeadline(slot.signal, () => runAudit(input, (event) => {
+      if (event.type === "audit") auditId = event.auditId;
+      send(event);
+    }));
     send({ type: "done", audit });
   }, {
-    onError: (error) => ({ type: "error", message: error instanceof Error ? error.message : "Audit failed unexpectedly." }),
+    onError: (error) => ({ type: "error", message: error instanceof RunDeadlineError ? deadlineMessage(error, auditId) : error instanceof Error ? error.message : "Audit failed unexpectedly." }),
     onSettled: () => slot.release(),
   });
   return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store" } });

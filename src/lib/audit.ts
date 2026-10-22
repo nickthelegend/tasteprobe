@@ -27,6 +27,7 @@ export async function runAudit(input: AuditInput, send: (event: AuditEvent) => v
   if (taste.tagScope.global) send({ type: "stage", stage: "qloo", message: `Qloo had only ${taste.tagScope.city} city-scoped tags for ${input.city}; ${taste.tagScope.global} more come from the venue's global taste neighbourhood` });
 
   const auditId = crypto.randomUUID();
+  send({ type: "audit", auditId });
   await writeRaw(auditId, "qloo", { search: place.raw, personaSource: taste.source, insights: taste.raw, crossDomain: cross.raw });
 
   send({ type: "stage", stage: "query", message: `Asking assistants as ${personas.length} Qloo personas` });

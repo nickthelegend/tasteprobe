@@ -141,6 +141,8 @@ export type Audit = {
 export type AuditEvent =
   | { type: "stage"; stage: "resolve" | "qloo" | "personas" | "query" | "stats"; message: string }
   | { type: "place"; name: string; entityId: string; address?: string }
+  // The id the audit (and its raw answers, written as they arrive) is stored under.
+  | { type: "audit"; auditId: string }
   | { type: "personas"; personas: Persona[] }
   | { type: "answer"; personaId: string; segmentId: string; answered: number; mentioned: number; failed: number; rivals: string[] }
   | { type: "progress"; done: number; total: number; mentions: number }

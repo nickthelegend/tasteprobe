@@ -1,4 +1,6 @@
-import { runArms, summarizeArms } from "./experiment.ts";
+import { runArms, summarizeArms, type ArmsRun } from "./experiment.ts";
+import { coalescingWriter } from "./filestore.mjs";
+import { probePersona } from "./probe.ts";
 import { requireKeys, suggestContentChange } from "./providers.ts";
 import { findAudit, updateAudit, writeRaw } from "./storage.ts";
 import type { Counterfactual } from "./types";
@@ -28,19 +30,38 @@ export async function findFixTarget(auditId: string, segmentId?: string) {
   return { audit, segment, personas };
 }
 
-export async function runFix(auditId: string, segmentId?: string): Promise<Counterfactual> {
+// The live calls a fix makes. Always the real providers in the app; test/ passes stand-ins.
+export type FixDeps = { suggestContentChange: typeof suggestContentChange; probePersona: typeof probePersona };
+
+export async function runFix(auditId: string, segmentId?: string, deps: Partial<FixDeps> = {}): Promise<Counterfactual> {
+  const live = { suggestContentChange, probePersona, ...deps };
   requireKeys();
   const { audit, segment, personas } = await findFixTarget(auditId, segmentId);
 
   const tastes = [...new Set(personas.flatMap((persona) => persona.affinities.map((tag) => tag.name)))].slice(0, 8);
-  const suggestion = await suggestContentChange({
+  const suggestion = await live.suggestContentChange({
     brand: audit.brand, category: audit.category, city: audit.city, segment: segment.name, tastes,
     competitors: segment.competitors.slice(0, 3).map((item) => item.name),
   });
 
-  const run = await runArms(audit, personas, suggestion.change);
+  // Paid answers reach raw/<audit id>/counterfactual-<id>.json as they arrive (complete: false), so a
+  // deadline or a crash mid-run keeps them; the attempt joins the audit's history only when complete.
   const id = crypto.randomUUID();
-  await writeRaw(audit.id, `counterfactual-${id}`, { suggestion, segment: segment.name, ...run });
+  const rawName = `counterfactual-${id}`;
+  let partial: { run: ArmsRun | null; done: number } = { run: null, done: 0 };
+  const writePartial = () => writeRaw(audit.id, rawName, { complete: false, personasDone: partial.done, personasTotal: personas.length, suggestion, segment: segment.name, ...(partial.run ?? {}) });
+  await writePartial();
+  const progress = coalescingWriter(writePartial);
+  let run: ArmsRun;
+  try {
+    run = await runArms(audit, personas, suggestion.change, undefined, {
+      probe: live.probePersona,
+      onProgress: (current, done) => { partial = { run: current, done }; progress.schedule().catch(() => undefined); },
+    });
+  } finally {
+    await progress.drain();
+  }
+  await writeRaw(audit.id, rawName, { complete: true, suggestion, segment: segment.name, ...run });
   for (const arm of ["baseline", "placebo", "fix"] as const) {
     if (!run[arm].rows.length) throw new Error(`Every ${arm} re-test call failed. First error: ${run[arm].failures[0]?.error ?? "unknown"}`);
   }

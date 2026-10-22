@@ -10,10 +10,15 @@ import { AsyncLocalStorage } from "node:async_hooks";
 
 export class RunDeadlineError extends Error {
   constructor(kind, seconds) {
-    super(`Deadline: the ${kind} run stopped after ${seconds} s (TASTEPROBE_RUN_DEADLINE_SECONDS). Answers already paid for are kept in the server's audit store (raw/<id>); the run slot is free again.`);
+    super(`Deadline: the ${kind} run stopped after ${seconds} s (TASTEPROBE_RUN_DEADLINE_SECONDS). Answers already paid for are kept in the server's audit store under raw/<audit id>/, marked complete: false; the run slot is free again.`);
     this.name = "RunDeadlineError";
     this.code = "deadline";
   }
+}
+
+// The deadline message with the audit id the partial answers are stored under.
+export function deadlineMessage(error, auditId) {
+  return auditId ? `${error.message} Audit id: ${auditId}.` : error.message;
 }
 
 const store = new AsyncLocalStorage();

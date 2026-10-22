@@ -1,3 +1,4 @@
+export function deadlineMessage(error: Error, auditId: string | null): string;
 export class RunDeadlineError extends Error {
   constructor(kind: string, seconds: number);
   code: "deadline";
