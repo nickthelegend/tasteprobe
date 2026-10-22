@@ -26,7 +26,12 @@ Set each key by name, reading the value from stdin so it never lands in shell hi
 ```sh
 railway variable set QLOO_API_KEY --stdin --skip-deploys
 railway variable set NEBIUS_API_KEY --stdin --skip-deploys
-railway variable set OPENAI_API_KEY --stdin --skip-deploys     # or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID
+# Two-key minimum: the assistant under test also runs on Nebius (no OpenAI key needed).
+railway variable set MODEL_2_API_KEY --stdin --skip-deploys    # the same Nebius key
+railway variable set MODEL_2_BASE_URL=https://api.tokenfactory.nebius.com/v1 --skip-deploys
+railway variable set MODEL_2_ID=<a non-NVIDIA chat model from your key's /v1/models> --skip-deploys
+railway variable set MODEL_2_NAME=<its label> --skip-deploys
+# Or, with an OpenAI key as well: railway variable set OPENAI_API_KEY --stdin --skip-deploys
 railway domain                     # generates the public *.up.railway.app URL
 ```
 
@@ -43,7 +48,7 @@ railway up --detach
 | `QLOO_API_KEY` | yes | Qloo hackathon key. `QLOO_BASE_URL` defaults to the hackathon host. |
 | `NEBIUS_API_KEY` | yes | Nebius Token Factory. Spend-capped key, see below. |
 | `NEBIUS_MODEL` | no | NVIDIA model your key serves (default `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`). |
-| `OPENAI_API_KEY` + `OPENAI_MODEL`, or `MODEL_2_API_KEY` / `MODEL_2_BASE_URL` / `MODEL_2_ID` / `MODEL_2_NAME` | at least one assistant | The assistants under audit. `MODEL_3_*` is optional. |
+| `MODEL_2_API_KEY` / `MODEL_2_BASE_URL` / `MODEL_2_ID` / `MODEL_2_NAME`, or `OPENAI_API_KEY` + `OPENAI_MODEL` | at least one assistant | The assistants under audit. The minimum setup is MODEL_2_* on Nebius Token Factory with the Nebius key (two keys in all). The three MODEL_2 values go together. `MODEL_3_*` is optional. |
 | `NEBIUS_INPUT_PRICE_PER_MILLION`, `NEBIUS_OUTPUT_PRICE_PER_MILLION` | strongly recommended | Without them the agent's dollar cap is reported as unenforced. |
 | `NEBIUS_MAX_TOKENS`, `NEBIUS_REASONING_EFFORT`, `NEBIUS_THINKING` | no | See the README table. |
 | `RAILWAY_RUN_UID` | `0` on Railway | Lets the entrypoint chown the root-owned volume. The server itself still runs as `node`. |
@@ -74,7 +79,7 @@ For the public demo:
 - Set `TASTEPROBE_RUN_TOKEN` (read it from stdin: `railway variable set TASTEPROBE_RUN_TOKEN --stdin --skip-deploys`), `TASTEPROBE_MAX_PERSONAS=24`, `TASTEPROBE_RUNS_PER_IP_PER_HOUR=3` and `TASTEPROBE_DAILY_RUNS=20`.
 - Set `TASTEPROBE_TRUSTED_IP_HEADER=x-real-ip`. Railway's networking specs list `X-Real-IP` "for identifying client's remote IP"; they do not say whether a client-sent value is replaced, so check it once after the deploy (send a made-up `X-Real-IP` and confirm the bucket does not move to it). They do not document `X-Forwarded-For`.
 - A private Docker run with no token needs `TASTEPROBE_RUNS_OPEN=1`; without it the production server answers 503 Setup required for every paid route.
-- Use a **dedicated Nebius key** with a spend limit or a low prepaid balance in the Nebius Token Factory console. Do the same for the OpenAI (or `MODEL_2_*`) key.
+- Use a **dedicated Nebius key** with a spend limit or a low prepaid balance in the Nebius Token Factory console. With the two-key setup that one Nebius key also pays for the assistant under test, so size its limit for both; an OpenAI key, if you add one, gets its own limit.
 - Set `NEBIUS_INPUT_PRICE_PER_MILLION` and `NEBIUS_OUTPUT_PRICE_PER_MILLION` so the agent loop's dollar cap is enforced.
 - Set a usage limit on the Railway workspace so the container bill is capped too.
 - Seed the store with one real audit first and set `TASTEPROBE_FEATURED_AUDIT_ID` to its id. The listing pins it first and the tasting room opens it by default, however many audits are run after it, so judges land on it and can open the flight and `/audits/<id>/report` without spending anything.

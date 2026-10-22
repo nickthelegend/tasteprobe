@@ -19,18 +19,31 @@ const REQUEST_TIMEOUT_MS = 120_000;
 // Reasoning models spend tokens thinking before the JSON; 2048 truncated long answers.
 const nemotronMaxTokens = () => Number(process.env.NEBIUS_MAX_TOKENS) || 8192;
 
-// Names of the variables a live audit needs and that are not set.
+const MODEL_SLOT_VARS = (slot: number) => [`MODEL_${slot}_API_KEY`, `MODEL_${slot}_BASE_URL`, `MODEL_${slot}_ID`];
+
+// Names of the variables a live audit needs and that are not set. With no assistant at all that is
+// OPENAI_API_KEY; a MODEL_2_* / MODEL_3_* slot that is only partly set names its missing variables
+// instead of being ignored. The minimum setup is two keys: QLOO_API_KEY and NEBIUS_API_KEY, with
+// MODEL_2_* pointing at a non-NVIDIA chat model on Nebius Token Factory (see .env.example).
 export function missingKeys() {
   const missing: string[] = [];
   if (!process.env.QLOO_API_KEY) missing.push("QLOO_API_KEY");
   if (!process.env.NEBIUS_API_KEY) missing.push("NEBIUS_API_KEY");
-  if (!configuredModels().length) missing.push("OPENAI_API_KEY");
+  const partial = [2, 3].flatMap((slot) => {
+    const vars = MODEL_SLOT_VARS(slot);
+    const set = vars.filter((name) => process.env[name]);
+    return set.length && set.length < vars.length ? vars.filter((name) => !process.env[name]) : [];
+  });
+  if (partial.length) missing.push(...partial);
+  else if (!configuredModels().length) missing.push("OPENAI_API_KEY");
   return missing;
 }
 
 export function requireKeys() {
   if (!process.env.QLOO_API_KEY) throw new ConfigError("Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.");
   if (!process.env.NEBIUS_API_KEY) throw new ConfigError("Nebius key not configured: add NEBIUS_API_KEY to .env.local to run NVIDIA Nemotron on Nebius.");
+  const incomplete = missingKeys().filter((name) => name.startsWith("MODEL_"));
+  if (incomplete.length) throw new ConfigError(`Assistant endpoint incomplete: set ${incomplete.join(", ")} in .env.local (MODEL_n_API_KEY, MODEL_n_BASE_URL and MODEL_n_ID go together).`);
   if (!configuredModels().length) throw new ConfigError("No assistant to test: set OPENAI_API_KEY or a MODEL_2_* OpenAI-compatible endpoint in .env.local.");
 }
 
@@ -142,9 +155,7 @@ function configuredModels(): ChatModel[] {
     models.push({ id: "openai", name: model, model, client: new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: REQUEST_TIMEOUT_MS, maxRetries: 2 }) });
   }
   for (const slot of [2, 3]) {
-    const apiKey = process.env[`MODEL_${slot}_API_KEY`];
-    const baseURL = process.env[`MODEL_${slot}_BASE_URL`];
-    const model = process.env[`MODEL_${slot}_ID`];
+    const [apiKey, baseURL, model] = MODEL_SLOT_VARS(slot).map((name) => process.env[name]);
     if (apiKey && baseURL && model) models.push({
       id: `system-${slot}`,
       name: process.env[`MODEL_${slot}_NAME`] || model,

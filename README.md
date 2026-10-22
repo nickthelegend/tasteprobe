@@ -68,7 +68,9 @@ npm run dev                  # http://localhost:3000
 |---|---|---|
 | `QLOO_API_KEY` | yes | Qloo taste graph. `QLOO_BASE_URL` defaults to the hackathon host; set `https://api.qloo.com` for production keys. |
 | `NEBIUS_API_KEY` | yes | Nebius Token Factory. `NEBIUS_MODEL` must be an NVIDIA model your key serves (default `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`). |
-| `OPENAI_API_KEY` or `MODEL_2_*` | at least one | The assistants being audited. `MODEL_2_*` and `MODEL_3_*` take any OpenAI-compatible endpoint. |
+| `OPENAI_API_KEY` or `MODEL_2_*` | at least one | The assistants being audited. `MODEL_2_*` and `MODEL_3_*` take any OpenAI-compatible endpoint; a partly set slot is reported as Setup required. |
+
+**Minimum setup: two keys.** `QLOO_API_KEY` and `NEBIUS_API_KEY`, with the assistant under test on Nebius Token Factory: `MODEL_2_BASE_URL=https://api.tokenfactory.nebius.com/v1`, `MODEL_2_API_KEY` set to the same Nebius key, `MODEL_2_ID` a non-NVIDIA chat model from your key's `/v1/models` list (a Llama, Qwen or DeepSeek model), and `MODEL_2_NAME` its label. Nemotron still reads every answer and runs the agent; the MODEL_2 model is the assistant being audited. No OpenAI key is needed (`test/providers-config.test.mjs` checks that this configuration reports nothing missing).
 | `NEBIUS_INPUT_PRICE_PER_MILLION`, `NEBIUS_OUTPUT_PRICE_PER_MILLION` | no | Your Nebius rates. Used for cost estimates and the agent's dollar cap (without them the cap is reported as unenforced). |
 | `NEBIUS_MAX_TOKENS` | no | Nemotron `max_tokens` (default 8192, so reasoning is not cut off). |
 | `NEBIUS_REASONING_EFFORT` | no | Sends Nebius's documented `reasoning_effort` (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). Unset sends nothing. |
