@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { AgentEvent, AgentRun, Audit } from "@/lib/types";
+import { agentChoices } from "@/lib/ui-state.mjs";
 import { ci, pct, signedPts } from "./format";
 import { readNdjson } from "./ndjson";
 
@@ -11,8 +12,8 @@ const tokens = (input: number, output: number) => `${(input + output).toLocaleSt
 
 type Caps = { maxTries: number; maxAssistantCalls: number };
 
-export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun, onRunningChange }: {
-  audit: Audit; segmentId: string; ready: boolean; headers: Record<string, string>; caps?: Caps; onRun: (run: AgentRun) => void; onRunningChange?: (running: boolean) => void;
+export function AgentLoop({ audit, segmentId, ready, headers, caps, assistants, onRun, onRunningChange }: {
+  audit: Audit; segmentId: string; ready: boolean; headers: Record<string, string>; caps?: Caps; assistants: number; onRun: (run: AgentRun) => void; onRunningChange?: (running: boolean) => void;
 }) {
   const [running, setRunningState] = useState(false);
   const setRunning = (value: boolean) => { setRunningState(value); onRunningChange?.(value); };
@@ -25,6 +26,11 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun, onRun
   const [error, setError] = useState("");
   const runs = audit.agentRuns ?? [];
   const last = runs[runs.length - 1];
+  // What the selects show is what the request sends: clamped to the server caps and to the smallest
+  // call cap this segment can run with (the confirmation probe plus one search persona).
+  const segmentName = audit.segments.find((item) => item.id === segmentId)?.name;
+  const choice = agentChoices({ caps, personaIds: audit.personas.filter((persona) => persona.segment === segmentName).map((persona) => persona.id), assistants, tries, calls });
+  const runnable = choice.tries !== null && choice.calls !== null;
 
   async function start() {
     setRunning(true); setError(""); setLines([]);
@@ -33,7 +39,7 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun, onRun
     try {
       controller.current?.abort();
       controller.current = new AbortController();
-      const response = await fetch(`/api/audits/${audit.id}/agent`, { method: "POST", headers, body: JSON.stringify({ segment: segmentId, maxTries: tries, maxAssistantCalls: calls }), signal: controller.current.signal });
+      const response = await fetch(`/api/audits/${audit.id}/agent`, { method: "POST", headers, body: JSON.stringify({ segment: segmentId, maxTries: choice.tries, maxAssistantCalls: choice.calls }), signal: controller.current.signal });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
         throw new Error(payload.message ?? payload.error ?? `Agent request failed (${response.status}).`);
@@ -64,17 +70,19 @@ export function AgentLoop({ audit, segmentId, ready, headers, caps, onRun, onRun
   return <div className="agent notebook">
     <header><span>Sommelier’s notebook</span><span>Nemotron agent · {runs.length} {runs.length === 1 ? "run" : "runs"} kept</span></header>
     <div className="cf-controls">
-      <label className="field field-sm"><span>Copies to try</span>
-        <select value={tries} onChange={(event) => setTries(Number(event.target.value))} disabled={running}>
-          {[1, 2, 3, 5].filter((value) => value <= (caps?.maxTries ?? 5)).map((value) => <option key={value} value={value}>{value}</option>)}
-        </select>
-      </label>
-      <label className="field field-sm"><span>Assistant-call cap</span>
-        <select value={calls} onChange={(event) => setCalls(Number(event.target.value))} disabled={running}>
-          {[48, 120, 240, 480].filter((value) => value <= (caps?.maxAssistantCalls ?? 480)).map((value) => <option key={value} value={value}>{value}</option>)}
-        </select>
-      </label>
-      <button className="btn btn-ghost" onClick={start} disabled={running || !ready}>
+      {runnable ? <>
+        <label className="field field-sm"><span>Copies to try</span>
+          <select value={choice.tries ?? undefined} onChange={(event) => setTries(Number(event.target.value))} disabled={running}>
+            {choice.tryOptions.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </label>
+        <label className="field field-sm"><span>Assistant-call cap</span>
+          <select value={choice.calls ?? undefined} onChange={(event) => setCalls(Number(event.target.value))} disabled={running}>
+            {choice.callOptions.map((value) => <option key={value} value={value}>{value}</option>)}
+          </select>
+        </label>
+      </> : <p className="agent-cap-note" role="note">This segment needs an assistant-call cap of at least {choice.minAssistantCalls} (the confirmation probe plus one search persona){caps ? `; this server allows ${caps.maxAssistantCalls}` : ""}, so the agent loop cannot run here.</p>}
+      <button className="btn btn-ghost" onClick={start} disabled={running || !ready || !runnable}>
         {running ? <><span className="spinner" /> Agent running</> : "Run agent loop"}
       </button>
     </div>

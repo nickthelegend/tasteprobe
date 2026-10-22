@@ -359,6 +359,7 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .agent { margin-top: 24px; display: grid; gap: 14px; }
 .agent-empty { font: 13px/1.6 var(--mono); color: var(--muted); }
 .agent-error { color: var(--bad); font-size: 14px; }
+.agent-cap-note { flex: 1 1 240px; margin: 0; font-size: 14px; color: var(--muted, inherit); overflow-wrap: anywhere; }
 .agent-log { list-style: none; margin: 0; padding: 0; display: grid; }
 .agent-log li { padding: 10px 0; border-bottom: 1px solid var(--line); display: grid; gap: 4px; font-size: 14px; }
 .agent-log b { font-weight: 500; }

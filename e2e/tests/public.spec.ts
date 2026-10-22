@@ -55,13 +55,21 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     await expect(locked.getByRole("heading", { name: "Runs are disabled on the public demo" })).toBeVisible();
     await expect(locked).toContainText("Stored flights and their printable reports stay open to read.");
     await expect(locked.getByLabel("Run token")).toHaveAttribute("type", "password");
-    await expect(room.locator(".order-caps")).toHaveText("This server runs one flight at a time, caps an audit at 24 personas and the agent at 5 copies and 480 assistant calls, and allows 10 runs an hour per visitor and 100 a day. Runs need the owner’s run token.");
+    await expect(room.locator(".order-caps")).toHaveText("This server runs one flight at a time, caps an audit at 24 personas and the agent at 2 copies and 100 assistant calls, and allows 10 runs an hour per visitor and 100 a day. Runs need the owner’s run token.");
     const personas = room.locator(".order-form select");
     await expect(personas).toHaveValue("24");
     await expect(personas.locator("option")).toHaveText(["16", "24"]);
     await expect(room.getByRole("button", { name: "Run audit" })).toBeDisabled();
     await expect(room.getByRole("button", { name: /Generate/ })).toBeDisabled();
     await expect(room.getByRole("button", { name: "Run agent loop" })).toBeDisabled();
+    // The agent selects are clamped to the server's lower caps (2 copies, 100 calls): what they show
+    // is what a run would send, not the UI defaults of 3 and 120.
+    const tries = room.getByLabel("Copies to try");
+    const calls = room.getByLabel("Assistant-call cap");
+    await expect(tries.locator("option")).toHaveText(["1", "2"]);
+    await expect(tries).toHaveValue("2");
+    await expect(calls.locator("option")).toHaveText(["48"]);
+    await expect(calls).toHaveValue("48");
     await expectNoHorizontalScroll(page);
     await locked.screenshot({ path: test.info().outputPath("14-runs-locked.png"), animations: "disabled" });
   });

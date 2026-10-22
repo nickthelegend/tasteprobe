@@ -7,7 +7,8 @@
 #         assembled exactly like the Dockerfile: standalone + .next/static), empty store, with
 #         TASTEPROBE_RUNS_OPEN=1 (a private server; without it or a run token, production refuses runs)
 #   3103  the same standalone build configured as a public demo: TASTEPROBE_RUN_TOKEN (a random
-#         test token written to e2e/.run/run-token, mode 600), TASTEPROBE_MAX_PERSONAS=24 and
+#         test token written to e2e/.run/run-token, mode 600), TASTEPROBE_MAX_PERSONAS=24, agent
+#         caps of 100 assistant calls and 2 copies (below the UI's defaults of 120 and 3), and
 #         TASTEPROBE_FEATURED_AUDIT_ID, with a test-only store seeded by e2e/seed.mjs from the
 #         SYNTHETIC fixture (14 audits, every name marked synthetic). Still no provider key.
 # Ports: TASTEPROBE_E2E_PORT_DEV / _STANDALONE / _PUBLIC override 3101 / 3102 / 3103 (the
@@ -56,6 +57,7 @@ start standalone env -i PATH="$PATH" HOME="$HOME" NODE_ENV=production NEXT_TELEM
   TASTEPROBE_RUNS_OPEN=1 TASTEPROBE_DATA_DIR="$PWD/$RUN/data-standalone" scripts/docker-entrypoint.sh node "$RUN/standalone/server.js"
 start public env -i PATH="$PATH" HOME="$HOME" NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME=127.0.0.1 PORT="$PUBLIC_PORT" \
   TASTEPROBE_DATA_DIR="$PWD/$RUN/data-public" TASTEPROBE_RUN_TOKEN="$(cat "$RUN/run-token")" TASTEPROBE_MAX_PERSONAS=24 \
+  TASTEPROBE_AGENT_MAX_CALLS=100 TASTEPROBE_AGENT_MAX_TRIES=2 \
   TASTEPROBE_FEATURED_AUDIT_ID=00000000-0000-4000-8000-000000000001 scripts/docker-entrypoint.sh node "$RUN/standalone/server.js"
 
 wait_http() { for _ in $(seq 1 200); do curl -fs -o /dev/null "$1" && return 0; sleep 0.5; done; echo "error: $1 never came up" >&2; return 1; }

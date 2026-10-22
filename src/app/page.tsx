@@ -375,7 +375,7 @@ export default function Home() {
         <section className="panel" id="repour-live" aria-labelledby="repour-live-title">
           <div className="panel-head"><div><h3 id="repour-live-title">Re-pour: baseline, placebo, fix</h3><p>Nemotron writes copy for one glass; the same personas re-ask every assistant three ways at once. Lift is fix minus placebo.</p></div><span className="stamp">placebo-controlled</span></div>
           <CounterfactualPanel audit={active} segmentId={segmentId} onSegment={setSegmentId} running={fixing} ready={controls.canFix || fixing} onRun={runFix} selectedAttempt={attemptId} onAttempt={setAttemptId} />
-          <AgentLoop audit={active} segmentId={segmentId} ready={controls.canRunAgent || agentRunning} headers={runHeaders} caps={caps?.agentCaps}
+          <AgentLoop audit={active} segmentId={segmentId} ready={controls.canRunAgent || agentRunning} headers={runHeaders} caps={caps?.agentCaps} assistants={assistants}
             onRunningChange={setAgentRunning} onRun={() => { void refresh(active.id); }} />
         </section>
 
