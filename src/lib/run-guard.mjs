@@ -89,6 +89,17 @@ export function checkJsonContentType(headers) {
   return type === "application/json" ? null : refusal(415, "json_required", "Send the request as JSON (Content-Type: application/json).");
 }
 
+// A paid route's body as a JSON object. An empty body is {}; anything else must parse to an object
+// (JSON null, an array or a primitive is refused), so a route never reads fields off null.
+export function parseJsonObjectBody(text) {
+  if (!String(text ?? "").trim()) return { body: {}, refusal: null };
+  let value;
+  try { value = JSON.parse(text); } catch { return { body: null, refusal: refusal(400, "invalid_json", "Request body must be JSON.") }; }
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? { body: value, refusal: null }
+    : { body: null, refusal: refusal(400, "invalid_body", "Request body must be a JSON object.") };
+}
+
 export function checkPersonaCap(personaCount, policy) {
   return personaCount > policy.maxPersonas
     ? refusal(400, "persona_cap", `This server allows at most ${policy.maxPersonas} personas per audit (TASTEPROBE_MAX_PERSONAS).`, { maxPersonas: policy.maxPersonas })

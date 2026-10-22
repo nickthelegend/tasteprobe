@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { findFixTarget, FixLookupError, runFix } from "@/lib/fix";
-import { openRun, quotaRefusal, startRun } from "@/lib/http-guard";
+import { openRun, quotaRefusal, readJsonObject, startRun } from "@/lib/http-guard";
 import { ConfigError, requireKeys } from "@/lib/providers";
 import { RunDeadlineError, runWithDeadline } from "@/lib/run-deadline.mjs";
 
@@ -12,7 +12,9 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const opened = openRun(request);
   if (opened.refusal) return opened.refusal;
   const { policy, ip } = opened;
-  const body = await request.json().catch(() => ({})) as { segment?: string };
+  const read = await readJsonObject(request);
+  if (read.refusal) return read.refusal;
+  const { body } = read;
   const quota = quotaRefusal(ip, policy);
   if (quota) return quota;
   const segmentId = typeof body.segment === "string" ? body.segment : undefined;

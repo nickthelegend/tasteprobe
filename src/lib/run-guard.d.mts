@@ -16,6 +16,7 @@ export function runPolicy(env?: Record<string, string | undefined>): RunPolicy;
 export function publicPolicy(policy: RunPolicy): PublicRunPolicy;
 export function checkRunToken(headers: HeaderReader, policy: RunPolicy): Refusal | null;
 export function checkJsonContentType(headers: HeaderReader): Refusal | null;
+export function parseJsonObjectBody(text: string): { body: Record<string, unknown>; refusal: null } | { body: null; refusal: Refusal };
 export function checkPersonaCap(personaCount: number, policy: RunPolicy): Refusal | null;
 export function clientAddress(headers: HeaderReader, policy?: Pick<RunPolicy, "trustedIpHeader">): string;
 export class RunGate {

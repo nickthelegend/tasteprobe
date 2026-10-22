@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { agentBudgetPlan, normalizeLimits } from "@/lib/agent-core.mjs";
 import { emptyTrace, runAgent } from "@/lib/agent";
-import { openRun, quotaRefusal, startRun } from "@/lib/http-guard";
+import { openRun, quotaRefusal, readJsonObject, startRun } from "@/lib/http-guard";
 import { createNdjsonStream } from "@/lib/ndjson-stream.mjs";
 import { runWithDeadline } from "@/lib/run-deadline.mjs";
 import { getTestModels, missingKeys } from "@/lib/providers";
@@ -19,13 +19,16 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const opened = openRun(request);
   if (opened.refusal) return opened.refusal;
   const { policy, ip } = opened;
+  // A body that is not a JSON object answers 400 before the quota, the key check or any lookup.
+  const read = await readJsonObject(request);
+  if (read.refusal) return read.refusal;
+  const { body } = read;
   const quota = quotaRefusal(ip, policy);
   if (quota) return quota;
   const missing = missingKeys();
   if (missing.length) return NextResponse.json({ error: "setup_required", missing, message: missing.map((name) => `Setup required: ${name}`).join("; ") }, { status: 503 });
   const audit = await findAudit(id);
   if (!audit) return NextResponse.json({ error: "Audit not found." }, { status: 404 });
-  const body = await request.json().catch(() => ({})) as Record<string, unknown>;
   const segment = typeof body.segment === "string"
     ? audit.segments.find((item) => item.id === body.segment)
     : [...audit.segments].sort((a, b) => a.share - b.share)[0];

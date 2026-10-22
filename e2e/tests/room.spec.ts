@@ -135,6 +135,19 @@ test.describe("tasting room with no keys", () => {
     expect(evidence.status()).toBe(404);
   });
 
+  test("a JSON null (or array) body answers 400 on the re-pour and agent routes, before any lookup or key check", async ({ request }) => {
+    const id = "00000000-0000-4000-8000-000000000000";
+    const before = (await (await request.get("/api/status")).json()).gate;
+    for (const route of ["fix", "agent"]) {
+      for (const body of ["null", "[]"]) {
+        const response = await request.post(`/api/audits/${id}/${route}`, { headers: { "content-type": "application/json" }, data: body });
+        expect(response.status(), `${route} ${body}`).toBe(400);
+        expect(await response.json()).toEqual({ error: "Request body must be a JSON object.", code: "invalid_body" });
+      }
+    }
+    expect((await (await request.get("/api/status")).json()).gate).toEqual({ running: null, runsToday: before.runsToday });
+  });
+
   test("no results chrome without an audit: no room nav, no past flights, no report link", async ({ page }) => {
     const room = await openRoom(page);
     await expect(room.getByRole("navigation", { name: "Tasting room sections" })).toHaveCount(0);

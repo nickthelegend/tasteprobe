@@ -150,3 +150,13 @@ test("running state is public: kind and start time, for an explainable busy 429"
   slot.release();
   assert.equal(gate.snapshot().running, null);
 });
+
+test("a paid route's body must be a JSON object: JSON null, arrays and primitives answer 400, an empty body is {}", async () => {
+  const { parseJsonObjectBody } = await import("../src/lib/run-guard.mjs");
+  assert.deepEqual(parseJsonObjectBody(""), { body: {}, refusal: null });
+  assert.deepEqual(parseJsonObjectBody('{"segment":"s1"}'), { body: { segment: "s1" }, refusal: null });
+  for (const text of ["null", "[]", '["s1"]', "3", '"s1"', "true"]) {
+    assert.deepEqual(parseJsonObjectBody(text), { body: null, refusal: { status: 400, body: { error: "Request body must be a JSON object.", code: "invalid_body" } } }, text);
+  }
+  assert.deepEqual(parseJsonObjectBody("{"), { body: null, refusal: { status: 400, body: { error: "Request body must be JSON.", code: "invalid_json" } } });
+});

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkJsonContentType, checkRunToken, clientAddress, runPolicy, sharedRunGate, type Refusal, type RunPolicy } from "./run-guard.mjs";
+import { checkJsonContentType, checkRunToken, clientAddress, parseJsonObjectBody, runPolicy, sharedRunGate, type Refusal, type RunPolicy } from "./run-guard.mjs";
 
 // The spend guard as the three paid routes use it. See src/lib/run-guard.mjs for the rules.
 export function refuse(refusal: Refusal) {
@@ -13,6 +13,12 @@ export function openRun(request: Request): { policy: RunPolicy; ip: string; refu
   const refusal = checkRunToken(request.headers, policy) ?? checkJsonContentType(request.headers);
   if (refusal) return { refusal: refuse(refusal) };
   return { policy, ip: clientAddress(request.headers, policy), refusal: null };
+}
+
+// The request body as a JSON object ({} when empty), or a 400 to send. Spends nothing.
+export async function readJsonObject(request: Request): Promise<{ body: Record<string, unknown>; refusal: null } | { refusal: NextResponse }> {
+  const parsed = parseJsonObjectBody(await request.text().catch(() => ""));
+  return parsed.refusal ? { refusal: refuse(parsed.refusal) } : { body: parsed.body, refusal: null };
 }
 
 // Out of runs for this address or for today? Spends nothing.
