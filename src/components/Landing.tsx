@@ -8,10 +8,11 @@ const Arrow = ({ down = false }: { down?: boolean }) => <svg viewBox="0 0 24 24"
 // Illustrative values only. Every surface that shows them carries the label "Example, not a real audit".
 const EXAMPLE_LABEL = "Example, not a real audit";
 const EXAMPLE_FLIGHT: FlightItem[] = [
-  { id: "a", name: "Cuisine tags", share: 0.58, interval: [0.41, 0.73], detail: "illustrative" },
-  { id: "b", name: "Ambience tags", share: 0.31, interval: [0.18, 0.47], detail: "illustrative" },
-  { id: "c", name: "Offering tags", share: 0.12, interval: [0.05, 0.27], detail: "illustrative" },
-  { id: "d", name: "Audience tags", share: 0, interval: [0, 0.13], detail: "illustrative" },
+  // Entity segments, as the Qloo hackathon key produces (it lists only urn:entity types).
+  { id: "a", name: "Music taste", share: 0.58, interval: [0.41, 0.73], detail: "illustrative" },
+  { id: "b", name: "Film taste", share: 0.31, interval: [0.18, 0.47], detail: "illustrative" },
+  { id: "c", name: "Brand taste", share: 0.12, interval: [0.05, 0.27], detail: "illustrative" },
+  { id: "d", name: "Place taste", share: 0, interval: [0, 0.13], detail: "illustrative" },
 ];
 const EXAMPLE_REPOUR: FlightItem[] = [
   { id: "baseline", name: "Baseline", share: 0.12, interval: [0.05, 0.27] },
@@ -23,7 +24,7 @@ export type CellarStatus = { qloo: boolean; nebius: { configured: boolean; ok: b
 
 const COURSES: { title: string; body: React.ReactNode; tag: string }[] = [
   { title: "Source the palates", tag: "Qloo Taste AI", body: <>Qloo <code>/search</code> resolves the venue in its city, then <code>/v2/insights</code> returns taste tags with affinity for that city, topped up from the venue’s global neighbourhood when the city has fewer than six (each audit says how many). If the key refuses <code>urn:tag</code>, as the hackathon host may, the palates come from artist, brand, film, book, TV, podcast and place affinities instead.</> },
-  { title: "Seat the personas", tag: "≥ 8 per glass", body: <>Each persona anchors on one tag and blends in two affinity-weighted tags. Tags are grouped into taste segments by Qloo subtype, and each segment gets at least eight personas.</> },
+  { title: "Seat the personas", tag: "≥ 8 per glass", body: <>Each persona anchors on one taste signal and blends in two affinity-weighted ones. Signals are grouped into taste segments: by Qloo tag subtype, or, on the hackathon key (<code>urn:entity</code> only), by entity type, such as music, film, brand or place taste. Each segment gets at least eight personas.</> },
   { title: "Pour the question", tag: "brand never named", body: <>The baseline prompt holds only the persona’s tastes, the category and the city. It never names you, so every mention is earned.</> },
   { title: "Take tasting notes", tag: "NVIDIA Nemotron", body: <>Every assistant answer is a tasting note. Nemotron on Nebius extracts the venues it recommends, cross-checked against a plain numbered-list parser.</> },
   { title: "Measure the glass", tag: "Wilson 95%", body: <>Each glass fills to your share of the answers. The pour lines are a Wilson interval on a persona-adjusted sample size, because one persona’s answers move together.</> },
@@ -81,7 +82,7 @@ export function Landing({ status, auditCount, featured = null }: { status: Cella
         </div>
       </div>
       <FlightBoard items={EXAMPLE_FLIGHT} stamp={EXAMPLE_LABEL} size={112}
-        caption={<><b>{EXAMPLE_LABEL}.</b> The layout of a result, with made-up levels. Real flights appear in the tasting room only after live Qloo, Nebius and assistant calls.</>} />
+        caption={<><b>{EXAMPLE_LABEL}.</b> The layout of a result, with made-up levels and the entity-taste segments the Qloo hackathon key yields. Real flights appear in the tasting room only after live Qloo, Nebius and assistant calls.</>} />
     </section>
 
     <section className="menu" id="flight" aria-labelledby="flight-title">

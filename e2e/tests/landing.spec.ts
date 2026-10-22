@@ -21,9 +21,11 @@ test.describe("landing: the tasting sheet", () => {
     await expect(hero.locator(".board-stamp")).toHaveText(EXAMPLE);
     await expect(hero.locator(".board-caption")).toContainText(`${EXAMPLE}.`);
     await expect(hero.locator(".board-caption")).toContainText("Real flights appear in the tasting room only after live Qloo, Nebius and assistant calls.");
-    await expect(hero.locator(".placard-name")).toHaveText(["Cuisine tags", "Ambience tags", "Offering tags", "Audience tags"]);
+    // Entity-taste segments, the kind the Qloo hackathon key yields (the hosted flights use the same).
+    await expect(hero.locator(".placard-name")).toHaveText(["Music taste", "Film taste", "Brand taste", "Place taste"]);
+    await expect(hero.locator(".board-caption")).toContainText("the entity-taste segments the Qloo hackathon key yields");
     await expect(hero.locator(".placard-share")).toHaveText(["58%", "31%", "12%", "0%"]);
-    await expect(hero.getByRole("img", { name: /^Cuisine tags: 58% of answers recommend the venue, 95% interval/ })).toBeVisible();
+    await expect(hero.getByRole("img", { name: /^Music taste: 58% of answers recommend the venue, 95% interval/ })).toBeVisible();
     // Every surface that shows made-up levels carries the stamp: hero, glass anatomy, re-pour.
     await expect(page.locator(".board-stamp", { hasText: EXAMPLE })).toHaveCount(3);
     await hero.scrollIntoViewIfNeeded();
