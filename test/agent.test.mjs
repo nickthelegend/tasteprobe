@@ -6,6 +6,7 @@ import {
   STOP_REASONS, tokenCostUsd, validateCopy,
 } from "../src/lib/agent-core.mjs";
 import { seededRandom } from "../src/lib/stats.mjs";
+import { nullTrial } from "./null-trial.mjs";
 
 const limits = normalizeLimits({ maxTries: 3, maxAssistantCalls: 96, maxUsd: 0.05, maxNemotronTokens: 100_000, maxTurns: 10 });
 const prices = { input: 0.06, output: 0.24 };
@@ -150,55 +151,6 @@ test("a cap that leaves the search no budget is refused up front (budget_too_sma
   assert.match(STOP_REASONS.budget_too_small, /too small/);
 });
 
-// Null simulation: the copy has NO effect (fix and placebo share each persona's rate). The agent
-// policy follows the README (probe 8 at a time, keep probing while the point lift is positive,
-// otherwise revise) under the default limits (3 copies, 120 assistant calls). Seeded, so the rates
-// below are exact for this code. The old rule stopped on the search interval and is reported as
-// `screened`; the new rule needs the confirmation probe as well.
-function nullTrial(seed, segmentSize, assistants) {
-  const random = seededRandom(seed);
-  const rates = Array.from({ length: segmentSize }, () => Math.min(0.95, Math.max(0.02, 0.3 + (random() - 0.5) * 0.5)));
-  const ids = rates.map((_, index) => `p${index}`);
-  const draw = (personaIds) => {
-    const placeboRows = [], fixRows = [];
-    for (const id of personaIds) for (let model = 0; model < assistants; model++) {
-      const rate = rates[Number(id.slice(1))];
-      placeboRows.push({ personaId: id, brand: random() < rate });
-      fixRows.push({ personaId: id, brand: random() < rate });
-    }
-    return { placeboRows, fixRows };
-  };
-  const plan = planConfirmation(ids);
-  const limits = normalizeLimits({});
-  const search = { ...limits, maxAssistantCalls: limits.maxAssistantCalls - confirmationCalls(plan, assistants) };
-  const candidates = [];
-  let budget = createBudget();
-  for (let attempt = 0; attempt < limits.maxTries; attempt++) {
-    const current = { id: `c${attempt}`, copy: "x", rationale: "", placeboRows: [], fixRows: [], personasProbed: [], failed: 0 };
-    candidates.push(current);
-    budget = chargeBudget(budget, { tries: 1 }, null);
-    while (current.personasProbed.length < plan.selection.length) {
-      const fresh = nextPersonas(plan.selection, current.personasProbed, 8);
-      const affordable = affordablePersonas(budget, search, fresh.length, assistants);
-      if (!affordable) return { screened: false, confirmed: false };
-      const chosen = fresh.slice(0, affordable);
-      const probe = draw(chosen);
-      current.placeboRows.push(...probe.placeboRows);
-      current.fixRows.push(...probe.fixRows);
-      current.personasProbed.push(...chosen);
-      budget = chargeBudget(budget, { assistantCalls: chosen.length * assistants * 2 }, null);
-      const decision = stopDecision(candidates, budget, search, plan.selection.length);
-      if (decision.confirm) {
-        const confirmation = confirmationResult({ candidateId: decision.confirm, mode: plan.mode, ...draw(plan.confirmation) });
-        return { screened: true, confirmed: stopDecision(candidates, budget, search, plan.selection.length, confirmation).reason === "lift_confirmed" };
-      }
-      if (decision.stop) return { screened: false, confirmed: false };
-      if (!(candidateStats(current).lift > 0)) break;
-    }
-  }
-  return { screened: false, confirmed: false };
-}
-
 test("null simulation: the confirmed rule keeps false wins at or under 5%, the search interval alone does not", { timeout: 120_000 }, () => {
   const trials = 800;
   for (const [segmentSize, assistants] of [[8, 2], [16, 1]]) {
@@ -211,6 +163,23 @@ test("null simulation: the confirmed rule keeps false wins at or under 5%, the s
     const screenRate = screened / trials, winRate = confirmed / trials;
     assert.ok(screenRate > 0.05, `segment ${segmentSize}, ${assistants} assistant(s): the search interval alone 'won' ${(screenRate * 100).toFixed(1)}% of null runs; expected well above 5%`);
     assert.ok(winRate <= 0.05, `segment ${segmentSize}, ${assistants} assistant(s): false confirmed wins ${(winRate * 100).toFixed(1)}% of null runs; must be <= 5%`);
+  }
+});
+
+// The server cap and the room allow up to 5 copies (TASTEPROBE_AGENT_MAX_TRIES default), so the
+// guarantee is checked there too: more copies mean more looks for the screen, not for the result.
+test("null simulation at 5 copies, the most the server allows: confirmed false wins stay at or under 5%", { timeout: 120_000 }, () => {
+  assert.equal(normalizeLimits({ maxTries: 5 }).maxTries, 5);
+  const trials = 800;
+  for (const [segmentSize, assistants] of [[8, 2], [16, 1], [24, 2]]) {
+    let screened = 0, confirmed = 0;
+    for (let trial = 0; trial < trials; trial++) {
+      const outcome = nullTrial(9000 + trial, segmentSize, assistants, 5);
+      if (outcome.screened) screened++;
+      if (outcome.confirmed) confirmed++;
+    }
+    assert.ok(screened / trials > 0.05, `segment ${segmentSize} x ${assistants}, 5 copies: the screen alone 'won' ${(100 * screened / trials).toFixed(1)}%`);
+    assert.ok(confirmed / trials <= 0.05, `segment ${segmentSize} x ${assistants}, 5 copies: false confirmed wins ${(100 * confirmed / trials).toFixed(1)}%; must be <= 5%`);
   }
 });
 

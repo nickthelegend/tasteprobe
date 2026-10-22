@@ -138,7 +138,7 @@ export function selectBest(candidates) {
 
 // Why a search-phase interval alone cannot end the run: the agent looks at the interval after every
 // probe (optional stopping) across up to maxTries copies (multiple comparisons). A seeded null
-// simulation (test/agent.test.mjs) puts the false "lift above zero" rate of that rule at 12-18%,
+// simulation (scripts/null-sim.mjs) puts the false "lift above zero" rate of that rule at 8.9-16.4% at 3 copies,
 // against a nominal 2.5%. So the search only SCREENS. A copy that clears the screen gets ONE
 // confirmation probe on personas the search never used (held-out personas when the segment has
 // at least 16; otherwise a fresh re-ask of the same personas, whose answers are new draws), and

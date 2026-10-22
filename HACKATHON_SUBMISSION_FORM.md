@@ -75,7 +75,7 @@ Do AI assistants recommend you to your own audience? A placebo-controlled audit 
 ## Challenges
 - **Separating name exposure from copy.** Injecting any snippet that names the venue raises mentions, so a placebo arm was needed.
 - **Honest intervals at small n.** 0 of 12 must not read as "0–0%".
-- **Honest stopping.** Checking a lift interval after every probe across several copies gave false wins in 12-18% of simulated null runs, so the agent's search now only screens and a held-out confirmation decides (0.2-0.6% in the same simulation).
+- **Honest stopping.** Checking a lift interval after every probe across several copies gave false wins in 8.9-16.4% of simulated null runs at 3 copies, so the agent's search now only screens and one confirmation probe decides (0.1-1.1% false confirmed wins across 1-5 copies in the same simulation; `node scripts/null-sim.mjs` prints the table).
 - **Reasoning-model output.** Truncated or non-JSON extractions must be counted, not dropped.
 - **Building against docs without keys.** Every parameter was checked against the live docs. That check found a wrong default model ID and an unhandled `/search` 404 before the first call. The rest is listed as unverified in the README.
 
