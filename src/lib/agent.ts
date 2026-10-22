@@ -1,40 +1,49 @@
 import type OpenAI from "openai";
 import {
   affordablePersonas, budgetExhausted, candidateStats, chargeBudget, confirmationCalls, confirmationResult, createBudget, nextPersonas,
-  parseToolArguments, planConfirmation, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy,
+  parseToolArguments, planConfirmation, qlooFilterTypes, selectBest, stopDecision, STOP_REASONS, tokenCostUsd, validateCopy, validateQlooToolArgs,
   type AgentBudget, type AgentLimits, type Candidate, type Confirmation, type StopReason,
 } from "./agent-core.mjs";
 import { runArms } from "./experiment.ts";
 import { sumUsage, type FailedRow, type ResponseRow } from "./probe.ts";
-import { COPY_RULES, fetchPersonaSignals, getTestModels, nebiusModel, nebiusPrices, nemotronTurn } from "./providers.ts";
+import { COPY_RULES, fetchPersonaSignals, getTestModels, nebiusModel, nebiusPrices, nemotronTurn, qlooOnHackathonHost, qlooTasteProfile } from "./providers.ts";
 import { placeboCopy, segmentLabel } from "./taste.mjs";
 import type { AgentCandidateSummary, AgentEvent, AgentRun, Audit, SegmentResult } from "./types";
 
 // Tool schemas sent to Nemotron in the OpenAI function-calling format that Nebius documents for
 // chat completions (`tools`, `tool_choice`). Which Nemotron builds on Nebius honour it is only
 // confirmed by a live run; a model that ignores tools ends the loop with stop reason agent_finished.
-export const AGENT_TOOLS: OpenAI.Chat.ChatCompletionTool[] = [
-  { type: "function", function: {
-    name: "qloo_insights",
-    description: "Live Qloo /v2/insights call for this venue in its city. Returns the taste tags (with affinity) of the target segment and the strongest tags overall.",
-    parameters: { type: "object", properties: {} },
-  } },
-  { type: "function", function: {
-    name: "propose_copy",
-    description: "Register one candidate piece of website copy for the venue. Max 45 words; no prices, awards or rankings. Uses one try. Returns candidate_id.",
-    parameters: { type: "object", properties: { copy: { type: "string" }, rationale: { type: "string" } }, required: ["copy"] },
-  } },
-  { type: "function", function: {
-    name: "probe_segment",
-    description: "Live test of a candidate on the search personas: the next n of them ask every assistant twice, once with a neutral placebo snippet and once with the candidate copy. Costs n x assistants x 2 assistant calls. Returns updated stats (nominal intervals; they only screen).",
-    parameters: { type: "object", properties: { candidate_id: { type: "string" }, n: { type: "integer", minimum: 1 } }, required: ["candidate_id", "n"] },
-  } },
-  { type: "function", function: {
-    name: "get_stats",
-    description: "Placebo share, fix share and the paired nominal 95% lift interval (fix minus placebo) for every candidate on the search personas, plus the budget left.",
-    parameters: { type: "object", properties: {} },
-  } },
-];
+// qloo_insights takes real Qloo arguments: which entity type to read, whose taste neighbourhood
+// (the venue or a rival this audit verified in Qloo) and where, so the agent can compare the
+// venue with a rival that wins the segment and aim the copy at the difference.
+export function buildAgentTools({ rivals, hackathonHost }: { rivals: { name: string; qlooId: string }[]; hackathonHost: boolean }): OpenAI.Chat.ChatCompletionTool[] {
+  return [
+    { type: "function", function: {
+      name: "qloo_insights",
+      description: "Live Qloo /v2/insights call. With no arguments: this segment's own persona signals for the venue in its city. With filter_type: the top entities of that type (with affinity) in the taste neighbourhood of `entity` (the venue, or a verified rival's Qloo id) for `location`. Each distinct call is made once per run and logged.",
+      parameters: { type: "object", properties: {
+        filter_type: { type: "string", enum: qlooFilterTypes(hackathonHost), description: hackathonHost ? "Qloo entity type. urn:tag is not available on the hackathon host." : "Qloo entity type, or urn:tag." },
+        entity: { type: "string", description: `"venue" (default) or the Qloo id of a verified rival: ${rivals.length ? rivals.map((item) => `${item.qlooId} = ${item.name}`).join("; ") : "none verified in this audit"}.` },
+        location: { type: "string", description: "City for signal.location.query; defaults to the venue's city." },
+      } },
+    } },
+    { type: "function", function: {
+      name: "propose_copy",
+      description: "Register one candidate piece of website copy for the venue. Max 45 words; no prices, awards or rankings. Uses one try. Returns candidate_id.",
+      parameters: { type: "object", properties: { copy: { type: "string" }, rationale: { type: "string" } }, required: ["copy"] },
+    } },
+    { type: "function", function: {
+      name: "probe_segment",
+      description: "Live test of a candidate on the search personas: the next n of them ask every assistant twice, once with a neutral placebo snippet and once with the candidate copy. Costs n x assistants x 2 assistant calls. Returns updated stats (nominal intervals; they only screen).",
+      parameters: { type: "object", properties: { candidate_id: { type: "string" }, n: { type: "integer", minimum: 1 } }, required: ["candidate_id", "n"] },
+    } },
+    { type: "function", function: {
+      name: "get_stats",
+      description: "Placebo share, fix share and the paired nominal 95% lift interval (fix minus placebo) for every candidate on the search personas, plus the budget left.",
+      parameters: { type: "object", properties: {} },
+    } },
+  ];
+}
 
 const round = (value: number | null, digits = 3) => value === null ? null : Number(value.toFixed(digits));
 const stripThink = (text: string) => text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
@@ -62,6 +71,8 @@ export type AgentTrace = {
   messages: OpenAI.Chat.ChatCompletionMessageParam[];
   probes: { candidateId: string; personas: string[]; confirmation?: boolean; placebo: { rows: ResponseRow[]; failures: FailedRow[] }; fix: { rows: ResponseRow[]; failures: FailedRow[] } }[];
   qloo?: unknown;
+  // Every qloo_insights call with arguments: what was asked and the raw payload (kept server-side).
+  qlooCalls?: { filterType: string; entity: string; location: string; payload: unknown }[];
 };
 
 // Plan -> propose -> probe vs placebo -> revise, driven by Nemotron tool calls, on the segment's
@@ -92,6 +103,10 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
   let budget = createBudget();
   let steps = 0;
   let qlooCache: unknown;
+  const qlooCalls = new Map<string, unknown>();
+  const rivals = (audit.rivalChecks ?? []).filter((check) => check.status === "verified" && check.qlooId).map((check) => ({ name: check.name, qlooId: check.qlooId as string }));
+  const hackathonHost = qlooOnHackathonHost();
+  const tools = buildAgentTools({ rivals, hackathonHost });
   let nudged = false;
 
   send({ type: "start", runId, segment: segment.name, model, limits });
@@ -100,7 +115,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
     { role: "system", content: [
       `You are TasteProbe's fix agent. Find website copy for ${audit.brand} (${audit.category}, ${audit.city}) that makes AI assistants recommend it more often to people in the "${segment.name}" taste segment.`,
       `Every probe compares your copy against a placebo snippet ("${placeboCopy(audit.brand, audit.category, audit.city)}") on the same personas, so only copy that beats mere name exposure counts.`,
-      `Procedure: 1) plan in one or two sentences and call qloo_insights to read the segment's taste signals; 2) propose_copy with one candidate; 3) probe_segment on it, starting with n=8; 4) get_stats. If the point lift is positive but the interval includes 0, probe more personas. If the lift is zero or negative, revise with a new propose_copy that targets the segment's tastes differently.`,
+      `Procedure: 1) plan in one or two sentences and call qloo_insights to read the segment's taste signals; you may also call it with filter_type and entity to compare the venue's taste neighbourhood with a verified rival's; 2) propose_copy with one candidate; 3) probe_segment on it, starting with n=8; 4) get_stats. If the point lift is positive but the interval includes 0, probe more personas. If the lift is zero or negative, revise with a new propose_copy that targets the segment's tastes differently.`,
       `Your probes use ${personaIds.length} search personas. When a copy's lift interval clears zero there, the code runs one confirmation probe ${plan.mode === "holdout" ? `on ${plan.confirmation.length} held-out personas you never see` : "that re-asks the same personas fresh"}, and only that probe can declare a win. Then the loop stops.`,
       `${COPY_RULES} Use only facts implied by the venue's category and the Qloo tastes; do not invent dishes, events or people.`,
       "The loop also stops when the budget runs out. Call one tool at a time.",
@@ -109,6 +124,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
       venue,
       segment: { name: segment.name, personas: personas.length, search_personas: personaIds.length, baseline_share: round(segment.share), baseline_ci: segment.ci.map((value) => round(value)) },
       rivals_recommended_instead: segment.competitors.slice(0, 5).map((item) => item.name),
+      rivals_verified_in_qloo: rivals.map((item) => ({ name: item.name, qloo_id: item.qlooId })),
       assistants_under_test: assistants,
       budget: remaining(budget, searchLimits),
     }) },
@@ -118,6 +134,20 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
 
   async function execute(name: string, args: Record<string, unknown>): Promise<{ ok: boolean; result: unknown; summary: string }> {
     if (name === "qloo_insights") {
+      const checked = validateQlooToolArgs(args, { rivals, hackathonHost, city: audit.city });
+      if (!checked.ok) return { ok: false, result: { error: checked.error }, summary: `Rejected qloo_insights: ${checked.error}` };
+      const { filterType, entity, location } = checked.value;
+      if (filterType) {
+        const whose = entity.kind === "venue" ? audit.brand : entity.name;
+        const key = `${filterType}|${entity.kind === "venue" ? audit.qlooEntityId : entity.id}|${location}`;
+        const cached = qlooCalls.get(key);
+        if (cached) return { ok: true, result: cached, summary: `Qloo ${filterType} for ${whose} in ${location} (already read this run)` };
+        const profile = await qlooTasteProfile({ entityId: entity.kind === "venue" ? audit.qlooEntityId : entity.id, filterType, location });
+        trace.qlooCalls = [...(trace.qlooCalls ?? []), { filterType, entity: key.split("|")[1], location, payload: profile.raw }];
+        const result = { filter_type: filterType, entity: whose, location, top: profile.items.map((item) => ({ name: item.name, affinity: round(item.affinity) })) };
+        qlooCalls.set(key, result);
+        return { ok: true, result, summary: `Qloo ${filterType} for ${whose} in ${location}: ${profile.items.length} results${profile.items[0] ? `, top ${profile.items.slice(0, 3).map((item) => item.name).join(", ")}` : ""}` };
+      }
       if (!qlooCache) {
         // Same fallback as the audit: urn:tag, or urn:entity affinities when the key refuses urn:tag.
         const { tags, raw, source } = await fetchPersonaSignals(audit.qlooEntityId, audit.city, audit.brand);
@@ -219,7 +249,7 @@ export async function runAgent(audit: Audit, segment: SegmentResult, limits: Age
   while (!reason) {
     const exhausted = budgetExhausted(budget, searchLimits);
     if (exhausted) { reason = exhausted; break; }
-    const turn = await nemotronTurn(messages, AGENT_TOOLS);
+    const turn = await nemotronTurn(messages, tools);
     steps++;
     budget = chargeBudget(budget, { nemotronCalls: 1, usage: turn.usage, turns: 1 }, prices);
     const content = turn.message.content ?? "";

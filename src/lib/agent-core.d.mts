@@ -36,3 +36,9 @@ export function confirmationResult(input: { candidateId: string; mode: "holdout"
 export function stopDecision(candidates: Candidate[], budget: AgentBudget, limits: AgentLimits, selectionSize: number, confirmation?: Confirmation | null): { stop: boolean; reason: StopReason | null; confirm: string | null };
 export const STOP_REASONS: Record<StopReason, string>;
 export function nextPersonas(segmentPersonaIds: string[], probedIds: string[], count: number): string[];
+export function qlooFilterTypes(hackathonHost: boolean): string[];
+export type QlooToolArgs = { filterType: string | null; entity: { kind: "venue" } | { kind: "rival"; id: string; name: string }; location: string };
+export function validateQlooToolArgs(
+  args: Record<string, unknown> | undefined,
+  context: { rivals?: { name: string; qlooId: string }[]; hackathonHost?: boolean; city: string },
+): { ok: true; value: QlooToolArgs } | { ok: false; error: string };

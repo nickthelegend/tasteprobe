@@ -22,7 +22,7 @@ flowchart LR
   L --> M
   M --> D[Dashboard + run report]
   M --> F[Fix: baseline / placebo / fix arms<br/>same personas, run concurrently]
-  M --> G[Agent loop: Nemotron tool calls<br/>qloo_insights · propose_copy · probe_segment · get_stats]
+  M --> G[Agent loop: Nemotron tool calls<br/>qloo_insights by type, entity, city · propose_copy · probe_segment · get_stats]
   F --> D
   G --> D
   A -. raw answers .-> C[(.data/raw cache<br/>SHA-256 in report)]
@@ -44,7 +44,7 @@ flowchart LR
 | Live CLI, report and replay | `scripts/live-audit.mjs`, `src/lib/report.mjs` |
 | Qloo response handling (404 = no results, 401/403 messages) | `src/lib/qloo.mjs` |
 | Nebius model ID and reasoning settings | `src/lib/nebius.mjs` |
-| MCP server (`run_audit`, `run_fix`, `get_report`) | `src/mcp/server.mjs`, `src/lib/fix.ts`, `src/lib/report-model.mjs` |
+| MCP server (`run_audit`, `run_fix`, `get_report`, `qloo_taste_profile`) | `src/mcp/server.mjs`, `src/lib/fix.ts`, `src/lib/report-model.mjs` |
 | Printable report | `src/app/audits/[id]/report/page.tsx`, `src/lib/print-report.mjs` |
 | Dashboard | `src/app/page.tsx`, `src/components/*` |
 
@@ -86,15 +86,16 @@ npm run audit:live -- --replay <run id>
 
 ## MCP server
 
-`npm run mcp` starts a stdio [Model Context Protocol](https://modelcontextprotocol.io) server (`src/mcp/server.mjs`), so any MCP client or agent can use TasteProbe as a tool. Run it from the repo root so it finds `.env.local` and `.data/`.
+`npm run mcp` starts a stdio [Model Context Protocol](https://modelcontextprotocol.io) server (`src/mcp/server.mjs`), so any MCP client or agent can use TasteProbe, and Qloo through it, as a tool. Run it from the repo root so it finds `.env.local` and `.data/`.
 
 | Tool | Input | What it does | Keys |
 |---|---|---|---|
 | `run_audit` | `brand`, `city`, `category?`, `personas?` (8–200) | The full live audit (same pipeline as the web app and CLI). Sends MCP progress notifications per persona when the client asks for them. | Qloo, Nebius, assistant |
 | `run_fix` | `audit_id`, `segment?` | One placebo-controlled fix attempt on a stored audit (weakest segment by default) | Qloo, Nebius, assistant |
 | `get_report` | `audit_id?` | A stored audit as a report (text plus structured JSON), or the list of stored audits | none |
+| `qloo_taste_profile` | `audit_id`, `filter_type`, `entity?`, `location?` | Live Qloo `/v2/insights`: the top entities of one type (with affinity) in the taste neighbourhood of a stored audit's venue, or of a rival that audit verified in Qloo, for a city. On the hackathon host only `urn:entity:*` types are offered. Names and affinities only; the raw payload is not passed on. | Qloo |
 
-Without keys, `run_audit` and `run_fix` return a tool error, `Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY. ...`, before any API call. Inputs are validated (audit ids must be UUIDs). Example client config:
+Without keys, `run_audit` and `run_fix` return a tool error, `Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY. ...`, and `qloo_taste_profile` returns `Setup required: QLOO_API_KEY. ...`, before any API call. Inputs are validated (audit ids must be UUIDs). Example client config:
 
 ```json
 { "mcpServers": { "tasteprobe": { "command": "npm", "args": ["run", "-s", "mcp"], "cwd": "/path/to/tasteprobe" } } }
@@ -148,7 +149,8 @@ Every model call that TasteProbe itself makes goes to an NVIDIA open model on Ne
 - `/search` (`types=urn:entity:place`) resolves the venue in its own city and checks the rivals assistants recommend. A 404 is Qloo's documented "No results" and stops the audit with a readable message.
 - `/v2/insights` with `filter.type=urn:tag`, `signal.interests.entities` and `signal.location.query` builds the personas (Taste Analysis). If the key answers 403 for `urn:tag` (the hackathon guide lists it as unsupported), the personas come from `urn:entity:artist|brand|movie|book|tv_show|podcast|place` affinities instead, and the audit records `personaSource: "urn:entity"`.
 - `/v2/insights` with `filter.type=urn:entity:artist|brand|movie|book` adds cross-domain taste, and `filter.type=urn:demographics` adds the audience lean.
-- The agent reads Qloo live through its `qloo_insights` tool. The MCP server exposes the whole Qloo-grounded audit to other agents.
+- The agent reads Qloo live through its `qloo_insights` tool. With no arguments it returns the segment's own persona signals. With `filter_type` (an `urn:entity:*` type; `urn:tag` only off the hackathon host), `entity` (`venue` or the Qloo id of a rival the audit verified with `/search`) and `location`, it returns that entity's taste neighbourhood, so the agent can compare the venue with a rival that wins the segment and aim the copy at the difference. Each distinct call is made once per run, logged in the notebook, and its raw payload kept in the server-side trace.
+- The MCP server exposes the whole Qloo-grounded audit to other agents, plus `qloo_taste_profile` for direct Qloo reads.
 - Raw Qloo payloads are cached server-side under `.data/` (git-ignored). Qloo's FAQ forbids putting Qloo response data in a public repo.
 
 ## API facts: confirmed vs unverified

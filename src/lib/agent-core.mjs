@@ -1,5 +1,6 @@
 // Pure pieces of the fix-agent loop: budget accounting, the stop rule, copy validation and
 // best-candidate selection. No network here, so all of it is unit-tested directly.
+import { HACKATHON_ENTITY_TYPES } from "./persona-source.mjs";
 import { pairedBootstrapDifference, shareInterval, shareOf } from "./stats.mjs";
 import { MIN_PERSONAS_PER_SEGMENT } from "./taste.mjs";
 
@@ -194,4 +195,34 @@ export const STOP_REASONS = {
 export function nextPersonas(segmentPersonaIds, probedIds, count) {
   const used = new Set(probedIds);
   return segmentPersonaIds.filter((id) => !used.has(id)).slice(0, Math.max(0, count));
+}
+
+// filter.type values the agent's qloo_insights tool (and the MCP qloo_taste_profile tool) may ask
+// for. The hackathon host supports only urn:entity types (urn:tag answers 403 there), so urn:tag
+// is offered only against another Qloo host.
+export function qlooFilterTypes(hackathonHost) {
+  const entityTypes = HACKATHON_ENTITY_TYPES.map((type) => `urn:entity:${type}`);
+  return hackathonHost ? entityTypes : ["urn:tag", ...entityTypes];
+}
+
+// Validates qloo_insights arguments. No filter_type = the segment's own persona signals (urn:tag,
+// or urn:entity after a 403), as before. `entity` is "venue" or the Qloo id of a rival this audit
+// verified in Qloo; `location` defaults to the venue's city.
+export function validateQlooToolArgs(args = {}, { rivals = [], hackathonHost = true, city }) {
+  const allowedTypes = qlooFilterTypes(hackathonHost);
+  const filterType = args.filter_type === undefined || args.filter_type === null || args.filter_type === "" ? null : String(args.filter_type);
+  if (filterType !== null && !allowedTypes.includes(filterType)) {
+    const hint = filterType === "urn:tag" && hackathonHost ? "urn:tag is not supported on the Qloo hackathon host (it answers 403). " : "";
+    return { ok: false, error: `${hint}filter_type must be one of: ${allowedTypes.join(", ")}.` };
+  }
+  const entity = args.entity === undefined || args.entity === null || args.entity === "" ? "venue" : String(args.entity);
+  const rival = rivals.find((item) => item.qlooId === entity || item.name === entity);
+  if (entity !== "venue" && !rival) {
+    return { ok: false, error: `entity must be "venue" or the Qloo id of a verified rival: ${rivals.length ? rivals.map((item) => `${item.qlooId} (${item.name})`).join(", ") : "this audit has no verified rivals"}.` };
+  }
+  if (args.location !== undefined && args.location !== null && (typeof args.location !== "string" || args.location.trim().length < 2 || args.location.trim().length > 80)) {
+    return { ok: false, error: "location must be a city name of 2 to 80 characters." };
+  }
+  const location = typeof args.location === "string" && args.location.trim() ? args.location.trim() : city;
+  return { ok: true, value: { filterType, entity: rival ? { kind: "rival", id: rival.qlooId, name: rival.name } : { kind: "venue" }, location } };
 }

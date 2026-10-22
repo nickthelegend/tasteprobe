@@ -3,7 +3,7 @@ import { parseJsonObject } from "./json.mjs";
 import { QLOO_HACKATHON_BASE_URL, readQlooResponse } from "./qloo.mjs";
 import { DEFAULT_NEBIUS_MODEL, reasoningLabel, reasoningParams, reasoningText } from "./nebius.mjs";
 import { collectPersonaSignals, type PersonaSignals } from "./persona-source.mjs";
-import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, pickPlace, type QlooEntity } from "./taste.mjs";
+import { CROSS_DOMAIN_TYPES, matchesBrand, parseQlooDemographics, parseQlooEntities, parseQlooTags, pickPlace, type QlooEntity } from "./taste.mjs";
 import type { QlooSignals, Usage } from "./types";
 
 export class ConfigError extends Error {}
@@ -71,6 +71,24 @@ export async function verifyRival(name: string, city: string): Promise<{ name: s
 // src/lib/persona-source.mjs.
 export function fetchPersonaSignals(entityId: string, city: string, venueName: string) {
   return collectPersonaSignals(qloo, { entityId, city, venueName });
+}
+
+// True when QLOO_BASE_URL is the hackathon host (the default), where only urn:entity types work.
+export function qlooOnHackathonHost() {
+  try { return new URL(QLOO_BASE_URL()).host === new URL(QLOO_HACKATHON_BASE_URL).host; } catch { return true; }
+}
+
+// One /v2/insights call for any entity's taste neighbourhood: `filterType` is urn:tag or an
+// urn:entity type, `entityId` the venue or a rival, `location` the city (signal.location.query).
+// Returns names and affinities; the raw payload goes back separately so callers keep it server-side.
+export async function qlooTasteProfile({ entityId, filterType, location, take = 12 }: { entityId: string; filterType: string; location?: string; take?: number }) {
+  const params: Record<string, string> = { "filter.type": filterType, "signal.interests.entities": entityId, take: String(take) };
+  if (location) params["signal.location.query"] = location;
+  const payload = await qloo("/v2/insights", params);
+  const items = filterType === "urn:tag"
+    ? parseQlooTags(payload).map((tag) => ({ name: tag.name, affinity: tag.affinity ?? null, kind: tag.subtype }))
+    : parseQlooEntities(payload).map((entity) => ({ name: entity.name, affinity: entity.affinity ?? null, kind: filterType }));
+  return { items: items.slice(0, take), raw: payload };
 }
 
 // Cross-domain taste: artists, brands, films and books with affinity to the venue (city-scoped),

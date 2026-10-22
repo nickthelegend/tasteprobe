@@ -45,9 +45,13 @@ test("MCP server over stdio: tools, Setup required without keys, input validatio
   const client = await connect(dataDir, root);
   t.after(async () => { await client.close(); await rm(root, { recursive: true, force: true }); });
 
-  await t.test("lists run_audit, run_fix and get_report with input schemas", async () => {
+  await t.test("lists run_audit, run_fix, get_report and qloo_taste_profile with input schemas", async () => {
     const { tools } = await client.listTools();
-    assert.deepEqual(tools.map((tool) => tool.name).sort(), ["get_report", "run_audit", "run_fix"]);
+    assert.deepEqual(tools.map((tool) => tool.name).sort(), ["get_report", "qloo_taste_profile", "run_audit", "run_fix"]);
+    const qloo = tools.find((tool) => tool.name === "qloo_taste_profile");
+    assert.deepEqual(qloo.inputSchema.required.sort(), ["audit_id", "filter_type"]);
+    assert.ok(qloo.inputSchema.properties.filter_type.enum.includes("urn:entity:artist"));
+    assert.ok(!qloo.inputSchema.properties.filter_type.enum.includes("urn:tag"), "urn:tag is not offered on the hackathon host");
     const audit = tools.find((tool) => tool.name === "run_audit");
     assert.deepEqual(audit.inputSchema.required.sort(), ["brand", "city"]);
     assert.equal(audit.inputSchema.properties.personas.minimum, 8);
@@ -65,6 +69,14 @@ test("MCP server over stdio: tools, Setup required without keys, input validatio
     const result = await client.callTool({ name: "run_fix", arguments: { audit_id: AUDIT_ID } });
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /^Setup required: QLOO_API_KEY/);
+  });
+
+  await t.test("qloo_taste_profile without a Qloo key answers Setup required before any call", async () => {
+    const result = await client.callTool({ name: "qloo_taste_profile", arguments: { audit_id: AUDIT_ID, filter_type: "urn:entity:artist" } });
+    assert.equal(result.isError, true);
+    assert.match(result.content[0].text, /^Setup required: QLOO_API_KEY\. .*No API call was made\./);
+    assert.deepEqual(result.structuredContent, { error: "setup_required", missing: ["QLOO_API_KEY"] });
+    await rejects(client, "qloo_taste_profile", { audit_id: AUDIT_ID, filter_type: "urn:tag" }, "filter_type");
   });
 
   await t.test("invalid input is rejected before the tool runs", async () => {

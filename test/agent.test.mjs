@@ -195,3 +195,33 @@ test("null simulation: the confirmed rule keeps false wins at or under 5%, the s
     assert.ok(winRate <= 0.05, `segment ${segmentSize}, ${assistants} assistant(s): false confirmed wins ${(winRate * 100).toFixed(1)}% of null runs; must be <= 5%`);
   }
 });
+
+test("qloo_insights arguments: supported urn:entity types only on the hackathon host, venue or a verified rival, a city", async () => {
+  const { validateQlooToolArgs, qlooFilterTypes } = await import("../src/lib/agent-core.mjs");
+  const rivals = [{ name: "Rival One", qlooId: "Q-RIVAL-1" }];
+  const context = { rivals, hackathonHost: true, city: "Mumbai" };
+  assert.deepEqual(validateQlooToolArgs({}, context), { ok: true, value: { filterType: null, entity: { kind: "venue" }, location: "Mumbai" } });
+  assert.deepEqual(validateQlooToolArgs({ filter_type: "urn:entity:artist", entity: "Q-RIVAL-1", location: "Pune" }, context),
+    { ok: true, value: { filterType: "urn:entity:artist", entity: { kind: "rival", id: "Q-RIVAL-1", name: "Rival One" }, location: "Pune" } });
+  const tag = validateQlooToolArgs({ filter_type: "urn:tag" }, context);
+  assert.equal(tag.ok, false);
+  assert.match(tag.error, /^urn:tag is not supported on the Qloo hackathon host \(it answers 403\)/);
+  assert.equal(validateQlooToolArgs({ filter_type: "urn:tag" }, { ...context, hackathonHost: false }).ok, true);
+  assert.match(validateQlooToolArgs({ filter_type: "urn:entity:restaurant" }, context).error, /filter_type must be one of: urn:entity:artist, urn:entity:book/);
+  assert.match(validateQlooToolArgs({ entity: "Q-UNKNOWN" }, context).error, /entity must be "venue" or the Qloo id of a verified rival: Q-RIVAL-1 \(Rival One\)/);
+  assert.match(validateQlooToolArgs({ location: "x" }, context).error, /location must be a city name/);
+  assert.deepEqual(qlooFilterTypes(true), ["urn:entity:artist", "urn:entity:book", "urn:entity:brand", "urn:entity:destination", "urn:entity:movie", "urn:entity:person", "urn:entity:place", "urn:entity:podcast", "urn:entity:tv_show", "urn:entity:video_game"]);
+});
+
+test("the agent's qloo_insights tool schema offers the supported types and the verified rivals", async () => {
+  const { buildAgentTools } = await import("../src/lib/agent.ts");
+  const tools = buildAgentTools({ rivals: [{ name: "Rival One", qlooId: "Q-RIVAL-1" }], hackathonHost: true });
+  const qloo = tools.find((tool) => tool.function.name === "qloo_insights").function;
+  assert.deepEqual(Object.keys(qloo.parameters.properties), ["filter_type", "entity", "location"]);
+  assert.ok(!qloo.parameters.properties.filter_type.enum.includes("urn:tag"));
+  assert.equal(qloo.parameters.properties.filter_type.enum.length, 10);
+  assert.match(qloo.parameters.properties.entity.description, /Q-RIVAL-1 = Rival One/);
+  assert.deepEqual(tools.map((tool) => tool.function.name), ["qloo_insights", "propose_copy", "probe_segment", "get_stats"]);
+  const production = buildAgentTools({ rivals: [], hackathonHost: false }).find((tool) => tool.function.name === "qloo_insights").function;
+  assert.equal(production.parameters.properties.filter_type.enum[0], "urn:tag");
+});
