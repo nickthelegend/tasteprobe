@@ -7,7 +7,9 @@ services:
     build: .
     image: hk-tasteprobe:latest
     restart: unless-stopped
-    mem_limit: 512m
+    mem_limit: 384m
+    memswap_limit: 768m
+    cpus: 0.5
     env_file: .env
     environment:
       TASTEPROBE_DATA_DIR: /data
