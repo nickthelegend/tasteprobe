@@ -1,0 +1,39 @@
+# Lightweight hackathon-demo deployment on the VPS behind Coolify's Traefik (network "coolify").
+# Redeploy: cd /opt/hk/tasteprobe && docker compose up -d --build
+# Secrets live only in ./.env on the server (chmod 600, gitignored); keys are added there by name.
+# With no QLOO/NEBIUS keys the app starts and shows "Setup required".
+services:
+  tasteprobe:
+    build: .
+    image: hk-tasteprobe:latest
+    restart: unless-stopped
+    mem_limit: 512m
+    env_file: .env
+    environment:
+      TASTEPROBE_DATA_DIR: /data
+      # Traefik overwrites X-Real-Ip with the client address, so a client-sent value is not trusted.
+      TASTEPROBE_TRUSTED_IP_HEADER: x-real-ip
+      TASTEPROBE_MAX_PERSONAS: "24"
+      TASTEPROBE_RUNS_PER_IP_PER_HOUR: "3"
+      TASTEPROBE_DAILY_RUNS: "20"
+    volumes:
+      - tasteprobe-data:/data
+    networks: [coolify]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hk-tasteprobe.rule=Host(`tasteprobe.201-18-198-162.sslip.io`)
+      - traefik.http.routers.hk-tasteprobe.entrypoints=https
+      - traefik.http.routers.hk-tasteprobe.tls=true
+      - traefik.http.routers.hk-tasteprobe.tls.certresolver=letsencrypt
+      - traefik.http.services.hk-tasteprobe.loadbalancer.server.port=3000
+volumes:
+  tasteprobe-data:
+networks:
+  coolify:
+    external: true
