@@ -279,7 +279,7 @@ export default function Home() {
           <span className="setup-cork" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 7v6M12 17h.01" /></svg>
           </span>
-          <div><h3 id="setup-title">Setup required</h3><p>The flight stays corked until these are set in <code>.env.local</code>. Nothing below is filled in until a live run completes.</p></div>
+          <div><h3 id="setup-title">Setup required</h3><p>The flight stays corked until these are set in the server’s environment (<code>.env.local</code> when you run it yourself). Nothing below is filled in until a live run completes.</p></div>
         </div>
         <ul>{missing.map((item) => {
           const { name, detail } = splitSetup(item);

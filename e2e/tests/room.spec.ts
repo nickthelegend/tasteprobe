@@ -21,7 +21,8 @@ test.describe("tasting room with no keys", () => {
   test("Setup required names every missing key; the cellar shows each connection missing", async ({ page }) => {
     const room = await openRoom(page);
     const setup = room.getByRole("alert").filter({ has: page.getByRole("heading", { name: "Setup required" }) });
-    await expect(setup).toContainText("The flight stays corked until these are set in .env.local.");
+    // Names where the keys go both on a hosted server and on a local checkout.
+    await expect(setup).toContainText("The flight stays corked until these are set in the server’s environment (.env.local when you run it yourself).");
     const items = setup.locator("li");
     await expect(items).toHaveCount(3);
     for (const [index, [name, detail]] of SETUP.entries()) {
