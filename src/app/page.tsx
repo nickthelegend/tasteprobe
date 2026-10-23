@@ -261,7 +261,7 @@ export default function Home() {
         </div>
         <div className="cellar" aria-label="Connections">
           <span className="cellar-item"><i className={dotClass(status?.qloo)} /><b>Qloo</b>{status ? (status.qloo ? "key set" : "key missing") : "…"}</span>
-          <span className="cellar-item" title={status?.nebius.detail}><i className={dotClass(status?.nebius.ok)} /><b>Nebius</b>{status?.nebius.model.split("/").pop() ?? "…"}</span>
+          <span className="cellar-item" title={status?.nebius.detail}><i className={dotClass(status?.nebius.ok)} /><b>Nebius</b>{status ? (status.nebius.configured ? status.nebius.model.split("/").pop() : "key missing") : "…"}</span>
           <span className="cellar-item"><i className={dotClass(Boolean(status?.systems.length))} /><b>Assistants</b>{status?.systems.length ? status.systems.join(", ") : status ? "none configured" : "…"}</span>
         </div>
       </div>

@@ -29,7 +29,8 @@ test.describe("tasting room with no keys", () => {
       await expect(items.nth(index).locator("span")).toHaveText(detail);
     }
     const cellar = room.getByLabel("Connections");
-    await expect(cellar.locator(".cellar-item")).toHaveText(["Qlookey missing", /^Nebius/, "Assistantsnone configured"]);
+    // A missing Nebius key reads "key missing", like Qloo, not the model name next to a red dot.
+    await expect(cellar.locator(".cellar-item")).toHaveText(["Qlookey missing", "Nebiuskey missing", "Assistantsnone configured"]);
     await expect(cellar.locator(".dot.bad")).toHaveCount(3);
     await expect(cellar.locator(".cellar-item").nth(1)).toHaveAttribute("title", "NEBIUS_API_KEY not set");
     await expect(room.locator(".order-head .stamp")).toHaveText("setup required");
