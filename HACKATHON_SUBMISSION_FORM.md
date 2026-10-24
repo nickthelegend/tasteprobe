@@ -115,8 +115,8 @@ Written before we had a key, so it covers the docs, the catalog and the API surf
 Qloo Taste AI API, NVIDIA Nemotron, Nebius Token Factory, Model Context Protocol, Next.js, TypeScript, Node.js, OpenAI-compatible APIs
 
 ## Links
-- Repo: https://github.com/nickthelegend/tasteprobe (**PENDING: push**)
-- Hosted demo: **PENDING: hosting**
+- Repo: https://github.com/nickthelegend/tasteprobe (public, MIT)
+- Hosted demo: https://tasteprobe.201-18-198-162.sslip.io (live; Setup required until the keys are on the server, then pin the first real audit)
 - Demo video (Nebius, YouTube, under 3 minutes): **PENDING KEYS** (script: `docs/demo.md`)
 - Live report (`/audits/<id>/report` on the hosted demo, or the HTML from `npm run audit:live`): **PENDING KEYS**
 

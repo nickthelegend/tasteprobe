@@ -1,4 +1,4 @@
-# Hosting TasteProbe (Railway)
+# Hosting TasteProbe
 
 Qloo requires a hosted, externally published demo ("local-only entries do not qualify"), and Nebius wants the demo URL live until Dec 15, 2026. This repo ships what a container host needs:
 
@@ -9,7 +9,7 @@ Qloo requires a hosted, externally published demo ("local-only entries do not qu
 | `railway.json` | Dockerfile builder, healthcheck on `/`, restart on failure. |
 | `.railwayignore` | Keeps `.env*`, `.data/`, `.loom/`, `node_modules/` and `.next/` out of the `railway up` upload. |
 
-Nothing has been deployed. Nobody has created a Railway project or set variables yet.
+**Current deployment:** https://tasteprobe.201-18-198-162.sslip.io, a small VPS behind Coolify's Traefik, from this repo's `docker-compose.yml` (data volume at `/data`, healthcheck on `/api/status`). Its `.env` holds only a generated `TASTEPROBE_RUN_TOKEN`, so it shows Setup required. To go live there, add the variables from [Environment variables](#environment-variables-by-name) (`QLOO_API_KEY`, `NEBIUS_API_KEY`, `MODEL_2_*` or `OPENAI_API_KEY`, the Nebius prices) to the server's `.env` by name and run `docker compose up -d`; after the first real audit, set `TASTEPROBE_FEATURED_AUDIT_ID`. No Railway project exists; the Railway steps below are the alternative.
 
 ## One-time setup (the owner, from the repo root)
 

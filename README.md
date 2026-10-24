@@ -4,11 +4,11 @@
 
 > **Status: not yet run end to end against live keys.** No Qloo, Nebius or assistant keys were available while building, so every live path ends at "Setup required: VAR" (HTTP 503 in the app, a tool error over MCP, exit code 1 in the CLI). Nothing is simulated. What the docs confirm and what still needs a live call is listed in [API facts: confirmed vs unverified](#api-facts-confirmed-vs-unverified).
 >
-> Hosted demo: _not deployed yet_ (Qloo requires an externally hosted demo). The production `Dockerfile` and `railway.json` are ready, and the paid routes sit behind a spend guard (run token, persona and agent caps, quotas): one-time setup, then `railway up --detach` ([docs/hosting.md](docs/hosting.md)). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
+> Hosted demo: **https://tasteprobe.201-18-198-162.sslip.io** (UI and API on one origin, a small VPS behind TLS). It answers **Setup required** until the Qloo, Nebius and assistant keys are added on the server, and runs need the owner's run token; nothing on it is simulated. The paid routes sit behind a spend guard (run token, persona and agent caps, quotas); see [docs/hosting.md](docs/hosting.md). Demo video: _not recorded yet; needs keys_ (script in [docs/demo.md](docs/demo.md)).
 
 ## Try it in 2 minutes
 
-1. **Hosted demo:** _not deployed yet_ (it needs the Qloo and Nebius keys; the URL goes here once it is live).
+1. **Hosted demo:** https://tasteprobe.201-18-198-162.sslip.io. Today it shows the honest Setup required state (no Qloo, Nebius or assistant key on the server yet), so the tasting room's Run button stays disabled.
 2. **The featured audit:** the hosted demo opens on one real audit pinned with `TASTEPROBE_FEATURED_AUDIT_ID`, so you see a real flight without spending credits. None exists until the first live run.
 3. **The printable report:** any stored audit prints at `/audits/<id>/report`.
 4. **No keys needed:** after `npm ci`, `npm test` runs the unit suite; `npm run build && npm run e2e:stack && npm run test:e2e` runs the browser suite in Chrome ([TESTING.md](TESTING.md)).
