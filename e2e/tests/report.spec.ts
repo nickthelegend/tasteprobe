@@ -36,5 +36,10 @@ test("an unknown page renders the not-found page, not a crash", async ({ page, w
   watch.allow(/\/no-such-page$/, 404);
   const response = await page.goto("/no-such-page");
   expect(response?.status()).toBe(404);
-  await expect(page.getByText("This page could not be found.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Nothing poured here" })).toBeVisible();
+  await expect(page.getByText("This page could not be found.")).toHaveCount(0);
+  const home = page.getByRole("link", { name: "Back to TasteProbe" });
+  await expect(home).toHaveAttribute("href", "/");
+  await expect(page.getByRole("link", { name: "Tasting room" })).toHaveAttribute("href", "/#room");
+  await expectNoHorizontalScroll(page);
 });
