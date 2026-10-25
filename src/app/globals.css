@@ -35,7 +35,7 @@ button { cursor: pointer; }
 button:disabled { cursor: not-allowed; }
 a { color: inherit; }
 :focus-visible { outline: 2.5px solid var(--pink-text); outline-offset: 3px; border-radius: 6px; }
-.board :focus-visible, .setup :focus-visible, .colophon :focus-visible, .masthead :focus-visible { outline-color: var(--pink); }
+.board :focus-visible, .setup :focus-visible, .colophon :focus-visible { outline-color: var(--pink); }
 code { font: .86em var(--mono); letter-spacing: 0; background: rgba(42, 15, 46, .07); padding: 1px 6px; border-radius: 5px; overflow-wrap: anywhere; }
 h1, h2, h3 { font-weight: 500; margin: 0; }
 p { margin: 0; }
@@ -130,7 +130,6 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 
 /* ============================== Landing: the tasting sheet ============================== */
 .sheet { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
-.masthead { margin: 0 calc(50% - 50vw); padding: 9px calc((100vw - min(var(--max), 100vw)) / 2 + var(--gutter)); background: var(--berry); color: var(--paper); display: flex; flex-wrap: wrap; gap: 4px 24px; justify-content: space-between; font: 500 11.5px/1.5 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 .masthead-live { display: inline-flex; align-items: center; gap: 8px; color: var(--pink-light); }
 .masthead-live i, .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255, 244, 250, .4); flex: none; display: inline-block; }
 .masthead-live i.ok, .dot.ok { background: #6fe0a6; }
@@ -143,8 +142,8 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .courses-nav a:hover { color: var(--pink-text); }
 .courses-nav b { font: 500 11px var(--mono); color: var(--pink-text); }
 
-.hero { padding: 52px 0 96px; }
-.hero h1 { font-size: clamp(44px, 6.6vw, 84px); line-height: .96; letter-spacing: -.05em; max-width: 16ch; }
+.hero { padding: 64px 0 128px; }
+.hero h1 { font-size: clamp(44px, 6.6vw, 84px); line-height: .96; letter-spacing: -.05em; max-width: 19ch; }
 .hero-side { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 48px; align-items: end; margin: 28px 0 40px; }
 .lead { font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 60ch; }
 .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
@@ -205,6 +204,38 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .label-card details[open] summary::after { content: "−"; }
 .label-card p { margin-top: 10px; color: var(--muted); font-size: 15px; }
 .label-foot { margin-top: 16px; font: 12.5px var(--mono); color: var(--muted); }
+
+/* Below the fold: three short bands (how, proof, what's live), then the tasting room. */
+.band { padding: 0 0 128px; }
+.band > h2 { font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -.045em; max-width: 18ch; }
+.band-lede { margin-top: 16px; color: var(--muted); font-size: 18px; max-width: 46ch; }
+.steps { list-style: none; margin: 48px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+.steps li { border-top: 2px solid var(--ink); padding-top: 20px; }
+.steps h3 { margin-top: 14px; font-size: clamp(22px, 2.2vw, 28px); letter-spacing: -.035em; line-height: 1.15; }
+.steps p { margin-top: 8px; color: var(--muted); font-size: 16.5px; }
+.proof { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-top: 48px; }
+.proof b { display: block; font-weight: 500; font-size: clamp(64px, 9vw, 128px); line-height: .9; letter-spacing: -.06em; color: var(--berry); font-variant-numeric: tabular-nums; }
+.proof span { display: block; margin-top: 14px; font: 500 13px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--pink-text); }
+.more { display: inline-flex; align-items: center; gap: 8px; margin-top: 48px; font-weight: 500; font-size: 17px; text-decoration: none; border-bottom: 2px solid var(--pink); padding-bottom: 3px; }
+.more:hover { color: var(--pink-text); }
+.live-line { margin-top: 20px; }
+.live-line .masthead-live { color: var(--muted); font: 500 12.5px/1.6 var(--mono); letter-spacing: .04em; text-transform: uppercase; align-items: baseline; }
+.live-line .masthead-live i { transform: translateY(-1px); background: var(--line-strong); }
+.live-line .masthead-live i.ok { background: var(--ok); }
+.live-line .masthead-live i.bad { background: var(--pink); }
+.live-strip { margin-top: 32px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; border-top: 1px solid var(--line); padding-top: 24px; }
+.live-strip h3 { display: flex; align-items: center; gap: 10px; font-size: 21px; letter-spacing: -.03em; }
+.live-strip .dot.ok { background: var(--ok); }
+.live-strip .dot.bad { background: var(--pink); }
+.live-strip p { margin-top: 8px; color: var(--muted); font-size: 16px; }
+.live-faq { margin-top: 28px; border-top: 1px dashed var(--line-strong); padding-top: 18px; max-width: 760px; }
+.live-faq summary { cursor: pointer; font-weight: 500; font-size: 17px; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+.live-faq summary::-webkit-details-marker { display: none; }
+.live-faq summary::after { content: "+"; font: 500 18px var(--mono); color: var(--pink-text); }
+.live-faq[open] summary::after { content: "−"; }
+.live-faq p { margin-top: 10px; color: var(--muted); font-size: 15px; }
+.method-hero { padding: 64px 0 72px; }
+.method-hero h1 { font-size: clamp(44px, 6.6vw, 84px); line-height: .96; letter-spacing: -.05em; }
 
 /* ============================== App: the tasting room ============================== */
 .room { background: var(--paper-2); border-top: 2px solid var(--ink); padding: 64px max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))) 72px; display: grid; gap: 20px; }
@@ -433,11 +464,18 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
   .menu-list li p { grid-column: 2; }
   .label-card { grid-template-columns: minmax(0, 1fr); }
   .label-card details:nth-last-child(2) { border-bottom: 1px dashed var(--line-strong); }
+  .steps, .live-strip { grid-template-columns: minmax(0, 1fr); gap: 28px; }
 }
 @media (max-width: 640px) {
   :root { --gutter: 16px; }
   .hero { padding: 44px 0 64px; }
   .hero-side { margin: 24px 0 32px; }
+  .band { padding-bottom: 88px; }
+  .proof { gap: 12px; }
+  .proof b { font-size: 52px; }
+  .proof span { font-size: 11.5px; }
+  .method-back { display: none; }
+  .sheet-head .tp-btn-berry { padding: 0 14px; }
   .lead { font-size: 17px; }
   .hero .board-row, .board-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 10px; }
   .board-compact .board-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 6px; }
@@ -471,7 +509,6 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
   .big-num { font-size: 52px; }
   .evidence summary { grid-template-columns: minmax(0, 1fr) auto; }
   .evidence .who { grid-column: 1 / -1; }
-  .masthead { font-size: 10.5px; }
   .notebook { padding: 0 14px 18px 38px; }
   .notebook::before { left: 26px; }
   .heatmap tbody th { min-width: 118px; }

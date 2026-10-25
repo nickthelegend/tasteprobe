@@ -40,7 +40,7 @@ test.describe("public demo: featured audit, listing, spend guard", () => {
     // No pre-live copy once the store has audits: no "unverified until first live run" stamp, and
     // the FAQ answers from the store (here the SYNTHETIC test store, so this checks the copy logic).
     await expect(page.getByText("unverified until first live run")).toHaveCount(0);
-    const faq = page.locator("#label details").filter({ hasText: "Has it run end to end?" });
+    const faq = page.locator("#live details.live-faq");
     await faq.locator("summary").click();
     await expect(faq.locator("p")).toHaveText("Not on this server: 14 audits stored, none saved by a live run. Each one is stamped in the tasting room as a synthetic fixture or as having no recorded provenance. Every glass above the tasting room is an example.");
     await expect(faq).not.toContainText("saved by a live run (");

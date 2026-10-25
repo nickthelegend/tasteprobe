@@ -4,13 +4,19 @@ const EXAMPLE = "Example, not a real audit";
 const REPO = "https://github.com/nickthelegend/tasteprobe";
 
 test.describe("landing: the tasting sheet", () => {
-  test("loads with the live cellar line: every key missing, no flights poured", async ({ page }) => {
+  test("loads with one headline, three bands and the live cellar line: every key missing, no flights poured", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle("TasteProbe — does AI recommend you to your own audience?");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Does AI recommend you to your own audience?");
-    // The masthead is filled from /api/status and /api/audits, not hardcoded.
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("How often does AI recommend you to your audience?");
+    await expect(page.locator(".sheet > section")).toHaveCount(4); // hero + how + proof + what's live
+    await expect(page.locator("#how .steps > li h3")).toHaveText(["Source the palates", "Pour the question", "Measure the glass"]);
+    await expect(page.locator("#proof .proof b")).toHaveText(["155", "8+", "95%"]);
+    await expect(page.locator("#proof .proof span")).toHaveText(["Tests", "Personas", "Intervals"]);
+    // The live line is filled from /api/status and /api/audits, not hardcoded.
     await expect(page.locator(".masthead-live")).toHaveText("Qloo key missing · Nebius key missing · no assistant · no flights poured on this server");
     await expect(page.locator(".masthead-live i")).toHaveClass("bad");
+    await expect(page.locator("#live .live-strip h3")).toHaveText(["Live", "Setup required"]);
+    await expect(page.locator("#live .live-strip code")).toHaveText(["QLOO_API_KEY", "NEBIUS_API_KEY", "MODEL_2_*"]);
     await expectNoHorizontalScroll(page);
     await shot(page, "01-landing");
   });
@@ -20,14 +26,13 @@ test.describe("landing: the tasting sheet", () => {
     const hero = page.locator(".hero .board");
     await expect(hero.locator(".board-stamp")).toHaveText(EXAMPLE);
     await expect(hero.locator(".board-caption")).toContainText(`${EXAMPLE}.`);
-    await expect(hero.locator(".board-caption")).toContainText("Real flights appear in the tasting room only after live Qloo, Nebius and assistant calls.");
+    await expect(hero.locator(".board-caption")).toHaveText(`${EXAMPLE}. Real flights fill only from live Qloo, Nebius and assistant calls.`);
     // Entity-taste segments, the kind the Qloo hackathon key yields (the hosted flights use the same).
     await expect(hero.locator(".placard-name")).toHaveText(["Music taste", "Film taste", "Brand taste", "Place taste"]);
-    await expect(hero.locator(".board-caption")).toContainText("the entity-taste segments the Qloo hackathon key yields");
     await expect(hero.locator(".placard-share")).toHaveText(["58%", "31%", "12%", "0%"]);
     await expect(hero.getByRole("img", { name: /^Music taste: 58% of answers recommend the venue, 95% interval/ })).toBeVisible();
-    // Every surface that shows made-up levels carries the stamp: hero, glass anatomy, re-pour.
-    await expect(page.locator(".board-stamp", { hasText: EXAMPLE })).toHaveCount(3);
+    // The landing shows one example surface (the hero); the method page has the other two.
+    await expect(page.locator(".board-stamp", { hasText: EXAMPLE })).toHaveCount(1);
     // The README hero image (docs/screenshots/landing-example-flight.png) is this shot: it must hold
     // the whole headline and the whole board, not start mid-headline.
     const section = await page.locator("section.hero").boundingBox();
@@ -42,8 +47,12 @@ test.describe("landing: the tasting sheet", () => {
     await page.screenshot({ path: test.info().outputPath("02-example-flight.png"), clip, fullPage: true, animations: "disabled" });
   });
 
-  test("wine-list steps: seven numbered courses with their sponsor tags", async ({ page }) => {
-    await page.goto("/");
+  test("method page: seven numbered courses with their sponsor tags, every example stamped", async ({ page }) => {
+    await page.goto("/method");
+    await expect(page).toHaveTitle("Method · TasteProbe");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("How a flight is poured");
+    await expect(page.locator(".board-stamp", { hasText: EXAMPLE })).toHaveCount(2);
+    await expectNoHorizontalScroll(page);
     const courses = page.locator("#flight .menu-list > li");
     await expect(courses).toHaveCount(7);
     await expect(courses.locator(".menu-no")).toHaveText(["01", "02", "03", "04", "05", "06", "07"]);
@@ -57,7 +66,7 @@ test.describe("landing: the tasting sheet", () => {
   });
 
   test("glass anatomy: one example glass with fill, both pour lines and four definitions", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/method");
     const figure = page.locator("#glass .anatomy-glass");
     await expect(figure.locator(".board-stamp")).toHaveText(EXAMPLE);
     await expect(figure.getByRole("img")).toHaveAccessibleName(`${EXAMPLE}: a glass filled to 31% with pour lines at 18% and 47%`);
@@ -74,7 +83,7 @@ test.describe("landing: the tasting sheet", () => {
   });
 
   test("three flights: baseline, placebo and fix, with the lift rule and the notebook rules", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/method");
     const repour = page.locator("#repour");
     await expect(repour.locator(".board-stamp")).toHaveText(EXAMPLE);
     await expect(repour.locator(".placard-name")).toHaveText(["Baseline", "Placebo", "Fix"]);
@@ -89,16 +98,16 @@ test.describe("landing: the tasting sheet", () => {
     await repour.screenshot({ path: test.info().outputPath("05-three-flights.png"), animations: "disabled" });
   });
 
-  test("back-label FAQ: six questions, first open, each one opens and closes on click", async ({ page }) => {
-    await page.goto("/");
+  test("back-label FAQ on the method page: five questions, first open, each one opens and closes; the landing answers the sixth from the store", async ({ page }) => {
+    await page.goto("/method");
     const items = page.locator("#label details");
-    await expect(items).toHaveCount(6);
+    await expect(items).toHaveCount(5);
     await expect(items.locator("summary")).toHaveText([
       "Where do the personas come from?", "Does the assistant know who is being audited?", "How sure are the numbers?",
-      "What does a fix change?", "What do I need to run it?", "Has it run end to end?",
+      "What does a fix change?", "What do I need to run it?",
     ]);
     await expect(items.nth(0)).toHaveAttribute("open", "");
-    for (let index = 0; index < 6; index++) {
+    for (let index = 0; index < 5; index++) {
       const item = items.nth(index);
       const body = item.locator("p");
       const wasOpen = await item.evaluate((element) => (element as HTMLDetailsElement).open);
@@ -108,26 +117,38 @@ test.describe("landing: the tasting sheet", () => {
       if (wasOpen) await expect(body).toBeVisible(); else await expect(body).toBeHidden();
     }
     // Open them all for the record, and check what the label promises about missing keys.
-    for (let index = 1; index < 6; index++) await items.nth(index).locator("summary").click();
+    for (let index = 1; index < 5; index++) await items.nth(index).locator("summary").click();
     await expect(items.nth(4)).toContainText("Without them the tasting room says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.");
-    // Data-driven from this server's store (empty on the dev and standalone targets).
-    await expect(items.nth(5).locator("p")).toHaveText("Not on this server: no audit has been stored here yet. Every glass above the tasting room is an example; the tasting room fills only from a live run, and that run’s raw provider payloads are kept with it for checking.");
     await page.locator("#label").screenshot({ path: test.info().outputPath("06-back-label.png"), animations: "disabled" });
+    // "Has it run end to end?" sits in the landing's What's live band, data-driven from this
+    // server's store (empty on the dev and standalone targets).
+    await page.goto("/");
+    const live = page.locator("#live details.live-faq");
+    await expect(live.locator("summary")).toHaveText("Has it run end to end?");
+    await live.locator("summary").click();
+    await expect(live.locator("p")).toHaveText("Not on this server: no audit has been stored here yet. Every glass above the tasting room is an example; the tasting room fills only from a live run, and that run’s raw provider payloads are kept with it for checking.");
   });
 
-  test("header nav anchors jump to each course (desktop; the course nav is hidden below 900 px)", async ({ page }, info) => {
+  test("header nav anchors jump to each band and the method page (desktop; the nav is hidden below 900 px)", async ({ page }, info) => {
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
     if (isMobile(info.project.name)) {
       await expect(nav).toBeHidden();
       return;
     }
-    const targets: [RegExp, string][] = [[/The flight/, "#flight"], [/Reading a glass/, "#glass"], [/Re-pour/, "#repour"], [/Back label/, "#label"]];
+    const targets: [RegExp, string][] = [[/How it works/, "#how"], [/Proof/, "#proof"], [/What’s live/, "#live"]];
     for (const [name, hash] of targets) {
       await nav.getByRole("link", { name }).click();
       await expect(page).toHaveURL(new RegExp(`${hash}$`));
       await expectInViewport(page, hash);
     }
+    await nav.getByRole("link", { name: "Method" }).click();
+    await expect(page).toHaveURL(/\/method$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("How a flight is poured");
+    // The method page leads back to the overview and the tasting room.
+    await page.getByRole("link", { name: "Tasting room" }).click();
+    await expect(page).toHaveURL(/\/#room$/);
+    await expectInViewport(page, "#room");
   });
 
   test("calls to action: Tasting room, Pour a flight, How it is poured, and the logo back to top", async ({ page }) => {
@@ -143,21 +164,26 @@ test.describe("landing: the tasting sheet", () => {
     await expectInViewport(page, "#room");
     await page.getByRole("link", { name: "TasteProbe home" }).first().click();
     await page.getByRole("link", { name: "How it is poured" }).click();
-    await expect(page).toHaveURL(/#flight$/);
-    await expectInViewport(page, "#flight");
+    await expect(page).toHaveURL(/#how$/);
+    await expectInViewport(page, "#how");
+    await page.getByRole("link", { name: "See the method and evidence" }).click();
+    await expect(page).toHaveURL(/\/method$/);
     // Footer logo goes back to the top as well.
+    await page.goto("/");
     await page.locator(".colophon").getByRole("link", { name: "TasteProbe home" }).click();
     await expect.poll(() => page.evaluate(() => scrollY)).toBeLessThan(5);
   });
 
   test("outbound links point at the public repo and open in place", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/method");
     await expect(page.getByRole("link", { name: "Source on GitHub" })).toHaveAttribute("href", REPO);
     await expect(page.getByRole("link", { name: "How the numbers are made" })).toHaveAttribute("href", `${REPO}#how-the-numbers-are-made`);
     await expect(page.locator(".colophon").getByRole("link", { name: "github.com/nickthelegend/tasteprobe" })).toHaveAttribute("href", REPO);
+    await page.goto("/");
+    await expect(page.locator(".colophon").getByRole("link", { name: "github.com/nickthelegend/tasteprobe" })).toHaveAttribute("href", REPO);
     // Every other link on the page is a same-page anchor whose target exists.
     const anchors = await page.locator('a[href^="#"]').evaluateAll((links) => links.map((link) => link.getAttribute("href")!));
-    expect(anchors.length).toBeGreaterThan(5);
+    expect(anchors.length).toBeGreaterThanOrEqual(5);
     for (const hash of new Set(anchors)) expect(await page.locator(hash).count(), `${hash} exists`).toBe(1);
   });
 

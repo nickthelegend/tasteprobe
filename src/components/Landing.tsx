@@ -44,6 +44,15 @@ function cellarLine(status: CellarStatus, auditCount: number | null, liveCount: 
   return `${keys.join(" · ")}${poured}`;
 }
 
+// The variables a run still needs, named as the tasting room names them.
+function missingKeys(status: NonNullable<CellarStatus>) {
+  const keys: string[] = [];
+  if (!status.qloo) keys.push("QLOO_API_KEY");
+  if (!status.nebius.configured || status.nebius.ok === false) keys.push("NEBIUS_API_KEY");
+  if (!status.systems.length) keys.push("MODEL_2_*");
+  return keys;
+}
+
 export type FeaturedFlight = { brand: string; live: boolean } | null;
 
 // The "Has it run end to end?" answer, from this server's store. Only audits that runAudit stamped
@@ -58,40 +67,75 @@ export function liveRunAnswer(auditCount: number | null, liveCount: number | nul
   return `Yes, on this server: ${stored}, ${liveCount === auditCount ? (auditCount === 1 ? "saved" : "each saved") : `${liveCount} saved`} by a live run (Qloo, Nemotron on Nebius and the assistants under test)${others ? ` and ${others} stamped as not live` : ""}${featuredText}. Open one in the tasting room to read every answer behind it. Every glass above the tasting room is an example.`;
 }
 
-export function Landing({ status, auditCount, liveCount, featured = null }: { status: CellarStatus; auditCount: number | null; liveCount: number | null; featured?: FeaturedFlight }) {
-  return <div className="sheet" id="top">
-    <div className="masthead">
-      <span className="masthead-title">TasteProbe tasting sheet</span>
-      <span className="masthead-live" aria-live="polite"><i className={status ? (status.qloo && status.nebius.ok && status.systems.length ? "ok" : "bad") : ""} />{cellarLine(status, auditCount, liveCount)}</span>
-    </div>
+const STEPS: { title: string; body: string }[] = [
+  { title: "Source the palates", body: "Qloo turns your venue’s real taste neighbourhood into personas." },
+  { title: "Pour the question", body: "Live assistants answer as each persona. Your name is never in the prompt." },
+  { title: "Measure the glass", body: "Nemotron reads every answer; each glass fills to your share, with a 95% interval." },
+];
 
+export function Landing({ status, auditCount, liveCount, featured = null }: { status: CellarStatus; auditCount: number | null; liveCount: number | null; featured?: FeaturedFlight }) {
+  const ready = Boolean(status && status.qloo && status.nebius.ok && status.systems.length);
+  const missing = status ? missingKeys(status) : [];
+  return <div className="sheet" id="top">
     <header className="sheet-head">
       <Logo href="#top" ring="#2a0f2e" dot="#ff6ec7" className="sheet-logo" />
       <nav className="courses-nav" aria-label="Main">
-        <a href="#flight"><b>01</b>The flight</a>
-        <a href="#glass"><b>02</b>Reading a glass</a>
-        <a href="#repour"><b>03</b>Re-pour</a>
-        <a href="#label"><b>04</b>Back label</a>
+        <a href="#how">How it works</a>
+        <a href="#proof">Proof</a>
+        <a href="#live">What’s live</a>
+        <a href="/method">Method</a>
       </nav>
       <a className="tp-btn tp-btn-berry" href="#room">Tasting room <Arrow down /></a>
     </header>
 
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
-        <p className="kicker">A tasting flight for AI recommendations · Qloo × NVIDIA Nemotron on Nebius</p>
-        <h1 id="hero-title">Does AI recommend you to your own audience?</h1>
+        <h1 id="hero-title">How often does AI recommend you to your audience?</h1>
         <div className="hero-side">
-          <p className="lead">TasteProbe builds taste personas from your venue’s real Qloo neighbourhood, asks live AI assistants for a recommendation as each one, and pours the result into a flight: one glass per taste segment, filled to your share of the answers.</p>
+          <p className="lead">Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.</p>
           <div className="cta-row">
             <a className="tp-btn tp-btn-pink" href="#room">Pour a flight <Arrow /></a>
-            <a className="tp-btn tp-btn-line" href="#flight">How it is poured</a>
+            <a className="tp-btn tp-btn-line" href="#how">How it is poured</a>
           </div>
         </div>
       </div>
       <FlightBoard items={EXAMPLE_FLIGHT} stamp={EXAMPLE_LABEL} size={112}
-        caption={<><b>{EXAMPLE_LABEL}.</b> The layout of a result, with made-up levels and the entity-taste segments the Qloo hackathon key yields. Real flights appear in the tasting room only after live Qloo, Nebius and assistant calls.</>} />
+        caption={<><b>{EXAMPLE_LABEL}.</b> Real flights fill only from live Qloo, Nebius and assistant calls.</>} />
     </section>
 
+    <section className="band" id="how" aria-labelledby="how-title">
+      <h2 id="how-title">Three pours, one honest number</h2>
+      <ol className="steps">
+        {STEPS.map((step, index) => <li key={step.title}><span className="menu-no">{String(index + 1).padStart(2, "0")}</span><h3>{step.title}</h3><p>{step.body}</p></li>)}
+      </ol>
+    </section>
+
+    <section className="band" id="proof" aria-labelledby="proof-title">
+      <h2 id="proof-title">Measured, not guessed</h2>
+      <p className="band-lede">Every glass seats at least eight personas and carries its interval.</p>
+      <div className="proof">
+        <div><b>155</b><span>Tests</span></div>
+        <div><b>8+</b><span>Personas</span></div>
+        <div><b>95%</b><span>Intervals</span></div>
+      </div>
+      <a className="more" href="/method">See the method and evidence <Arrow /></a>
+    </section>
+
+    <section className="band" id="live" aria-labelledby="live-title">
+      <h2 id="live-title">What’s live on this server</h2>
+      <p className="live-line"><span className="masthead-live" aria-live="polite"><i className={status ? (ready ? "ok" : "bad") : ""} />{cellarLine(status, auditCount, liveCount)}</span></p>
+      <div className="live-strip">
+        <div><h3><i className="dot ok" />Live</h3><p>The tasting room, its key checks and each stored flight’s printable report.{ready ? " Runs make live Qloo, Nemotron and assistant calls." : ""}</p></div>
+        {missing.length > 0 && <div><h3><i className="dot bad" />Setup required</h3><p>Runs need {missing.map((key, index) => <span key={key}>{index ? " and " : ""}<code>{key}</code></span>)} on this server. Nothing is simulated.</p></div>}
+      </div>
+      <details className="live-faq"><summary>Has it run end to end?</summary><p>{liveRunAnswer(auditCount, liveCount, featured)}</p></details>
+    </section>
+  </div>;
+}
+
+// The full method: wine list, glass anatomy, re-pour and the back label. Served at /method.
+export function MethodSections() {
+  return <>
     <section className="menu" id="flight" aria-labelledby="flight-title">
       <div className="sec-head">
         <span className="sec-no">01</span>
@@ -165,9 +209,8 @@ export function Landing({ status, auditCount, liveCount, featured = null }: { st
         <details><summary>How sure are the numbers?</summary><p>Every share comes with a 95% Wilson interval computed on an effective sample size: one persona’s answers across assistants are correlated, so a design effect shrinks the count toward the number of personas. Lift is a paired bootstrap over personas. The intervals cover sampling variation only, not extraction errors or the choice of prompt template.</p></details>
         <details><summary>What does a fix change?</summary><p>Nothing on your site. The copy is injected as retrieved web context, so it shows whether assistants would pick it up if they retrieved it, not whether a published change would be crawled. The baseline is re-asked in the same run, so model drift since the audit does not count as lift, and every attempt is kept.</p></details>
         <details><summary>What do I need to run it?</summary><p>Two keys at minimum: <code>QLOO_API_KEY</code> and <code>NEBIUS_API_KEY</code>, with the assistant under test on Nebius Token Factory through <code>MODEL_2_*</code> (or an <code>OPENAI_API_KEY</code>), in <code>.env.local</code>. Without them the tasting room says Setup required, names the missing variable and keeps the Run button disabled. Nothing is simulated.</p></details>
-        <details><summary>Has it run end to end?</summary><p>{liveRunAnswer(auditCount, liveCount, featured)}</p></details>
       </div>
       <p className="label-foot"><a href={REPO}>Source on GitHub</a> · <a href={`${REPO}#how-the-numbers-are-made`}>How the numbers are made</a> · MIT</p>
     </section>
-  </div>;
+  </>;
 }
