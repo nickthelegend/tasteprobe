@@ -1,0 +1,10 @@
+B-026
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001/fix
+HTTP 503
+Headers: {"content-type":"application/json"}
+Body: {"error":"Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server."}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

@@ -1,0 +1,218 @@
+S-137
+Status: PASS
+All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+=== 3101-375 http://127.0.0.1:3101/audits/not-a-real-id/report ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET http://127.0.0.1:3101/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3101/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030023443
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030023443
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030023443
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030023443
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030023443
+navigation status: 200
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/audits/00000000-0000-4000-8000-000000000000/report
+response: 200 http://127.0.0.1:3101/audits/00000000-0000-4000-8000-000000000000/report
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030023490
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030023490
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030023490
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030023490
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030023490
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030023490
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3101/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030023759
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030023759
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030023759
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030023759
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030023759
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030023759
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3102/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3102/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3103/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3103/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+Visible text:
+TASTEPROBE · AUDIT REPORT
+NOTHING TO PRINT
+Back to the tasting room
+No audit with this id
+
+This server has no stored audit not-a-real-id.
+
+Fixture Venue (synthetic), Testville
+2026-10-21 12:00 UTC
+Visitor Venue 1 (synthetic), Testville
+2026-10-22 01:00 UTC
+Visitor Venue 2 (synthetic), Testville
+2026-10-22 00:00 UTC
+Visitor Venue 3 (synthetic), Testville
+2026-10-21 23:00 UTC
+Visitor Venue 4 (synthetic), Testville
+2026-10-21 22:00 UTC
+Visitor Venue 5 (synthetic), Testville
+2026-10-21 21:00 UTC
+Visitor Venue 6 (synthetic), Testville
+2026-10-21 20:00 UTC
+Visitor Venue 7 (synthetic), Testville
+2026-10-21 19:00 UTC
+Visitor Venue 8 (synthetic), Testville
+2026-10-21 18:00 UTC
+Visitor Venue 9 (synthetic), Testville
+2026-10-21 17:00 UTC
+Visitor Venue 10 (synthetic), Testville
+2026-10-21 16:00 UTC
+Visitor Venue 11 (synthetic), Testville
+2026-10-21 15:00 UTC
+
+=== 3102-375 http://127.0.0.1:3102/audits/not-a-real-id/report ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET http://127.0.0.1:3102/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3102/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 200
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3101/audits/00000000-0000-4000-8000-000000000000/report
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/audits/00000000-0000-4000-8000-000000000000/report
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030024398
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030024398
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030024398
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030024398
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030024398
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030024398
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3101/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030024672
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030024672
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030024672
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030024672
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030024672
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030024672
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3102/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3102/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3103/audits/not-a-real-id/report
+response: 200 http://127.0.0.1:3103/audits/not-a-real-id/report
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501

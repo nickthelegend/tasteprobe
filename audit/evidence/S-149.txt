@@ -1,0 +1,288 @@
+S-149
+Status: PASS
+All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+=== hosted-1280 https://tasteprobe.201-18-198-162.sslip.io/method ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET https://tasteprobe.201-18-198-162.sslip.io/method
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/method
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/css/acd208839f2fd550.css
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main-app-2ecc3bf42ae2d122.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/method/page-32a61cf0384d24c5.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/css/acd208839f2fd550.css
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main-app-2ecc3bf42ae2d122.js
+navigation status: 200
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/method/page-32a61cf0384d24c5.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
+Visible text:
+TasteProbe
+Overview
+Tasting room
+
+METHOD
+
+How a flight is poured
+01
+The flight, course by course
+
+Seven steps from a venue name to a measured glass. Each one is a real call or a computation you can replay from the cached responses.
+
+01
+Source the palates
+QLOO TASTE AI
+
+Qloo /search resolves the venue in its city, then /v2/insights returns taste tags with affinity for that city, topped up from the venue’s global neighbourhood when the city has fewer than six (each audit says how many). If the key refuses urn:tag, as the hackathon host may, the palates come from artist, brand, film, book, TV, podcast and place affinities instead.
+
+02
+Seat the personas
+≥ 8 PER GLASS
+
+Each persona anchors on one taste signal and blends in two affinity-weighted ones. Signals are grouped into taste segments: by Qloo tag subtype, or, on the hackathon key (urn:entity only), by entity type, such as music, film, brand or place taste. Each segment gets at least eight personas.
+
+03
+Pour the question
+BRAND NEVER NAMED
+
+The baseline prompt holds only the persona’s tastes, the category and the city. It never names you, so every mention is earned.
+
+04
+Take tasting notes
+NVIDIA NEMOTRON
+
+Every assistant answer is a tasting note. Nemotron on Nebius extracts the venues it recommends, cross-checked against a plain numbered-list parser.
+
+05
+Measure the glass
+WILSON 95%
+
+Each glass fills to your share of the answers. The pour lines are a Wilson interval on a persona-adjusted sample size, because one persona’s answers move together.
+
+06
+Re-pour three flights
+PAIRED BOOTSTRAP
+
+Nemotron writes copy for the weakest glass. The same personas re-ask every assistant three ways at once: baseline, a placebo that only names you, and the fix.
+
+07
+Keep the sommelier’s notebook
+TOOL CALLING
+
+A Nemotron agent revises copy with four tools under a budget. Every attempt is written down. Its intervals only screen; a win needs one confirmation probe (on held-out personas from 16 per segment, otherwise a fresh re-ask of the same personas), and the stop rule runs in code, not in the model.
+
+02
+Reading a glass
+
+Every number on the board has one meaning. Nothing is smoothed, ranked or scored.
+
+EXAMPLE, NOT A REAL AUDIT
+fill · 31%
+upper pour line · 47%
+lower pour line · 18%
+Fill level
+The share of usable answers in this taste segment that recommend you. The scale is linear: the 50 tick is half the answers.
+Pour lines
+The 95% Wilson interval, widened by a design effect for persona clustering. Zero mentions still leaves a gap above the base, never a 0–0% line.
+Placard
+The segment’s Qloo tag subtype, its share and its interval. Calls that failed or could not be parsed are counted there and kept out of the denominator.
+Tasting notes
+The raw assistant answers behind the glass, each with the venues Nemotron extracted and a flag where the list parser disagrees.
+03
+Re-pour, three ways
+
+A fix is tested as a prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.
+
+EXAMPLE, NOT A REAL AUDIT
+01
+Baseline
+12%
+5–27%
+02
+Placebo
+20%
+10–36%
+03
+Fix
+38%
+24–54%
+
+Lift = fix − placebo, with a 95% paired bootstrap interval over personas. The placebo names you without the copy, so the lift measures the copy rather than the name.
+
+SOMMELIER’S NOTEBOOK
+RULES, NOT A RUN
+Tools live Qloo insights · propose copy · probe the segment · read the stats
+Probe placebo against fix on the segment’s next personas
+Stop after one confirmation probe once a copy clears the screen: on held-out personas the search never used, or, in segments under 16 personas, a fresh re-ask of the same personas; or when tries, calls, tokens or dollars run out
+Enforced in code, not by the model; every attempt stays in the notebook
+04
+Back label
+
+What TasteProbe measures, and what it does not.
+
+Where do the personas come from?
+
+Qloo’s /v2/insights returns taste tags with affinity to your venue in its city; when the city has fewer than six, tags from the venue’s global neighbourhood are added and counted on the audit. Tags are grouped into segments by subtype, and each persona blends one anchor tag with two affinity-weighted tags from other segments. If the Qloo key refuses urn:tag (the hackathon guide lists only entity types), each entity type (music, brands, film, books, TV, podcasts, places) becomes a segment instead, and the audit records which source it used. Personas are composites of Qloo signals, not real individuals or a representative panel.
+
+Does the assistant know who is being audited?
+How sure are the numbers?
+What does a fix change?
+What do I need to run it?
+
+Source on GitHub · How the numbers are made · MIT
+
+TasteProbe
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
+
+=== hosted-375 https://tasteprobe.201-18-198-162.sslip.io/method ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET https://tasteprobe.201-18-198-162.sslip.io/method
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/method
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/css/acd208839f2fd550.css
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main-app-2ecc3bf42ae2d122.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/method/page-32a61cf0384d24c5.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/css/acd208839f2fd550.css
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main-app-2ecc3bf42ae2d122.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/method/page-32a61cf0384d24c5.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
+navigation status: 200
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
+Visible text:
+TasteProbe
+Tasting room
+
+METHOD
+
+How a flight is poured
+01
+The flight, course by course
+
+Seven steps from a venue name to a measured glass. Each one is a real call or a computation you can replay from the cached responses.
+
+01
+Source the palates
+QLOO TASTE AI
+
+Qloo /search resolves the venue in its city, then /v2/insights returns taste tags with affinity for that city, topped up from the venue’s global neighbourhood when the city has fewer than six (each audit says how many). If the key refuses urn:tag, as the hackathon host may, the palates come from artist, brand, film, book, TV, podcast and place affinities instead.
+
+02
+Seat the personas
+≥ 8 PER GLASS
+
+Each persona anchors on one taste signal and blends in two affinity-weighted ones. Signals are grouped into taste segments: by Qloo tag subtype, or, on the hackathon key (urn:entity only), by entity type, such as music, film, brand or place taste. Each segment gets at least eight personas.
+
+03
+Pour the question
+BRAND NEVER NAMED
+
+The baseline prompt holds only the persona’s tastes, the category and the city. It never names you, so every mention is earned.
+
+04
+Take tasting notes
+NVIDIA NEMOTRON
+
+Every assistant answer is a tasting note. Nemotron on Nebius extracts the venues it recommends, cross-checked against a plain numbered-list parser.
+
+05
+Measure the glass
+WILSON 95%
+
+Each glass fills to your share of the answers. The pour lines are a Wilson interval on a persona-adjusted sample size, because one persona’s answers move together.
+
+06
+Re-pour three flights
+PAIRED BOOTSTRAP
+
+Nemotron writes copy for the weakest glass. The same personas re-ask every assistant three ways at once: baseline, a placebo that only names you, and the fix.
+
+07
+Keep the sommelier’s notebook
+TOOL CALLING
+
+A Nemotron agent revises copy with four tools under a budget. Every attempt is written down. Its intervals only screen; a win needs one confirmation probe (on held-out personas from 16 per segment, otherwise a fresh re-ask of the same personas), and the stop rule runs in code, not in the model.
+
+02
+Reading a glass
+
+Every number on the board has one meaning. Nothing is smoothed, ranked or scored.
+
+EXAMPLE, NOT A REAL AUDIT
+fill · 31%
+upper pour line · 47%
+lower pour line · 18%
+Fill level
+The share of usable answers in this taste segment that recommend you. The scale is linear: the 50 tick is half the answers.
+Pour lines
+The 95% Wilson interval, widened by a design effect for persona clustering. Zero mentions still leaves a gap above the base, never a 0–0% line.
+Placard
+The segment’s Qloo tag subtype, its share and its interval. Calls that failed or could not be parsed are counted there and kept out of the denominator.
+Tasting notes
+The raw assistant answers behind the glass, each with the venues Nemotron extracted and a flag where the list parser disagrees.
+03
+Re-pour, three ways
+
+A fix is tested as a prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.
+
+EXAMPLE, NOT A REAL AUDIT
+01
+Baseline
+12%
+5–27%
+02
+Placebo
+20%
+10–36%
+03
+Fix
+38%
+24–54%
+
+Lift = fix − placebo, with a 95% paired bootstrap interval over personas. The placebo names you without the copy, so the lift measures the copy rather than the name.
+
+SOMMELIER’S NOTEBOOK
+RULES, NOT A RUN
+Tools live Qloo insights · propose copy · probe the segment · read the stats
+Probe placebo against fix on the segment’s next personas
+Stop after one confirmation probe once a copy clears the screen: on held-out personas the search never used, or, in segments under 16 personas, a fresh re-ask of the same personas; or when tries, calls, tokens or dollars run out
+Enforced in code, not by the model; every attempt stays in the notebook
+04
+Back label
+
+What TasteProbe measures, and what it does not.
+
+Where do the personas come from?
+
+Qloo’s /v2/insights returns taste tags with affinity to your venue in its city; when the city has fewer than six, tags from the venue’s global neighbourhood are added and counted on the audit. Tags are grouped into segments by subtype, and each persona blends one anchor tag with two affinity-weighted tags from other segments. If the Qloo key refuses urn:tag (the hackathon guide lists only entity types), each entity type (music, brands, film, books, TV, podcasts, places) becomes a segment instead, and the audit records which source it used. Personas are composites of Qloo signals, not real individuals or a representative panel.
+
+Does the assistant know who is being audited?
+How sure are the numbers?
+What does a fix change?
+What do I need to run it?
+
+Source on GitHub · How the numbers are made · MIT
+
+TasteProbe
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi

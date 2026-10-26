@@ -1,0 +1,15 @@
+B-048
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000000/agent
+HTTP 401
+Headers: {"content-type":"application/json"}
+Body: {"error":"Runs are disabled on this server: it needs the run token (TASTEPROBE_RUN_TOKEN) in the X-TasteProbe-Run-Token header. Stored audits stay open to read.","code":"run_locked"}
+
+POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000000/agent
+HTTP 401
+Headers: {"content-type":"application/json"}
+Body: {"error":"Runs are disabled on this server: it needs the run token (TASTEPROBE_RUN_TOKEN) in the X-TasteProbe-Run-Token header. Stored audits stay open to read.","code":"run_locked"}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

@@ -1,0 +1,15 @@
+B-004
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+GET http://127.0.0.1:3101/api/audits
+HTTP 200
+Headers: {"content-type":"application/json","x-live-count":"0","x-total-count":"0"}
+Body: []
+
+GET http://127.0.0.1:3102/api/audits
+HTTP 200
+Headers: {"content-type":"application/json","x-live-count":"0","x-total-count":"0"}
+Body: []
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

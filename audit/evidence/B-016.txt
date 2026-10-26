@@ -1,0 +1,55 @@
+B-016
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received null"}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received null"}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received array"}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received array"}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received string"}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received string"}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received number"}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received number"}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received boolean"}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Expected object, received boolean"}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

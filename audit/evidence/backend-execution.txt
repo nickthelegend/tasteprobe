@@ -1,0 +1,152 @@
+B-001 PASS Independent real requests/assertions passed; no provider call authorized.
+B-003 PASS Independent real requests/assertions passed; no provider call authorized.
+B-004 PASS Independent real requests/assertions passed; no provider call authorized.
+B-005 FAIL Expected values to be strictly equal:
+
+12 !== 1
+
+B-006 PASS Independent real requests/assertions passed; no provider call authorized.
+B-007 PASS Independent real requests/assertions passed; no provider call authorized.
+B-008 UNTESTED Synthetic stored audit/private-host redaction verified; public known-host variants absent in stored fixture.
+B-009 UNTESTED Raw-answer whitelist and missing baseline/attempt variants verified; stored re-pour raw arms absent.
+B-010 PASS Independent real requests/assertions passed; no provider call authorized.
+B-011 PASS Independent real requests/assertions passed; no provider call authorized.
+B-012 PASS Independent real requests/assertions passed; no provider call authorized.
+B-013 PASS Independent real requests/assertions passed; no provider call authorized.
+B-014 PASS Independent real requests/assertions passed; no provider call authorized.
+B-015 PASS Independent real requests/assertions passed; no provider call authorized.
+B-016 PASS Independent real requests/assertions passed; no provider call authorized.
+B-017 PASS Independent real requests/assertions passed; no provider call authorized.
+B-023 PASS Independent real requests/assertions passed; no provider call authorized.
+B-024 PASS Independent real requests/assertions passed; no provider call authorized.
+B-025 PASS Independent real requests/assertions passed; no provider call authorized.
+B-026 PASS Independent real requests/assertions passed; no provider call authorized.
+B-029 PASS Independent real requests/assertions passed; no provider call authorized.
+B-035 PASS Independent real requests/assertions passed; no provider call authorized.
+B-037 PASS Independent real requests/assertions passed; no provider call authorized.
+B-036 PASS Independent real requests/assertions passed; no provider call authorized.
+B-038 PASS Independent real requests/assertions passed; no provider call authorized.
+B-039 PASS Independent real requests/assertions passed; no provider call authorized.
+B-040 PASS Independent real requests/assertions passed; no provider call authorized.
+B-041 PASS Independent real requests/assertions passed; no provider call authorized.
+B-042 PASS Independent real requests/assertions passed; no provider call authorized.
+B-043 PASS Independent real requests/assertions passed; no provider call authorized.
+B-044 PASS Independent real requests/assertions passed; no provider call authorized.
+B-045 PASS Independent real requests/assertions passed; no provider call authorized.
+B-046 PASS Independent real requests/assertions passed; no provider call authorized.
+B-047 PASS Independent real requests/assertions passed; no provider call authorized.
+B-048 PASS Independent real requests/assertions passed; no provider call authorized.
+B-049 PASS Independent real requests/assertions passed; no provider call authorized.
+B-050 PASS Independent real requests/assertions passed; no provider call authorized.
+B-074 PASS Independent real requests/assertions passed; no provider call authorized.
+B-078 PASS Independent real requests/assertions passed; no provider call authorized.
+B-080 PASS Independent real requests/assertions passed; no provider call authorized.
+B-094 PASS Independent real requests/assertions passed; no provider call authorized.
+B-103 PASS Independent real requests/assertions passed; no provider call authorized.
+B-107 PASS Independent real requests/assertions passed; no provider call authorized.
+B-111 PASS Independent real requests/assertions passed; no provider call authorized.
+B-082 PASS Independent real requests/assertions passed; no provider call authorized.
+B-089 PASS Independent real requests/assertions passed; no provider call authorized.
+B-092 PASS Independent real requests/assertions passed; no provider call authorized.
+B-086 UNTESTED Absent-key helper and status passed; guarded Nebius-only 503 needs QLOO_API_KEY plus an assistant key in a later configuration.
+B-098 UNTESTED Direct no-assistant helper returns [] and all-missing agent guard passed; assistant-only HTTP refusal needs QLOO_API_KEY and NEBIUS_API_KEY.
+B-112 PASS Independent real requests/assertions passed; no provider call authorized.
+B-118 PASS Independent real requests/assertions passed; no provider call authorized.
+B-120 PASS Independent real requests/assertions passed; no provider call authorized.
+B-122 PASS Independent real requests/assertions passed; no provider call authorized.
+B-113 PASS Independent real requests/assertions passed; no provider call authorized.
+B-114 PASS Independent real requests/assertions passed; no provider call authorized.
+B-115 PASS Independent real requests/assertions passed; no provider call authorized.
+B-124 UNTESTED Labelled synthetic cached replay executed; raw hash-change warning needs a prior real report/hash inventory.
+B-125 PASS Independent real requests/assertions passed; no provider call authorized.
+B-126 PASS Independent real requests/assertions passed; no provider call authorized.
+B-127 PASS Independent real requests/assertions passed; no provider call authorized.
+B-128 UNTESTED Non-root writable handoff passed with supplied exit 7; root/chown/su-exec branch UNTESTED on this non-root macOS host.
+B-130 PASS Executed command; Exit code: 0
+B-132 PASS Executed command; Exit code: 0
+B-134 PASS Executed command; Exit code: 0
+B-131 PASS Independent real requests/assertions passed; no provider call authorized.
+B-133 PASS Independent real requests/assertions passed; no provider call authorized.
+B-135 FAIL The expression evaluated to a falsy value:
+
+  assert(later.includes('Exit code: 0'))
+
+B-137 PASS Independent real requests/assertions passed; no provider call authorized.
+B-138 UNTESTED Observed one real harness refusal. Missing-build/existing-PID/occupied-port/readiness branches require separate harness state; not inferred from one refusal.
+B-129 FAIL ENOENT: no such file or directory, open 'railway.toml'
+B-140 FAIL Expected values to be strictly equal:
+
+2 !== 1
+
+B-056 PASS Independent real requests/assertions passed; no provider call authorized.
+B-057 PASS Independent real requests/assertions passed; no provider call authorized.
+B-058 PASS Independent real requests/assertions passed; no provider call authorized.
+B-062 PASS Independent real requests/assertions passed; no provider call authorized.
+B-064 PASS Independent real requests/assertions passed; no provider call authorized.
+B-065 PASS Independent real requests/assertions passed; no provider call authorized.
+B-066 PASS Independent real requests/assertions passed; no provider call authorized.
+B-067 PASS Independent real requests/assertions passed; no provider call authorized.
+B-068 PASS Independent real requests/assertions passed; no provider call authorized.
+B-069 PASS Independent real requests/assertions passed; no provider call authorized.
+B-063 FAIL The expression evaluated to a falsy value:
+
+  assert(!JSON.stringify(r).includes('example.test'))
+
+B-002 UNTESTED needs NEBIUS_API_KEY (real configured catalog check still pending). No upstream response fabricated or live provider call made.
+B-018 UNTESTED needs QLOO_API_KEY and assistant key present with only NEBIUS_API_KEY absent. No upstream response fabricated or live provider call made.
+B-019 UNTESTED needs QLOO_API_KEY and NEBIUS_API_KEY present with only assistant key absent. No upstream response fabricated or live provider call made.
+B-020 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and partial MODEL_2_API_KEY configuration. No upstream response fabricated or live provider call made.
+B-021 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-022 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-027 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-028 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-030 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key configured before unknown-audit lookup. No upstream response fabricated or live provider call made.
+B-031 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-032 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key before budget validation. No upstream response fabricated or live provider call made.
+B-033 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-034 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-051 UNTESTED needs real startRun usage exhausting daily quota; needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-052 UNTESTED needs real startRun usage exhausting address bucket; needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-053 UNTESTED needs a real active keyed run; needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-054 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-055 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-059 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-060 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-061 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key before fix lookup. No upstream response fabricated or live provider call made.
+B-070 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-071 UNTESTED needs QLOO_API_KEY configured before unknown-audit lookup. No upstream response fabricated or live provider call made.
+B-072 UNTESTED needs QLOO_API_KEY and stored audit with no verified rivals. No upstream response fabricated or live provider call made.
+B-073 UNTESTED needs QLOO_API_KEY. No upstream response fabricated or live provider call made.
+B-075 UNTESTED needs QLOO_API_KEY and real upstream Qloo 404. No upstream response fabricated or live provider call made.
+B-076 UNTESTED needs QLOO_API_KEY and real wrong-city/name search response. No upstream response fabricated or live provider call made.
+B-077 UNTESTED needs QLOO_API_KEY. No upstream response fabricated or live provider call made.
+B-079 UNTESTED needs QLOO_API_KEY. No upstream response fabricated or live provider call made.
+B-081 UNTESTED needs QLOO_API_KEY. No upstream response fabricated or live provider call made.
+B-083 UNTESTED needs QLOO_API_KEY and actual upstream 401/403/other failure. No upstream response fabricated or live provider call made.
+B-084 UNTESTED needs QLOO_API_KEY and actual upstream invalid-JSON success. No upstream response fabricated or live provider call made.
+B-085 UNTESTED needs NEBIUS_API_KEY. No upstream response fabricated or live provider call made.
+B-087 UNTESTED needs NEBIUS_API_KEY and actual unavailable-model/401/403 catalog response. No upstream response fabricated or live provider call made.
+B-088 UNTESTED needs NEBIUS_API_KEY. No upstream response fabricated or live provider call made.
+B-090 UNTESTED needs NEBIUS_API_KEY and actual truncated/invalid completion. No upstream response fabricated or live provider call made.
+B-091 UNTESTED needs NEBIUS_API_KEY. No upstream response fabricated or live provider call made.
+B-093 UNTESTED needs NEBIUS_API_KEY. No upstream response fabricated or live provider call made.
+B-095 UNTESTED needs NEBIUS_API_KEY and live request acceptance of reasoning fields. No upstream response fabricated or live provider call made.
+B-096 UNTESTED needs NEBIUS_API_KEY and actual upstream provider failure. No upstream response fabricated or live provider call made.
+B-097 UNTESTED needs OPENAI_API_KEY or complete MODEL_2_* assistant slot. No upstream response fabricated or live provider call made.
+B-099 UNTESTED needs OPENAI_API_KEY or complete MODEL_2_* assistant slot. No upstream response fabricated or live provider call made.
+B-100 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and partial MODEL_2_API_KEY later configuration. No upstream response fabricated or live provider call made.
+B-101 UNTESTED needs assistant key and actual upstream failure. No upstream response fabricated or live provider call made.
+B-102 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-104 UNTESTED needs NEBIUS_API_KEY, QLOO_API_KEY and assistant key to reach internal agent tools. No upstream response fabricated or live provider call made.
+B-105 UNTESTED needs NEBIUS_API_KEY, QLOO_API_KEY and assistant key to reach propose_copy inside a real agent turn. No upstream response fabricated or live provider call made.
+B-106 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-108 UNTESTED needs NEBIUS_API_KEY, QLOO_API_KEY and assistant key to reach internal probe refusal. No upstream response fabricated or live provider call made.
+B-109 UNTESTED needs NEBIUS_API_KEY, QLOO_API_KEY and assistant key to reach internal tool dispatch. No upstream response fabricated or live provider call made.
+B-110 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-116 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key. No upstream response fabricated or live provider call made.
+B-117 UNTESTED needs QLOO_API_KEY. No upstream response fabricated or live provider call made.
+B-119 UNTESTED needs NEBIUS_API_KEY. No upstream response fabricated or live provider call made.
+B-121 UNTESTED needs OPENAI_API_KEY or complete MODEL_2_* assistant slot. No upstream response fabricated or live provider call made.
+B-123 UNTESTED needs QLOO_API_KEY, NEBIUS_API_KEY and assistant key for successful preflight before runtime check. No upstream response fabricated or live provider call made.
+
+Exit code: 0

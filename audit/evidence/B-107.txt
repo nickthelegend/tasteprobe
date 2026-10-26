@@ -1,0 +1,10 @@
+B-107
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000001/agent
+HTTP 503
+Headers: {"content-type":"application/json"}
+Body: {"error":"setup_required","missing":["QLOO_API_KEY","NEBIUS_API_KEY","OPENAI_API_KEY"],"message":"Setup required: QLOO_API_KEY; Setup required: NEBIUS_API_KEY; Setup required: OPENAI_API_KEY"}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

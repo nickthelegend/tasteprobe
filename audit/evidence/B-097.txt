@@ -1,0 +1,3 @@
+B-097
+Status: UNTESTED
+needs OPENAI_API_KEY or complete MODEL_2_* assistant slot. No upstream response fabricated or live provider call made.

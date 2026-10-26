@@ -1,0 +1,669 @@
+S-007
+Status: PASS
+All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+=== 3101-1280 http://127.0.0.1:3101/ ===
+Assertion: completed
+Problems: console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary loading={null}>
+      <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
+        <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+                <SegmentViewNode type="page" pagePath="page.tsx">
+                  <SegmentTrieNode>
+                  <ClientPageRoot Component={function Home} searchParams={{}} params={{}}>
+                    <Home params={Promise} searchParams={Promise}>
+                      <main>
+                        <Landing status={null} auditCount={null} liveCount={null} featured={null}>
+                          <div className="sheet" id="top">
+                            <header>
+                            <section>
+                            <section>
+                            <section>
+                            <section className="band" id="live" aria-labelledby="live-title">
+                              <h2>
+                              <p>
+                              <div>
+                              <details
+                                className="live-faq"
+-                               open=""
+                              >
+                        <section className="room" id="room" aria-labelledby="room-title">
+                          <div>
+                          <div>
+                          <section className="order" id="pour" aria-labelledby="form-title">
+                            <div>
+                            <form className="order-form" onSubmit={function runAudit}>
+                              <label className="field fiel...">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="Exact listing name, so Qloo can resolve it"
+                                  autoComplete="off"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value="restaurant"
+                                  onChange={function onChange}
+                                  placeholder="e.g. modern Indian restaurant"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="e.g. Mumbai"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                            ...
+                          ...
+                        ...
+                ...
+              ...
+
+POST count: 1
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029522125
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029522125
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029522125
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029522125
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+navigation status: 200
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029522125
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029522125
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary loading={null}>
+      <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
+        <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+                <SegmentViewNode type="page" pagePath="page.tsx">
+                  <SegmentTrieNode>
+                  <ClientPageRoot Component={function Home} searchParams={{}} params={{}}>
+                    <Home params={Promise} searchParams={Promise}>
+                      <main>
+                        <Landing status={null} auditCount={null} liveCount={null} featured={null}>
+                          <div className="sheet" id="top">
+                            <header>
+                            <section>
+                            <section>
+                            <section>
+                            <section className="band" id="live" aria-labelledby="live-title">
+                              <h2>
+                              <p>
+                              <div>
+                              <details
+                                className="live-faq"
+-                               open=""
+                              >
+                        <section className="room" id="room" aria-labelledby="room-title">
+                          <div>
+                          <div>
+                          <section className="order" id="pour" aria-labelledby="form-title">
+                            <div>
+                            <form className="order-form" onSubmit={function runAudit}>
+                              <label className="field fiel...">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="Exact listing name, so Qloo can resolve it"
+                                  autoComplete="off"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value="restaurant"
+                                  onChange={function onChange}
+                                  placeholder="e.g. modern Indian restaurant"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="e.g. Mumbai"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                            ...
+                          ...
+                        ...
+                ...
+              ...
+
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+request: POST http://127.0.0.1:3101/__nextjs_original-stack-frames
+Visible text:
+TasteProbe
+How it works
+Proof
+What’s live
+Method
+Tasting room
+How often does AI recommend you to your audience?
+
+Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.
+
+Pour a flight
+How it is poured
+EXAMPLE, NOT A REAL AUDIT
+01
+Music taste
+58%
+41–73%
+illustrative
+02
+Film taste
+31%
+18–47%
+illustrative
+03
+Brand taste
+12%
+5–27%
+illustrative
+04
+Place taste
+0%
+0–13%
+illustrative
+Example, not a real audit. Real flights fill only from live Qloo, Nebius and assistant calls.
+Three pours, one honest number
+01
+Source the palates
+
+Qloo turns your venue’s real taste neighbourhood into personas.
+
+02
+Pour the question
+
+Live assistants answer as each persona. Your name is never in the prompt.
+
+03
+Measure the glass
+
+Nemotron reads every answer; each glass fills to your share, with a 95% interval.
+
+Measured, not guessed
+
+Every glass seats at least eight personas and carries its interval.
+
+155
+TESTS
+8+
+PERSONAS
+95%
+INTERVALS
+See the method and evidence
+What’s live on this server
+
+CHECKING THE CELLAR…
+
+Live
+
+The tasting room, its key checks and each stored flight’s printable report.
+
+Has it run end to end?
+
+Checking this server’s audit store…
+
+THE TASTING ROOM · A RUN MAKES LIVE CALLS ONLY, NOTHING IS SIMULATED
+
+Pour a flight
+Qloo
+…
+Nebius
+…
+Assistants
+…
+Checking which keys are configured…
+Order a flight
+CHECKING
+BUSINESS NAME
+CATEGORY
+CITY
+PERSONAS
+16
+24
+48
+100
+200
+Run audit
+
+24 personas × 0 assistants = 0 live answers, each read by Nemotron. At least 8 personas per glass, so 24 personas fill up to 3 glasses. Configure an assistant to enable audits.
+
+EMPTY FLIGHT
+01
+Not poured
+—
+02
+Not poured
+—
+03
+Not poured
+—
+24 personas fill up to 3 glasses.
+Loading saved flights…
+
+Reading the audit store.
+
+TasteProbe
+Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
+
+=== 3101-375 http://127.0.0.1:3101/ ===
+Assertion: completed
+Problems: console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary loading={null}>
+      <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
+        <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+                <SegmentViewNode type="page" pagePath="page.tsx">
+                  <SegmentTrieNode>
+                  <ClientPageRoot Component={function Home} searchParams={{}} params={{}}>
+                    <Home params={Promise} searchParams={Promise}>
+                      <main>
+                        <Landing status={null} auditCount={null} liveCount={null} featured={null}>
+                          <div className="sheet" id="top">
+                            <header>
+                            <section>
+                            <section>
+                            <section>
+                            <section className="band" id="live" aria-labelledby="live-title">
+                              <h2>
+                              <p>
+                              <div>
+                              <details
+                                className="live-faq"
+-                               open=""
+                              >
+                        <section className="room" id="room" aria-labelledby="room-title">
+                          <div>
+                          <div>
+                          <section className="order" id="pour" aria-labelledby="form-title">
+                            <div>
+                            <form className="order-form" onSubmit={function runAudit}>
+                              <label className="field fiel...">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="Exact listing name, so Qloo can resolve it"
+                                  autoComplete="off"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value="restaurant"
+                                  onChange={function onChange}
+                                  placeholder="e.g. modern Indian restaurant"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="e.g. Mumbai"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                            ...
+                          ...
+                        ...
+                ...
+              ...
+
+POST count: 0
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029522589
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029522589
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029522589
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029522589
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029522589
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+navigation status: 200
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029522589
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch
+
+  ...
+    <LoadingBoundary loading={null}>
+      <HTTPAccessFallbackBoundary notFound={<SegmentViewNode>} forbidden={undefined} unauthorized={undefined}>
+        <HTTPAccessFallbackErrorBoundary pathname="/" notFound={<SegmentViewNode>} forbidden={undefined} ...>
+          <RedirectBoundary>
+            <RedirectErrorBoundary router={{...}}>
+              <InnerLayoutRouter url="/" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
+                <SegmentViewNode type="page" pagePath="page.tsx">
+                  <SegmentTrieNode>
+                  <ClientPageRoot Component={function Home} searchParams={{}} params={{}}>
+                    <Home params={Promise} searchParams={Promise}>
+                      <main>
+                        <Landing status={null} auditCount={null} liveCount={null} featured={null}>
+                          <div className="sheet" id="top">
+                            <header>
+                            <section>
+                            <section>
+                            <section>
+                            <section className="band" id="live" aria-labelledby="live-title">
+                              <h2>
+                              <p>
+                              <div>
+                              <details
+                                className="live-faq"
+-                               open=""
+                              >
+                        <section className="room" id="room" aria-labelledby="room-title">
+                          <div>
+                          <div>
+                          <section className="order" id="pour" aria-labelledby="form-title">
+                            <div>
+                            <form className="order-form" onSubmit={function runAudit}>
+                              <label className="field fiel...">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="Exact listing name, so Qloo can resolve it"
+                                  autoComplete="off"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value="restaurant"
+                                  onChange={function onChange}
+                                  placeholder="e.g. modern Indian restaurant"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              <label className="field">
+                                <span>
+                                <input
+                                  required={true}
+                                  minLength={2}
+                                  value=""
+                                  onChange={function onChange}
+                                  placeholder="e.g. Mumbai"
+-                                 style={{caret-color:"transparent"}}
+                                >
+                              ...
+                            ...
+                          ...
+                        ...
+                ...
+              ...
+
+Visible text:
+TasteProbe
+Tasting room
+How often does AI recommend you to your audience?
+
+Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.
+
+Pour a flight
+How it is poured
+EXAMPLE, NOT A REAL AUDIT
+01
+Music taste
+58%
+41–73%
+illustrative
+02
+Film taste
+31%
+18–47%
+illustrative
+03
+Brand taste
+12%
+5–27%
+illustrative
+04
+Place taste
+0%
+0–13%
+illustrative
+Example, not a real audit. Real flights fill only from live Qloo, Nebius and assistant calls.
+Three pours, one honest number
+01
+Source the palates
+
+Qloo turns your venue’s real taste neighbourhood into personas.
+
+02
+Pour the question
+
+Live assistants answer as each persona. Your name is never in the prompt.
+
+03
+Measure the glass
+
+Nemotron reads every answer; each glass fills to your share, with a 95% interval.
+
+Measured, not guessed
+
+Every glass seats at least eight personas and carries its interval.
+
+155
+TESTS
+8+
+PERSONAS
+95%
+INTERVALS
+See the method and evidence
+What’s live on this server
+
+CHECKING THE CELLAR…
+
+Live
+
+The tasting room, its key checks and each stored flight’s printable report.
+
+Has it run end to end?
+
+Checking this server’s audit store…
+
+THE TASTING ROOM · A RUN MAKES LIVE CALLS ONLY, NOTHING IS SIMULATED
+
+Pour a flight
+Qloo
+…
+Nebius
+…
+Assistants
+…
+Checking which keys are configured…
+Order a flight
+CHECKING
+BUSINESS NAME
+CATEGORY
+CITY
+PERSONAS
+16
+24
+48
+100
+200
+Run audit
+
+24 personas × 0 assistants = 0 live answers, each read by Nemotron. At least 8 personas per glass, so 24 personas fill up to 3 glasses. Configure an assistant to enable audits.
+
+EMPTY FLIGHT
+01
+Not poured
+—
+02
+Not poured
+—
+03
+Not poured
+—
+24 personas fill up to 3 glasses.
+Loading saved flights…
+
+Reading the audit store.
+
+TasteProbe
+Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
+
+=== 3102-1280 http://127.0.0.1:3102/ ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET http://127.0.0.1:3102/
+response: 200 http://127.0.0.1:3102/
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 200
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/api/status
+request: GET http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+
+
+=== 3102-375 http://127.0.0.1:3102/ ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET http://127.0.0.1:3102/
+response: 200 http://127.0.0.1:3102/
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+navigation status: 200
+request: GET http://127.0.0.1:3102/api/status
+request: GET http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501

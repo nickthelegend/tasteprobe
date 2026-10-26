@@ -1,0 +1,3 @@
+B-072
+Status: UNTESTED
+needs QLOO_API_KEY and stored audit with no verified rivals. No upstream response fabricated or live provider call made.

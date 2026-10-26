@@ -1,0 +1,64 @@
+S-139
+Final status: FAIL
+Observed result: The 375px not-found layout fits, but Chrome emits a resource-load console.error for HTTP 404 on both local targets.
+
+S-139
+Status: FAIL
+3101-375: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-375: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+
+=== 3101-375 http://127.0.0.1:3101/no-such-page ===
+Assertion: completed
+Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030025636
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030025636
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030025636
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030025636
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030025636
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+navigation status: 404
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030025636
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+Visible text:
+TASTEPROBE
+404 · NOT FOUND
+Tasting room
+Back to TasteProbe
+Nothing poured here
+
+There is no page at this address. Flights are poured in the tasting room, and each stored audit has its printable report at /audits/<id>/report.
+
+=== 3102-375 http://127.0.0.1:3102/no-such-page ===
+Assertion: completed
+Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3102/no-such-page
+response: 404 http://127.0.0.1:3102/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 404
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501

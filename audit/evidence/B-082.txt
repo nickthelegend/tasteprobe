@@ -1,0 +1,6 @@
+B-082
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Helper exception: ConfigError: Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.
+Probe exit code: 0 (expected exception captured)

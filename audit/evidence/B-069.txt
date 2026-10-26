@@ -1,0 +1,30 @@
+B-069
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+MCP tools/call qloo_taste_profile
+Arguments: {"audit_id":"00000000-0000-4000-8000-000000000000","filter_type":"urn:entity:artist"}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "Setup required: QLOO_API_KEY. Set it in .env.local (see .env.example) and restart the MCP server. No API call was made."
+    }
+  ],
+  "structuredContent": {
+    "error": "setup_required",
+    "missing": [
+      "QLOO_API_KEY"
+    ]
+  },
+  "isError": true
+}
+
+Independent stdio exit-evidence recheck
+MCP qloo_taste_profile {"audit_id":"00000000-0000-4000-8000-000000000000","filter_type":"urn:entity:artist"}
+Protocol result status: tool error
+Body: {"content":[{"type":"text","text":"Setup required: QLOO_API_KEY. Set it in .env.local (see .env.example) and restart the MCP server. No API call was made."}],"structuredContent":{"error":"setup_required","missing":["QLOO_API_KEY"]},"isError":true}
+Server PID: 78145
+Exit code: 0
+Exit signal: null
+stderr: (empty)

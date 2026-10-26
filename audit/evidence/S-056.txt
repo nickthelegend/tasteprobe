@@ -1,0 +1,3 @@
+S-056
+UNTESTED: needs NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot plus QLOO_API_KEY
+No provider call made.

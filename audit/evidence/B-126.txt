@@ -1,0 +1,28 @@
+B-126
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Command: npm run audit:live -- --replay 00000000-0000-4000-8000-000000000000
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --replay ***
+
+
+stderr:
+No recorded run 00000000-0000-4000-8000-000000000000 in /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/data-dev/audits.json.
+
+
+Command: npm run audit:live -- --replay 00000000-0000-4000-8000-000000000100
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --replay ***
+
+
+stderr:
+Run 00000000-0000-4000-8000-000000000100 has no cached responses at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/data-public/raw/00000000-0000-4000-8000-000000000100/responses.json; nothing to replay.

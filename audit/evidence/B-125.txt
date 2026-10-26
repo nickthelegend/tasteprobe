@@ -1,0 +1,15 @@
+B-125
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Command: npm run audit:live -- --replay
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --replay
+
+
+stderr:
+Usage: npm run audit:live -- --replay <run id>

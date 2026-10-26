@@ -1,0 +1,3 @@
+S-040
+UNTESTED: needs a real non-2xx /api/status response; no response was fabricated
+No provider call made.

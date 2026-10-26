@@ -1,0 +1,3 @@
+S-042
+UNTESTED: needs a configured NEBIUS_API_KEY whose real catalog check fails
+No provider call made.

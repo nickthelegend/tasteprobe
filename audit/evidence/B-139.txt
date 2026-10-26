@@ -1,0 +1,20 @@
+B-139
+Final status: PASS
+Observed result: npm run e2e:stack:stop exited 0, killed recorded dev/standalone/public PIDs; second call exited 0 with no e2e/.run/pids. Extra production PID tree terminated; all four ports refused connections; heavy slot released.
+
+
+> tasteprobe@1.0.0 e2e:stack:stop
+> e2e/stack.sh stop
+
+killed dev (18177)
+killed standalone (18178)
+killed public (18180)
+
+Exit code: 0
+
+> tasteprobe@1.0.0 e2e:stack:stop
+> e2e/stack.sh stop
+
+no e2e/.run/pids
+
+Exit code: 0

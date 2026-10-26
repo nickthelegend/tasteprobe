@@ -1,0 +1,10 @@
+
+Running 1 test using 1 worker
+
+[1/1] [desktop] › e2e/tests/zero-tolerance.spec.ts:163:1 › execute independent AUDIT surface rows with real Chrome
+[desktop] › e2e/tests/zero-tolerance.spec.ts:163:1 › execute independent AUDIT surface rows with real Chrome
+S-140 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+  1 passed (5.6s)
+
+Exit code: 0

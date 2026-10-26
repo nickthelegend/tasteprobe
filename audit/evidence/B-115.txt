@@ -1,0 +1,54 @@
+B-115
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Command: npm run audit:live -- --brand Exact listing name --city Mumbai --personas 7
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --brand Exact listing name --city Mumbai --personas 7
+
+
+stderr:
+--personas must be a whole number from 8 to 200 (at least 8 per taste segment).
+
+
+Command: npm run audit:live -- --brand Exact listing name --city Mumbai --personas 201
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --brand Exact listing name --city Mumbai --personas 201
+
+
+stderr:
+--personas must be a whole number from 8 to 200 (at least 8 per taste segment).
+
+
+Command: npm run audit:live -- --brand Exact listing name --city Mumbai --personas 8.5
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --brand Exact listing name --city Mumbai --personas 8.5
+
+
+stderr:
+--personas must be a whole number from 8 to 200 (at least 8 per taste segment).
+
+
+Command: npm run audit:live -- --brand Exact listing name --city Mumbai --personas not-a-number
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --brand Exact listing name --city Mumbai --personas not-a-number
+
+
+stderr:
+--personas must be a whole number from 8 to 200 (at least 8 per taste segment).

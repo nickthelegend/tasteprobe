@@ -1,0 +1,1095 @@
+{
+  "S-001": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-001-3101-1280.jpg",
+      "S-001-3101-375.jpg"
+    ]
+  },
+  "S-002": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-002-3101-1280.jpg",
+      "S-002-3101-375.jpg"
+    ]
+  },
+  "S-003": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-003-3101-1280.jpg",
+      "S-003-3101-375.jpg"
+    ]
+  },
+  "S-004": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-004-3101-1280.jpg",
+      "S-004-3101-375.jpg"
+    ]
+  },
+  "S-005": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-005-3101-1280.jpg",
+      "S-005-3101-375.jpg"
+    ]
+  },
+  "S-006": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-006-3101-1280.jpg",
+      "S-006-3101-375.jpg"
+    ]
+  },
+  "S-007": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-007-3101-1280.jpg",
+      "S-007-3101-375.jpg"
+    ]
+  },
+  "S-008": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_* assistant slot"
+  },
+  "S-009": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-009-3101-1280.jpg",
+      "S-009-3101-375.jpg"
+    ]
+  },
+  "S-010": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-010-3101-1280.jpg",
+      "S-010-3101-375.jpg"
+    ]
+  },
+  "S-011": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-011-3101-1280.jpg",
+      "S-011-3101-375.jpg"
+    ]
+  },
+  "S-012": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-012-3103-1280.jpg",
+      "S-012-3103-375.jpg"
+    ]
+  },
+  "S-013": {
+    "status": "UNTESTED",
+    "detail": "needs an actually stored live audit from QLOO_API_KEY, NEBIUS_API_KEY and an OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot; synthetic records cannot establish live provenance"
+  },
+  "S-014": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-014-3101-1280.jpg"
+    ]
+  },
+  "S-015": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-015-3101-1280.jpg",
+      "S-015-3101-375.jpg"
+    ]
+  },
+  "S-016": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-016-3101-1280.jpg",
+      "S-016-3101-375.jpg"
+    ]
+  },
+  "S-017": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-017-3101-1280.jpg",
+      "S-017-3101-375.jpg"
+    ]
+  },
+  "S-018": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-018-3101-1280.jpg",
+      "S-018-3101-375.jpg"
+    ]
+  },
+  "S-019": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-019-3101-1280.jpg",
+      "S-019-3101-375.jpg"
+    ]
+  },
+  "S-020": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-020-3101-1280.jpg",
+      "S-020-3101-375.jpg"
+    ]
+  },
+  "S-021": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY plus NEBIUS_API_KEY and an OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot for a real audit"
+  },
+  "S-022": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-022-3101-1280.jpg",
+      "S-022-3101-375.jpg"
+    ]
+  },
+  "S-023": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY"
+  },
+  "S-024": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-024-3101-1280.jpg",
+      "S-024-3101-375.jpg"
+    ]
+  },
+  "S-025": {
+    "status": "UNTESTED",
+    "detail": "needs OPENAI_API_KEY or complete MODEL_2_* plus QLOO_API_KEY and NEBIUS_API_KEY"
+  },
+  "S-026": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-026-3101-1280.jpg",
+      "S-026-3101-375.jpg"
+    ]
+  },
+  "S-027": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-027-3101-1280.jpg",
+      "S-027-3101-375.jpg"
+    ]
+  },
+  "S-028": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-028-3101-1280.jpg",
+      "S-028-3101-375.jpg"
+    ]
+  },
+  "S-029": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-029-3101-1280.jpg",
+      "S-029-3101-375.jpg"
+    ]
+  },
+  "S-030": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-030-3101-1280.jpg",
+      "S-030-3101-375.jpg"
+    ]
+  },
+  "S-031": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY, an OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot and required owner run token"
+  },
+  "S-032": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-032-3101-1280.jpg",
+      "S-032-3101-375.jpg"
+    ]
+  },
+  "S-033": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-033-3101-1280.jpg",
+      "S-033-3101-375.jpg"
+    ]
+  },
+  "S-034": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-034-3101-1280.jpg",
+      "S-034-3101-375.jpg"
+    ]
+  },
+  "S-035": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-035-3101-1280.jpg",
+      "S-035-3101-375.jpg"
+    ]
+  },
+  "S-036": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-036-3101-1280.jpg",
+      "S-036-3101-375.jpg"
+    ]
+  },
+  "S-037": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-037-3101-1280.jpg",
+      "S-037-3101-375.jpg"
+    ]
+  },
+  "S-038": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-038-3101-1280.jpg",
+      "S-038-3101-375.jpg"
+    ]
+  },
+  "S-039": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-039-3101-1280.jpg",
+      "S-039-3101-375.jpg"
+    ]
+  },
+  "S-040": {
+    "status": "UNTESTED",
+    "detail": "needs a real non-2xx /api/status response; no response was fabricated"
+  },
+  "S-041": {
+    "status": "FAIL",
+    "detail": "Real malformed-store read returned HTTP 500. The expected error alert and Dismiss worked, but Chrome logged console.error for the 500, so FAIL under the required console rule.",
+    "shots": [
+      "S-041-3101-1280.jpg",
+      "S-041-3101-375.jpg"
+    ]
+  },
+  "S-042": {
+    "status": "UNTESTED",
+    "detail": "needs a configured NEBIUS_API_KEY whose real catalog check fails"
+  },
+  "S-043": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-043-3103-1280.jpg",
+      "S-043-3103-375.jpg"
+    ]
+  },
+  "S-044": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-044-3103-1280.jpg",
+      "S-044-3103-375.jpg"
+    ]
+  },
+  "S-045": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-045-3103-1280.jpg",
+      "S-045-3103-375.jpg"
+    ]
+  },
+  "S-046": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot and authorized owner run token"
+  },
+  "S-047": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-047-3103-1280.jpg",
+      "S-047-3103-375.jpg"
+    ]
+  },
+  "S-048": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-048-3101-1280.jpg",
+      "S-048-3101-375.jpg"
+    ]
+  },
+  "S-049": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-049-3104-1280.jpg",
+      "S-049-3104-375.jpg"
+    ]
+  },
+  "S-050": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot"
+  },
+  "S-051": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-051-3101-1280.jpg",
+      "S-051-3101-375.jpg"
+    ]
+  },
+  "S-052": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot for real stage events"
+  },
+  "S-053": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-053-3101-1280.jpg",
+      "S-053-3101-375.jpg"
+    ]
+  },
+  "S-054": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot for real persona events"
+  },
+  "S-055": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-055-3101-1280.jpg",
+      "S-055-3101-375.jpg"
+    ]
+  },
+  "S-056": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot plus QLOO_API_KEY"
+  },
+  "S-057": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-057-3101-1280.jpg",
+      "S-057-3101-375.jpg"
+    ]
+  },
+  "S-058": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot"
+  },
+  "S-059": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-059-3101-1280.jpg",
+      "S-059-3101-375.jpg"
+    ]
+  },
+  "S-060": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot to initiate the real UI audit request"
+  },
+  "S-061": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot to begin a live stream; disabled Run and zero POSTs checked separately in S-029/S-051"
+  },
+  "S-062": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot to start a paid operation"
+  },
+  "S-063": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-063-3103-1280.jpg",
+      "S-063-3103-375.jpg"
+    ]
+  },
+  "S-064": {
+    "status": "UNTESTED",
+    "detail": "Synthetic provenance variant verified; needs genuine live and stored unrecorded-provenance records to verify all variants.",
+    "shots": [
+      "S-064-3103-1280.jpg",
+      "S-064-3103-375.jpg"
+    ]
+  },
+  "S-065": {
+    "status": "UNTESTED",
+    "detail": "Saved-results navigation verified; needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot to verify the during-pour navigation variant.",
+    "shots": [
+      "S-065-3103-1280.jpg",
+      "S-065-3103-375.jpg"
+    ]
+  },
+  "S-066": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-066-3103-1280.jpg",
+      "S-066-3103-375.jpg"
+    ]
+  },
+  "S-067": {
+    "status": "UNTESTED",
+    "detail": "Last-counterfactual selection verified; no-attempt weakest-share variant requires a saved audit without attempts.",
+    "shots": [
+      "S-067-3103-1280.jpg",
+      "S-067-3103-375.jpg"
+    ]
+  },
+  "S-068": {
+    "status": "UNTESTED",
+    "detail": "Reloaded saved-share behavior verified; needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot for just-finished-session expansion and the absent-personas tray variant.",
+    "shots": [
+      "S-068-3103-1280.jpg",
+      "S-068-3103-375.jpg"
+    ]
+  },
+  "S-069": {
+    "status": "UNTESTED",
+    "detail": "Saved counts and present failure types verified; no-rival and extraction-error variants absent from the seeded audit.",
+    "shots": [
+      "S-069-3103-1280.jpg",
+      "S-069-3103-375.jpg"
+    ]
+  },
+  "S-070": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-070-3103-1280.jpg",
+      "S-070-3103-375.jpg"
+    ]
+  },
+  "S-071": {
+    "status": "UNTESTED",
+    "detail": "Missing-result and dropped-answer variants verified; needs stored all-failed and extraction-failed cells for remaining variants.",
+    "shots": [
+      "S-071-3103-1280.jpg",
+      "S-071-3103-375.jpg"
+    ]
+  },
+  "S-072": {
+    "status": "UNTESTED",
+    "detail": "Saved verified badge and descending counts verified; no duplicate-brand rival, unchecked rival or saved unverified rival appears in this selected segment.",
+    "shots": [
+      "S-072-3103-1280.jpg",
+      "S-072-3103-375.jpg"
+    ]
+  },
+  "S-073": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY for a real saved rival verification; synthetic saved badges are not live evidence"
+  },
+  "S-074": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-074-3101-1280.jpg",
+      "S-074-3101-375.jpg"
+    ]
+  },
+  "S-075": {
+    "status": "FAIL",
+    "detail": "The labelled synthetic saved persona P2 renders 1 affinity chip; expected 3. Both 1280px and 375px reproduce this. Seed fixture contains only one affinity; no live persona construction was tested.",
+    "shots": [
+      "S-075-3103-1280.jpg",
+      "S-075-3103-375.jpg"
+    ]
+  },
+  "S-076": {
+    "status": "UNTESTED",
+    "detail": "Tag-source and failed-domain disclosure verified; entity-source/global-top-up/lilac-chip/demographic-value variants need corresponding saved data.",
+    "shots": [
+      "S-076-3103-1280.jpg",
+      "S-076-3103-375.jpg"
+    ]
+  },
+  "S-077": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY plus NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot for a completed real run"
+  },
+  "S-078": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-078-3101-1280.jpg",
+      "S-078-3101-375.jpg"
+    ]
+  },
+  "S-079": {
+    "status": "UNTESTED",
+    "detail": "Saved controls verified; no-attempt Generate fix & re-test variant absent from seeded store.",
+    "shots": [
+      "S-079-3103-1280.jpg",
+      "S-079-3103-375.jpg"
+    ]
+  },
+  "S-080": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY, QLOO_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot"
+  },
+  "S-081": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-081-3103-1280.jpg",
+      "S-081-3103-375.jpg"
+    ]
+  },
+  "S-082": {
+    "status": "UNTESTED",
+    "detail": "Positive saved verdict and failed arm counts verified; negative and zero-crossing saved attempts absent.",
+    "shots": [
+      "S-082-3103-1280.jpg",
+      "S-082-3103-375.jpg"
+    ]
+  },
+  "S-083": {
+    "status": "UNTESTED",
+    "detail": "Name-exposure label verified; needs stored multiple attempts for history selection and repeated-look caveat.",
+    "shots": [
+      "S-083-3103-1280.jpg",
+      "S-083-3103-375.jpg"
+    ]
+  },
+  "S-084": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY, QLOO_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot to start a real re-pour"
+  },
+  "S-085": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-085-3103-1280.jpg",
+      "S-085-3103-375.jpg"
+    ]
+  },
+  "S-086": {
+    "status": "UNTESTED",
+    "detail": "Public-cap eligible-select variant verified; impossible-minimum variant needs a saved segment with more personas than these caps permit.",
+    "shots": [
+      "S-086-3103-1280.jpg",
+      "S-086-3103-375.jpg"
+    ]
+  },
+  "S-087": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-087-3103-1280.jpg",
+      "S-087-3103-375.jpg"
+    ]
+  },
+  "S-088": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY, QLOO_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot"
+  },
+  "S-089": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-089-3103-1280.jpg",
+      "S-089-3103-375.jpg"
+    ]
+  },
+  "S-090": {
+    "status": "UNTESTED",
+    "detail": "needs a stored real agent run with confirmation variants; seeded synthetic store contains no agent runs"
+  },
+  "S-091": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY, QLOO_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot to initiate an agent stream"
+  },
+  "S-092": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY, QLOO_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot for a real running/persisted agent; disabled control checked in S-089"
+  },
+  "S-093": {
+    "status": "UNTESTED",
+    "detail": "Loading and empty-segment variants verified; failed-read variant needs a real store read failure.",
+    "shots": [
+      "S-093-3103-1280.jpg",
+      "S-093-3103-375.jpg"
+    ]
+  },
+  "S-094": {
+    "status": "UNTESTED",
+    "detail": "Saved summary, prompt/answer and toggles verified; no extraction-disagreement or long-answer variant in seeded cached responses.",
+    "shots": [
+      "S-094-3103-1280.jpg",
+      "S-094-3103-375.jpg"
+    ]
+  },
+  "S-095": {
+    "status": "UNTESTED",
+    "detail": "Audit-only evidence verified; saved synthetic counterfactual lacks raw baseline/placebo/fix arms, so attempt-view variants cannot be tested.",
+    "shots": [
+      "S-095-3103-1280.jpg",
+      "S-095-3103-375.jpg"
+    ]
+  },
+  "S-096": {
+    "status": "UNTESTED",
+    "detail": "45-row pagination and segment reset verified; attempt/view reset requires stored raw re-pour arms.",
+    "shots": [
+      "S-096-3103-1280.jpg",
+      "S-096-3103-375.jpg"
+    ]
+  },
+  "S-097": {
+    "status": "UNTESTED",
+    "detail": "Rapid audit switching and stale evidence isolation verified; attempt switching and late real re-pour/agent refresh require saved raw attempts and real provider keys.",
+    "shots": [
+      "S-097-3103-1280.jpg",
+      "S-097-3103-375.jpg"
+    ]
+  },
+  "S-098": {
+    "status": "UNTESTED",
+    "detail": "needs NEBIUS_API_KEY, QLOO_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot; synthetic extraction totals cannot establish live reader behavior"
+  },
+  "S-099": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-099-3101-1280.jpg",
+      "S-099-3101-375.jpg"
+    ]
+  },
+  "S-100": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-100-3103-1280.jpg",
+      "S-100-3103-375.jpg"
+    ]
+  },
+  "S-101": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-101-3103-1280.jpg",
+      "S-101-3103-375.jpg"
+    ]
+  },
+  "S-102": {
+    "status": "UNTESTED",
+    "detail": "Synthetic provenance variant verified; needs genuine live and stored unrecorded-provenance records to verify all variants.",
+    "shots": [
+      "S-102-3103-1280.jpg",
+      "S-102-3103-375.jpg"
+    ]
+  },
+  "S-103": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-103-3103-1280.jpg",
+      "S-103-3103-375.jpg"
+    ]
+  },
+  "S-104": {
+    "status": "FAIL",
+    "detail": "Real older-page store read returned HTTP 500. Existing flights remained and the expected error appeared, but Chrome logged console.error for the 500.",
+    "shots": [
+      "S-104-3103-1280.jpg",
+      "S-104-3103-375.jpg"
+    ]
+  },
+  "S-105": {
+    "status": "UNTESTED",
+    "detail": "Rapid audit switching and stale evidence isolation verified; attempt switching and late real re-pour/agent refresh require saved raw attempts and real provider keys.",
+    "shots": [
+      "S-105-3103-1280.jpg",
+      "S-105-3103-375.jpg"
+    ]
+  },
+  "S-106": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-106-3101-1280.jpg"
+    ]
+  },
+  "S-107": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-107-3101-1280.jpg",
+      "S-107-3101-375.jpg"
+    ]
+  },
+  "S-108": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-108-3101-1280.jpg",
+      "S-108-3101-375.jpg"
+    ]
+  },
+  "S-109": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-109-3101-1280.jpg",
+      "S-109-3101-375.jpg"
+    ]
+  },
+  "S-110": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-110-3101-1280.jpg",
+      "S-110-3101-375.jpg"
+    ]
+  },
+  "S-111": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-111-3101-1280.jpg",
+      "S-111-3101-375.jpg"
+    ]
+  },
+  "S-112": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-112-3101-1280.jpg",
+      "S-112-3101-375.jpg"
+    ]
+  },
+  "S-113": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-113-3101-1280.jpg",
+      "S-113-3101-375.jpg"
+    ]
+  },
+  "S-114": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-114-3101-1280.jpg",
+      "S-114-3101-375.jpg"
+    ]
+  },
+  "S-115": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-115-3101-1280.jpg",
+      "S-115-3101-375.jpg"
+    ]
+  },
+  "S-116": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-116-3101-1280.jpg",
+      "S-116-3101-375.jpg"
+    ]
+  },
+  "S-117": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-117-3101-1280.jpg",
+      "S-117-3101-375.jpg"
+    ]
+  },
+  "S-118": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-118-3101-1280.jpg",
+      "S-118-3101-375.jpg"
+    ]
+  },
+  "S-119": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-119-3101-1280.jpg",
+      "S-119-3101-375.jpg"
+    ]
+  },
+  "S-120": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-120-3103-1280.jpg",
+      "S-120-3103-375.jpg"
+    ]
+  },
+  "S-121": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-121-3101-1280.jpg",
+      "S-121-3101-375.jpg"
+    ]
+  },
+  "S-122": {
+    "status": "UNTESTED",
+    "detail": "Synthetic report verified; live/unrecorded-provenance report variants require corresponding genuinely stored audits.",
+    "shots": [
+      "S-122-3103-1280.jpg",
+      "S-122-3103-375.jpg"
+    ]
+  },
+  "S-123": {
+    "status": "FAIL",
+    "detail": "The labelled synthetic report lists assistant-a and assistant-b but omits Share per segment and assistant. The seeded record has only one modelSegments group; observed at 1280px and 375px.",
+    "shots": [
+      "S-123-3103-1280.jpg",
+      "S-123-3103-375.jpg"
+    ]
+  },
+  "S-124": {
+    "status": "UNTESTED",
+    "detail": "Present dropped causes verified; seeded synthetic segments have usable answers, so no-usable glass and extraction-error variants need corresponding saved data.",
+    "shots": [
+      "S-124-3103-1280.jpg",
+      "S-124-3103-375.jpg"
+    ]
+  },
+  "S-125": {
+    "status": "UNTESTED",
+    "detail": "Saved statuses and failed signals verified; empty-domain/demographic and absent optional-section variants need corresponding saved data.",
+    "shots": [
+      "S-125-3103-1280.jpg",
+      "S-125-3103-375.jpg"
+    ]
+  },
+  "S-126": {
+    "status": "UNTESTED",
+    "detail": "Saved positive attempt and escaped copy verified; no-fix and zero-crossing variants absent from seeded data.",
+    "shots": [
+      "S-126-3103-1280.jpg",
+      "S-126-3103-375.jpg"
+    ]
+  },
+  "S-127": {
+    "status": "UNTESTED",
+    "detail": "needs saved agent runs with confirmation variants; current labelled synthetic store has no agent runs"
+  },
+  "S-128": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-128-3103-1280.jpg",
+      "S-128-3103-375.jpg"
+    ]
+  },
+  "S-129": {
+    "status": "UNTESTED",
+    "detail": "needs interactive Chrome print dialog cancellation; headless window.print invocation and print styles checked in evidence, no dialog outcome claimed",
+    "shots": [
+      "S-129-3103-1280.jpg",
+      "S-129-3103-375.jpg"
+    ]
+  },
+  "S-130": {
+    "status": "FAIL",
+    "detail": "The correct not-found page renders with HTTP 404, but Chrome emits a resource-load console.error for that 404 on dev and standalone at both widths.",
+    "shots": [
+      "S-130-3101-1280.jpg",
+      "S-130-3101-375.jpg"
+    ]
+  },
+  "S-131": {
+    "status": "FAIL",
+    "detail": "Recovery links return to the real missing-key app, but opening the not-found page emits a Chrome resource-load console.error for HTTP 404 on both targets and widths.",
+    "shots": [
+      "S-131-3101-1280.jpg",
+      "S-131-3101-375.jpg"
+    ]
+  },
+  "S-132": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-132-3101-375.jpg"
+    ]
+  },
+  "S-133": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-133-3101-1280.jpg"
+    ]
+  },
+  "S-134": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-134-3101-375.jpg"
+    ]
+  },
+  "S-135": {
+    "status": "UNTESTED",
+    "detail": "Lock/results/evidence/notebook layout verified; multiple-attempt history needs corresponding saved attempts.",
+    "shots": [
+      "S-135-3103-375.jpg"
+    ]
+  },
+  "S-136": {
+    "status": "FAIL",
+    "detail": "At 375px on next dev, rapidly toggling native method FAQs produced a React hydration console.error: server/client details open attributes differed. No audit POST occurred; diagnostic POSTs went to Next.js error tooling.",
+    "shots": [
+      "S-136-3101-375.jpg"
+    ]
+  },
+  "S-137": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-137-3101-375.jpg"
+    ]
+  },
+  "S-138": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-138-3103-375.jpg"
+    ]
+  },
+  "S-139": {
+    "status": "FAIL",
+    "detail": "The 375px not-found layout fits, but Chrome emits a resource-load console.error for HTTP 404 on both local targets.",
+    "shots": [
+      "S-139-3101-375.jpg"
+    ]
+  },
+  "S-140": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-140-3101-1280.jpg",
+      "S-140-3101-375.jpg"
+    ]
+  },
+  "S-141": {
+    "status": "FAIL",
+    "detail": "Keyboard/no-log-control probes ran, but visiting the intentional not-found state emits Chrome console.error for HTTP 404. This fails the required any-console-error rule.",
+    "shots": [
+      "S-141-3101-1280.jpg",
+      "S-141-3101-375.jpg"
+    ]
+  },
+  "S-142": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-142-hosted-1280.jpg",
+      "S-142-hosted-375.jpg"
+    ]
+  },
+  "S-143": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-143-hosted-1280.jpg",
+      "S-143-hosted-375.jpg"
+    ]
+  },
+  "S-144": {
+    "status": "UNTESTED",
+    "detail": "needs QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot and hosted owner run token"
+  },
+  "S-145": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-145-hosted-1280.jpg",
+      "S-145-hosted-375.jpg"
+    ]
+  },
+  "S-146": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-146-hosted-1280.jpg",
+      "S-146-hosted-375.jpg"
+    ]
+  },
+  "S-147": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-147-hosted-1280.jpg",
+      "S-147-hosted-375.jpg"
+    ]
+  },
+  "S-148": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-148-hosted-1280.jpg",
+      "S-148-hosted-375.jpg"
+    ]
+  },
+  "S-149": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-149-hosted-1280.jpg",
+      "S-149-hosted-375.jpg"
+    ]
+  },
+  "S-150": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-150-hosted-1280.jpg",
+      "S-150-hosted-375.jpg"
+    ]
+  },
+  "S-151": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-151-hosted-1280.jpg",
+      "S-151-hosted-375.jpg"
+    ]
+  },
+  "S-152": {
+    "status": "PASS",
+    "detail": "All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.",
+    "shots": [
+      "S-152-hosted-375.jpg"
+    ]
+  }
+}

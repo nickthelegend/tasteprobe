@@ -1,0 +1,907 @@
+S-082
+Status: UNTESTED
+Positive saved verdict and failed arm counts verified; negative and zero-crossing saved attempts absent.
+
+=== 3103-1280 http://127.0.0.1:3103/ ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET http://127.0.0.1:3103/
+response: 200 http://127.0.0.1:3103/
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+navigation status: 200
+request: GET http://127.0.0.1:3103/api/status
+request: GET http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/status
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
+Visible text:
+TasteProbe
+How it works
+Proof
+What’s live
+Method
+Tasting room
+How often does AI recommend you to your audience?
+
+Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.
+
+Pour a flight
+How it is poured
+EXAMPLE, NOT A REAL AUDIT
+01
+Music taste
+58%
+41–73%
+illustrative
+02
+Film taste
+31%
+18–47%
+illustrative
+03
+Brand taste
+12%
+5–27%
+illustrative
+04
+Place taste
+0%
+0–13%
+illustrative
+Example, not a real audit. Real flights fill only from live Qloo, Nebius and assistant calls.
+Three pours, one honest number
+01
+Source the palates
+
+Qloo turns your venue’s real taste neighbourhood into personas.
+
+02
+Pour the question
+
+Live assistants answer as each persona. Your name is never in the prompt.
+
+03
+Measure the glass
+
+Nemotron reads every answer; each glass fills to your share, with a 95% interval.
+
+Measured, not guessed
+
+Every glass seats at least eight personas and carries its interval.
+
+155
+TESTS
+8+
+PERSONAS
+95%
+INTERVALS
+See the method and evidence
+What’s live on this server
+
+QLOO KEY MISSING · NEBIUS KEY MISSING · NO ASSISTANT · 14 FLIGHTS STORED HERE, NONE FROM A LIVE RUN
+
+Live
+
+The tasting room, its key checks and each stored flight’s printable report.
+
+Setup required
+
+Runs need QLOO_API_KEY and NEBIUS_API_KEY and MODEL_2_* on this server. Nothing is simulated.
+
+Has it run end to end?
+
+THE TASTING ROOM · A RUN MAKES LIVE CALLS ONLY, NOTHING IS SIMULATED
+
+Pour a flight
+Qloo
+key missing
+Nebius
+key missing
+Assistants
+none configured
+Order
+Flight
+Tasting sheet
+Re-pour
+Tasting notes
+Setup required
+
+The flight stays corked until these are set in the server’s environment (.env.local when you run it yourself). Nothing below is filled in until a live run completes.
+
+Setup required: QLOO_API_KEY
+Qloo key not configured, so personas cannot be built from real taste data.
+Setup required: NEBIUS_API_KEY
+Nebius key not configured, so NVIDIA Nemotron extraction cannot run.
+Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID
+there is no assistant to test.
+Runs are disabled on the public demo
+
+Every audit, re-pour and agent run spends this server’s Qloo, Nebius and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slots, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.
+
+RUN TOKEN
+Order a flight
+SETUP REQUIRED
+BUSINESS NAME
+CATEGORY
+CITY
+PERSONAS
+16
+24
+Run audit
+
+24 personas × 0 assistants = 0 live answers, each read by Nemotron. At least 8 personas per glass, so 24 personas fill up to 3 glasses. Configure an assistant to enable audits.
+
+This server runs one flight at a time, caps an audit at 24 personas and the agent at 2 copies and 100 assistant calls, and allows 10 runs an hour per visitor and 100 a day. Runs need the owner’s run token.
+
+10/21/2026, 5:30:00 PM · 61S · QLOO FIXTURE-ENTITY-ID
+
+Fixture Venue (synthetic)
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+
+restaurant · Testville · 1 Test Street, Testville
+
+Printable report
+WHOLE FLIGHT
+20%
+6 of 30 answers · 95% 9–38%
+The flight
+
+One glass per taste segment. Fill = share of answers that recommend Fixture Venue (synthetic); pour lines = 95% Wilson interval, widened for persona clustering. Pick a glass to read it.
+
+2 GLASSES · 2 PERSONAS
+01
+Restaurant genre
+33%
+15–58%
+5/15 · 8 personas · 1 call failed
+02
+Place keyword
+7%
+1–30%
+1/15 · 8 personas · 1 unparseable
+QLOO PERSONAS
+2
+2 taste segments · from urn:tag
+LIVE ANSWERS
+30
+assistant-a, assistant-b · 2 of 32 excluded (1 call errors, 1 unparseable, 0 extraction errors)
+POURED MOST INSTEAD
+Rival One (synthetic)
+in 40% of answers
+Tasting sheet: segment × assistant
+
+Share of answers that recommend Fixture Venue (synthetic), with mentions/answers and the 95% interval in each cell.
+
+TASTE SEGMENT	ALL ASSISTANTS	ASSISTANT-A	ASSISTANT-B
+
+Restaurant genre
+8 personas · 1 call failed
+
+33%
+5/15 · 15–58%
+1 of 16 dropped
+
+38%
+3/8 · 13–69%
+
+—
+no responses
+
+
+Place keyword
+8 personas · 1 unparseable
+
+7%
+1/15 · 1–30%
+1 of 16 dropped
+
+0%
+0/7 · 0–35%
+1 of 8 dropped
+
+—
+no responses
+0%
+100% of answers recommend you
+Poured instead
+
+Place keyword · 15 answers
+
+Rival One (synthetic)
+verified in Qloo
+53%
+Fixture Venue (synthetic) (you)
+7%
+Palates in this glass
+
+Each persona anchors on one Qloo tag (pink) and blends two affinity-weighted tags. Numbers are Qloo affinity scores.
+
+P2
+PLACE KEYWORD
+Test keyword B
+0.70
+
+Personas from Qloo urn:tag taste tags.
+
+Cross-domain Qloo signals (lilac chips): artist 1 · book failed · demographics failed
+
+Re-pour: baseline, placebo, fix
+
+Nemotron writes copy for one glass; the same personas re-ask every assistant three ways at once. Lift is fix minus placebo.
+
+PLACEBO-CONTROLLED
+ATTEMPT 1 · NVIDIA/NVIDIA-NEMOTRON-3-NANO-30B-A3B · PLACE KEYWORD
+“Synthetic fix copy <b>with markup</b> that must be escaped.”
+
+synthetic
+
+Prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.
+
+SEGMENT TO FIX
+Restaurant genre · 33% · 8 personas
+Place keyword · 7% · 8 personas
+Generate another fix
+01
+Baseline
+7%
+1–30%
+1/15 · 1 failed
+02
+Placebo
+20%
+7–45%
+3/15 · 1 failed
+03
+Fix
+53%
+30–75%
+8/15 · 1 failed
+Fix beat the placebo on this attempt. Fix minus placebo is +33 pts; the nominal 95% paired interval (+10 pts to +55 pts) sits above zero.
+
+Name exposure alone (placebo − baseline): +13 pts, 95% CI −5 pts to +30 pts. All three arms ran concurrently on the same 8 personas; failed calls are excluded from each arm’s denominator and counted above.
+
+SOMMELIER’S NOTEBOOK
+NEMOTRON AGENT · 0 RUNS KEPT
+COPIES TO TRY
+1
+2
+ASSISTANT-CALL CAP
+48
+Run agent loop
+
+This segment has 1 personas, fewer than 16, so none can be held out: a confirmation re-asks the same personas. Fresh answers, but not independent of the search; a win here is reported as re-confirmed, not confirmed.
+
+Nemotron plans with tool calls (Qloo insights, propose copy, probe the segment against the placebo, read stats) and revises. Its intervals are nominal and only screen: after several looks at three copies, one clears zero by chance in 9-16% of simulated null runs (scripts/null-sim.mjs). A copy that clears the screen gets one confirmation probe, on held-out personas the search never used (segments of 16 or more) or a fresh re-ask of the same personas (smaller segments), and only that probe can declare a win. The code enforces this, not the model.
+
+No agent runs on this audit yet. Each turn, tool call and stop reason is written here as it streams.
+
+Tasting notes
+
+The actual answers behind Place keyword, with the venues Nemotron extracted.
+
+CACHED
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+P6 · assistant-a
+Rival One (synthetic)
+ABSENT
+P7 · assistant-b
+Rival One (synthetic)
+ABSENT
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+P6 · assistant-a
+Rival One (synthetic)
+ABSENT
+P7 · assistant-b
+Rival One (synthetic)
+ABSENT
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+P6 · assistant-a
+Rival One (synthetic)
+ABSENT
+P7 · assistant-b
+Rival One (synthetic)
+ABSENT
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+
+Showing 30 of 45 answers.
+
+Show 15 more
+Who read the notes
+
+An NVIDIA open model on Nebius Token Factory parses every answer.
+
+Model
+nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B
+Tokens in / out
+12,000 / 3,400
+Est. cost
+set rates
+
+Set NEBIUS_INPUT_PRICE_PER_MILLION and NEBIUS_OUTPUT_PRICE_PER_MILLION to your Nebius rates to estimate cost from the real token usage above.
+
+Cross-check: Nemotron vs a deterministic numbered-list parser, over answers that contained a list.
+
+assistant-a
+10% disagree on you · 20% on the venue list · n=10
+PAST FLIGHTS
+FEATUREDFixture Venue (synthetic)
+Testville · 20% · 10/21/2026
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 1 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 2 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 3 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 4 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 5 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 6 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 7 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 8 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 9 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 10 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 11 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+2 older flights not listed
+Show older flights
+TasteProbe
+Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
+
+=== 3103-375 http://127.0.0.1:3103/ ===
+Assertion: completed
+Problems: none
+POST count: 0
+request: GET http://127.0.0.1:3103/
+response: 200 http://127.0.0.1:3103/
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 200
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/api/status
+request: GET http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/status
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
+Visible text:
+TasteProbe
+Tasting room
+How often does AI recommend you to your audience?
+
+Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.
+
+Pour a flight
+How it is poured
+EXAMPLE, NOT A REAL AUDIT
+01
+Music taste
+58%
+41–73%
+illustrative
+02
+Film taste
+31%
+18–47%
+illustrative
+03
+Brand taste
+12%
+5–27%
+illustrative
+04
+Place taste
+0%
+0–13%
+illustrative
+Example, not a real audit. Real flights fill only from live Qloo, Nebius and assistant calls.
+Three pours, one honest number
+01
+Source the palates
+
+Qloo turns your venue’s real taste neighbourhood into personas.
+
+02
+Pour the question
+
+Live assistants answer as each persona. Your name is never in the prompt.
+
+03
+Measure the glass
+
+Nemotron reads every answer; each glass fills to your share, with a 95% interval.
+
+Measured, not guessed
+
+Every glass seats at least eight personas and carries its interval.
+
+155
+TESTS
+8+
+PERSONAS
+95%
+INTERVALS
+See the method and evidence
+What’s live on this server
+
+QLOO KEY MISSING · NEBIUS KEY MISSING · NO ASSISTANT · 14 FLIGHTS STORED HERE, NONE FROM A LIVE RUN
+
+Live
+
+The tasting room, its key checks and each stored flight’s printable report.
+
+Setup required
+
+Runs need QLOO_API_KEY and NEBIUS_API_KEY and MODEL_2_* on this server. Nothing is simulated.
+
+Has it run end to end?
+
+THE TASTING ROOM · A RUN MAKES LIVE CALLS ONLY, NOTHING IS SIMULATED
+
+Pour a flight
+Qloo
+key missing
+Nebius
+key missing
+Assistants
+none configured
+Order
+Flight
+Tasting sheet
+Re-pour
+Tasting notes
+Setup required
+
+The flight stays corked until these are set in the server’s environment (.env.local when you run it yourself). Nothing below is filled in until a live run completes.
+
+Setup required: QLOO_API_KEY
+Qloo key not configured, so personas cannot be built from real taste data.
+Setup required: NEBIUS_API_KEY
+Nebius key not configured, so NVIDIA Nemotron extraction cannot run.
+Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID
+there is no assistant to test.
+Runs are disabled on the public demo
+
+Every audit, re-pour and agent run spends this server’s Qloo, Nebius and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slots, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.
+
+RUN TOKEN
+Order a flight
+SETUP REQUIRED
+BUSINESS NAME
+CATEGORY
+CITY
+PERSONAS
+16
+24
+Run audit
+
+24 personas × 0 assistants = 0 live answers, each read by Nemotron. At least 8 personas per glass, so 24 personas fill up to 3 glasses. Configure an assistant to enable audits.
+
+This server runs one flight at a time, caps an audit at 24 personas and the agent at 2 copies and 100 assistant calls, and allows 10 runs an hour per visitor and 100 a day. Runs need the owner’s run token.
+
+10/21/2026, 5:30:00 PM · 61S · QLOO FIXTURE-ENTITY-ID
+
+Fixture Venue (synthetic)
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+
+restaurant · Testville · 1 Test Street, Testville
+
+Printable report
+WHOLE FLIGHT
+20%
+6 of 30 answers · 95% 9–38%
+The flight
+
+One glass per taste segment. Fill = share of answers that recommend Fixture Venue (synthetic); pour lines = 95% Wilson interval, widened for persona clustering. Pick a glass to read it.
+
+2 GLASSES · 2 PERSONAS
+01
+Restaurant genre
+33%
+15–58%
+5/15 · 8 personas · 1 call failed
+02
+Place keyword
+7%
+1–30%
+1/15 · 8 personas · 1 unparseable
+QLOO PERSONAS
+2
+2 taste segments · from urn:tag
+LIVE ANSWERS
+30
+assistant-a, assistant-b · 2 of 32 excluded (1 call errors, 1 unparseable, 0 extraction errors)
+POURED MOST INSTEAD
+Rival One (synthetic)
+in 40% of answers
+Tasting sheet: segment × assistant
+
+Share of answers that recommend Fixture Venue (synthetic), with mentions/answers and the 95% interval in each cell.
+
+TASTE SEGMENT	ALL ASSISTANTS	ASSISTANT-A	ASSISTANT-B
+
+Restaurant genre
+8 personas · 1 call failed
+
+33%
+5/15 · 15–58%
+1 of 16 dropped
+
+38%
+3/8 · 13–69%
+
+—
+no responses
+
+
+Place keyword
+8 personas · 1 unparseable
+
+7%
+1/15 · 1–30%
+1 of 16 dropped
+
+0%
+0/7 · 0–35%
+1 of 8 dropped
+
+—
+no responses
+0%
+100% of answers recommend you
+Poured instead
+
+Place keyword · 15 answers
+
+Rival One (synthetic)
+verified in Qloo
+53%
+Fixture Venue (synthetic) (you)
+7%
+Palates in this glass
+
+Each persona anchors on one Qloo tag (pink) and blends two affinity-weighted tags. Numbers are Qloo affinity scores.
+
+P2
+PLACE KEYWORD
+Test keyword B
+0.70
+
+Personas from Qloo urn:tag taste tags.
+
+Cross-domain Qloo signals (lilac chips): artist 1 · book failed · demographics failed
+
+Re-pour: baseline, placebo, fix
+
+Nemotron writes copy for one glass; the same personas re-ask every assistant three ways at once. Lift is fix minus placebo.
+
+PLACEBO-CONTROLLED
+ATTEMPT 1 · NVIDIA/NVIDIA-NEMOTRON-3-NANO-30B-A3B · PLACE KEYWORD
+“Synthetic fix copy <b>with markup</b> that must be escaped.”
+
+synthetic
+
+Prompt-level counterfactual: the copy is injected as retrieved context. It is not a published website change.
+
+SEGMENT TO FIX
+Restaurant genre · 33% · 8 personas
+Place keyword · 7% · 8 personas
+Generate another fix
+01
+Baseline
+7%
+1–30%
+1/15 · 1 failed
+02
+Placebo
+20%
+7–45%
+3/15 · 1 failed
+03
+Fix
+53%
+30–75%
+8/15 · 1 failed
+Fix beat the placebo on this attempt. Fix minus placebo is +33 pts; the nominal 95% paired interval (+10 pts to +55 pts) sits above zero.
+
+Name exposure alone (placebo − baseline): +13 pts, 95% CI −5 pts to +30 pts. All three arms ran concurrently on the same 8 personas; failed calls are excluded from each arm’s denominator and counted above.
+
+SOMMELIER’S NOTEBOOK
+NEMOTRON AGENT · 0 RUNS KEPT
+COPIES TO TRY
+1
+2
+ASSISTANT-CALL CAP
+48
+Run agent loop
+
+This segment has 1 personas, fewer than 16, so none can be held out: a confirmation re-asks the same personas. Fresh answers, but not independent of the search; a win here is reported as re-confirmed, not confirmed.
+
+Nemotron plans with tool calls (Qloo insights, propose copy, probe the segment against the placebo, read stats) and revises. Its intervals are nominal and only screen: after several looks at three copies, one clears zero by chance in 9-16% of simulated null runs (scripts/null-sim.mjs). A copy that clears the screen gets one confirmation probe, on held-out personas the search never used (segments of 16 or more) or a fresh re-ask of the same personas (smaller segments), and only that probe can declare a win. The code enforces this, not the model.
+
+No agent runs on this audit yet. Each turn, tool call and stop reason is written here as it streams.
+
+Tasting notes
+
+The actual answers behind Place keyword, with the venues Nemotron extracted.
+
+CACHED
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+P6 · assistant-a
+Rival One (synthetic)
+ABSENT
+P7 · assistant-b
+Rival One (synthetic)
+ABSENT
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+P6 · assistant-a
+Rival One (synthetic)
+ABSENT
+P7 · assistant-b
+Rival One (synthetic)
+ABSENT
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+P6 · assistant-a
+Rival One (synthetic)
+ABSENT
+P7 · assistant-b
+Rival One (synthetic)
+ABSENT
+P0 · assistant-a
+Rival One (synthetic)
+ABSENT
+P1 · assistant-b
+Rival One (synthetic)
+ABSENT
+P2 · assistant-a
+Rival One (synthetic)
+ABSENT
+P3 · assistant-b
+Rival One (synthetic)
+ABSENT
+P4 · assistant-a
+Rival One (synthetic)
+ABSENT
+P5 · assistant-b
+Rival One (synthetic)
+ABSENT
+
+Showing 30 of 45 answers.
+
+Show 15 more
+Who read the notes
+
+An NVIDIA open model on Nebius Token Factory parses every answer.
+
+Model
+nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B
+Tokens in / out
+12,000 / 3,400
+Est. cost
+set rates
+
+Set NEBIUS_INPUT_PRICE_PER_MILLION and NEBIUS_OUTPUT_PRICE_PER_MILLION to your Nebius rates to estimate cost from the real token usage above.
+
+Cross-check: Nemotron vs a deterministic numbered-list parser, over answers that contained a list.
+
+assistant-a
+10% disagree on you · 20% on the venue list · n=10
+PAST FLIGHTS
+FEATUREDFixture Venue (synthetic)
+Testville · 20% · 10/21/2026
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 1 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 2 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 3 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 4 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 5 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 6 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 7 (synthetic)
+Testville · 20% · 10/22/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 8 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 9 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 10 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+Visitor Venue 11 (synthetic)
+Testville · 20% · 10/21/2026 · web
+SYNTHETIC FIXTURE, NOT A LIVE RUN
+2 older flights not listed
+Show older flights
+TasteProbe
+Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi

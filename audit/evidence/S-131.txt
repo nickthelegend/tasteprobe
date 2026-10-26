@@ -1,0 +1,448 @@
+S-131
+Final status: FAIL
+Observed result: Recovery links return to the real missing-key app, but opening the not-found page emits a Chrome resource-load console.error for HTTP 404 on both targets and widths.
+
+S-131
+Status: FAIL
+3101-1280: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3101-375: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-1280: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-375: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+
+=== 3101-1280 http://127.0.0.1:3101/no-such-page ===
+Assertion: completed
+Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012835
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012835
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030012835
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012835
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+navigation status: 404
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012835
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012940
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012940
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030012940
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012940
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012940
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030012940
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+Visible text:
+TasteProbe
+How it works
+Proof
+What’s live
+Method
+Tasting room
+How often does AI recommend you to your audience?
+
+Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.
+
+Pour a flight
+How it is poured
+EXAMPLE, NOT A REAL AUDIT
+01
+Music taste
+58%
+41–73%
+illustrative
+02
+Film taste
+31%
+18–47%
+illustrative
+03
+Brand taste
+12%
+5–27%
+illustrative
+04
+Place taste
+0%
+0–13%
+illustrative
+Example, not a real audit. Real flights fill only from live Qloo, Nebius and assistant calls.
+Three pours, one honest number
+01
+Source the palates
+
+Qloo turns your venue’s real taste neighbourhood into personas.
+
+02
+Pour the question
+
+Live assistants answer as each persona. Your name is never in the prompt.
+
+03
+Measure the glass
+
+Nemotron reads every answer; each glass fills to your share, with a 95% interval.
+
+Measured, not guessed
+
+Every glass seats at least eight personas and carries its interval.
+
+155
+TESTS
+8+
+PERSONAS
+95%
+INTERVALS
+See the method and evidence
+What’s live on this server
+
+QLOO KEY MISSING · NEBIUS KEY MISSING · NO ASSISTANT · NO FLIGHTS POURED ON THIS SERVER
+
+Live
+
+The tasting room, its key checks and each stored flight’s printable report.
+
+Setup required
+
+Runs need QLOO_API_KEY and NEBIUS_API_KEY and MODEL_2_* on this server. Nothing is simulated.
+
+Has it run end to end?
+
+THE TASTING ROOM · A RUN MAKES LIVE CALLS ONLY, NOTHING IS SIMULATED
+
+Pour a flight
+Qloo
+key missing
+Nebius
+key missing
+Assistants
+none configured
+Setup required
+
+The flight stays corked until these are set in the server’s environment (.env.local when you run it yourself). Nothing below is filled in until a live run completes.
+
+Setup required: QLOO_API_KEY
+Qloo key not configured, so personas cannot be built from real taste data.
+Setup required: NEBIUS_API_KEY
+Nebius key not configured, so NVIDIA Nemotron extraction cannot run.
+Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID
+there is no assistant to test.
+Order a flight
+SETUP REQUIRED
+BUSINESS NAME
+CATEGORY
+CITY
+PERSONAS
+16
+24
+48
+100
+200
+Run audit
+
+24 personas × 0 assistants = 0 live answers, each read by Nemotron. At least 8 personas per glass, so 24 personas fill up to 3 glasses. Configure an assistant to enable audits.
+
+This server runs one flight at a time, caps an audit at 200 personas and the agent at 5 copies and 480 assistant calls, and allows 10 runs an hour per visitor and 100 a day.
+
+EMPTY FLIGHT
+01
+Not poured
+—
+02
+Not poured
+—
+03
+Not poured
+—
+24 personas fill up to 3 glasses.
+Nothing poured yet
+
+No audits are stored on this server. Glasses fill here only after live Qloo, Nebius and assistant calls complete for a real venue.
+
+TasteProbe
+Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
+
+=== 3101-375 http://127.0.0.1:3101/no-such-page ===
+Assertion: completed
+Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013628
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013628
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030013628
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013628
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013628
+navigation status: 404
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013741
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013741
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030013741
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013741
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013741
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030013741
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+Visible text:
+TasteProbe
+Tasting room
+How often does AI recommend you to your audience?
+
+Live assistants answer as Qloo taste personas. Your share of their picks fills one glass per taste segment.
+
+Pour a flight
+How it is poured
+EXAMPLE, NOT A REAL AUDIT
+01
+Music taste
+58%
+41–73%
+illustrative
+02
+Film taste
+31%
+18–47%
+illustrative
+03
+Brand taste
+12%
+5–27%
+illustrative
+04
+Place taste
+0%
+0–13%
+illustrative
+Example, not a real audit. Real flights fill only from live Qloo, Nebius and assistant calls.
+Three pours, one honest number
+01
+Source the palates
+
+Qloo turns your venue’s real taste neighbourhood into personas.
+
+02
+Pour the question
+
+Live assistants answer as each persona. Your name is never in the prompt.
+
+03
+Measure the glass
+
+Nemotron reads every answer; each glass fills to your share, with a 95% interval.
+
+Measured, not guessed
+
+Every glass seats at least eight personas and carries its interval.
+
+155
+TESTS
+8+
+PERSONAS
+95%
+INTERVALS
+See the method and evidence
+What’s live on this server
+
+QLOO KEY MISSING · NEBIUS KEY MISSING · NO ASSISTANT · NO FLIGHTS POURED ON THIS SERVER
+
+Live
+
+The tasting room, its key checks and each stored flight’s printable report.
+
+Setup required
+
+Runs need QLOO_API_KEY and NEBIUS_API_KEY and MODEL_2_* on this server. Nothing is simulated.
+
+Has it run end to end?
+
+THE TASTING ROOM · A RUN MAKES LIVE CALLS ONLY, NOTHING IS SIMULATED
+
+Pour a flight
+Qloo
+key missing
+Nebius
+key missing
+Assistants
+none configured
+Setup required
+
+The flight stays corked until these are set in the server’s environment (.env.local when you run it yourself). Nothing below is filled in until a live run completes.
+
+Setup required: QLOO_API_KEY
+Qloo key not configured, so personas cannot be built from real taste data.
+Setup required: NEBIUS_API_KEY
+Nebius key not configured, so NVIDIA Nemotron extraction cannot run.
+Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID
+there is no assistant to test.
+Order a flight
+SETUP REQUIRED
+BUSINESS NAME
+CATEGORY
+CITY
+PERSONAS
+16
+24
+48
+100
+200
+Run audit
+
+24 personas × 0 assistants = 0 live answers, each read by Nemotron. At least 8 personas per glass, so 24 personas fill up to 3 glasses. Configure an assistant to enable audits.
+
+This server runs one flight at a time, caps an audit at 200 personas and the agent at 5 copies and 480 assistant calls, and allows 10 runs an hour per visitor and 100 a day.
+
+EMPTY FLIGHT
+01
+Not poured
+—
+02
+Not poured
+—
+03
+Not poured
+—
+24 personas fill up to 3 glasses.
+Nothing poured yet
+
+No audits are stored on this server. Glasses fill here only after live Qloo, Nebius and assistant calls complete for a real venue.
+
+TasteProbe
+Qloo Taste AI × NVIDIA Nemotron on Nebius. Runs make live calls only; each stored flight is stamped live or synthetic, and its numbers trace to the answers saved with it.
+github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
+
+=== 3102-1280 http://127.0.0.1:3102/no-such-page ===
+Assertion: completed
+Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3102/no-such-page
+response: 404 http://127.0.0.1:3102/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 404
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3102/
+response: 200 http://127.0.0.1:3102/
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3102/api/status
+request: GET http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/status
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/audits
+
+
+=== 3102-375 http://127.0.0.1:3102/no-such-page ===
+Assertion: completed
+Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3102/no-such-page
+response: 404 http://127.0.0.1:3102/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 404
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3102/
+response: 200 http://127.0.0.1:3102/
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3102/api/status
+request: GET http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/status
+response: 200 http://127.0.0.1:3102/api/audits

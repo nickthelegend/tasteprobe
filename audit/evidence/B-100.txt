@@ -1,0 +1,3 @@
+B-100
+Status: UNTESTED
+needs QLOO_API_KEY, NEBIUS_API_KEY and partial MODEL_2_API_KEY later configuration. No upstream response fabricated or live provider call made.

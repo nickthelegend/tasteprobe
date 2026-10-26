@@ -1,0 +1,3 @@
+B-071
+Status: UNTESTED
+needs QLOO_API_KEY configured before unknown-audit lookup. No upstream response fabricated or live provider call made.

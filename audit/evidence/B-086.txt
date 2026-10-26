@@ -1,0 +1,12 @@
+B-086
+Status: UNTESTED
+Absent-key helper and status passed; guarded Nebius-only 503 needs QLOO_API_KEY plus an OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot in a later configuration.
+
+checkNebiusModel(): {"ok":false,"detail":"NEBIUS_API_KEY not set"}
+
+GET http://127.0.0.1:3101/api/status
+HTTP 200
+Headers: {"content-type":"application/json"}
+Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":false,"setupRequired":null,"maxPersonas":200,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":5,"maxAssistantCalls":480,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

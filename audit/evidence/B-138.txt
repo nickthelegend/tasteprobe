@@ -1,0 +1,11 @@
+B-138
+Status: UNTESTED
+Observed one real harness refusal. Missing-build/existing-PID/occupied-port/readiness branches require separate harness state; not inferred from one refusal.
+
+Command: bash e2e/stack.sh
+Exit code: 1
+Signal: null
+stdout:
+
+stderr:
+error: .next/standalone/server.js missing; run: npm run build

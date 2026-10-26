@@ -1,0 +1,26 @@
+B-062
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+MCP tools/call get_report
+Arguments: {}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "No audits are stored yet. Run run_audit with live keys first."
+    }
+  ],
+  "structuredContent": {
+    "audits": []
+  }
+}
+
+Independent stdio exit-evidence recheck
+MCP get_report {}
+Protocol result status: success
+Body: {"content":[{"type":"text","text":"No audits are stored yet. Run run_audit with live keys first."}],"structuredContent":{"audits":[]}}
+Server PID: 78145
+Exit code: 0
+Exit signal: null
+stderr: (empty)
