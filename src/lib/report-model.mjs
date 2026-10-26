@@ -167,7 +167,8 @@ export const LISTING_MAX_PAGE = 50;
 export function listAudits(audits, { featuredId = null, limit = LISTING_PAGE, offset = 0 } = {}) {
   const featured = featuredId ? audits.find((audit) => audit.id === featuredId) : undefined;
   const ordered = featured ? [featured, ...audits.filter((audit) => audit !== featured)] : audits;
-  const size = Math.max(1, Math.min(LISTING_MAX_PAGE, Math.floor(Number(limit)) || LISTING_PAGE));
+  const numericLimit = Number(limit);
+  const size = Math.max(1, Math.min(LISTING_MAX_PAGE, Number.isFinite(numericLimit) ? Math.floor(numericLimit) : LISTING_PAGE));
   const start = Math.max(0, Math.floor(Number(offset)) || 0);
   return {
     items: ordered.slice(start, start + size).map((audit) => ({ ...summarizeAuditListing(audit), featured: audit === featured })),
