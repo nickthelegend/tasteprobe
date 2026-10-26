@@ -1,11 +1,14 @@
 B-128
+Executed: 2026-10-26T16:29:25.126Z
 Status: UNTESTED
 Non-root writable handoff passed with supplied exit 7; root/chown/su-exec branch UNTESTED on this non-root macOS host.
 
-Command: sh scripts/docker-entrypoint.sh sh -c echo writable-command-executed; exit 7
+Command: sh scripts/docker-entrypoint.sh sh -c exit 7
 Exit code: 7
 Signal: null
 stdout:
-writable-command-executed
 
 stderr:
+
+
+Dependency inventory: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY and MODEL_2_* are absent from the clean execution environment.

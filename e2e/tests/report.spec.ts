@@ -22,7 +22,7 @@ test.describe("printable report with an empty store", () => {
     await page.goto("/audits/00000000-0000-4000-8000-000000000000/report");
     await page.getByRole("link", { name: "Back to the tasting room" }).click();
     await expect(page).toHaveURL(/\/#room$/);
-    await expect(page.getByRole("heading", { name: "Setup required" })).toBeVisible();
+    await expect(page.locator("#room").getByRole("heading", { name: "Setup required", level: 3, exact: true })).toBeVisible();
     await expectInViewport(page, "#room");
   });
 

@@ -1,11 +1,12 @@
 S-066
+Executed: 2026-10-26T16:27:33.446Z
 Status: PASS
-All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+All row assertions passed; no application console/page errors, unexpected HTTP errors, paid POSTs or Next error-overlay POSTs. Expected native HTTP messages, if any, are logged explicitly.
 
 === 3103-1280 http://127.0.0.1:3103/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3103/
 response: 200 http://127.0.0.1:3103/
 request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -14,15 +15,15 @@ request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
-navigation status: 200
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+navigation status: 200
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/api/status
@@ -459,7 +460,7 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 === 3103-375 http://127.0.0.1:3103/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3103/
 response: 200 http://127.0.0.1:3103/
 request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -468,14 +469,14 @@ request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
-response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 navigation status: 200

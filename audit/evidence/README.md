@@ -1,28 +1,17 @@
-# Phase 2 execution evidence
+# Final audit evidence
 
-Executed 2026-10-26 in this worktree. 292 rows: 164 PASS, 11 FAIL, 117 UNTESTED. Every fix cell is blank. No product source or existing e2e spec was changed. No deploy or upstream provider response was fabricated.
+Executed on 2026-10-26 in this worktree. **179 PASS, 0 FAIL, 113 UNTESTED** across 292 rows. This directory contains only the final full run; earlier screenshots and logs were removed before S-001.
 
-## Targets and controls
+Real Chrome, channel chrome, headless, 1280×800 and 375×812; local env -i dev :3101, private standalone :3102 and labelled synthetic public store :3103 from e2e/stack.sh; additional npm run start production-lock target :3104; and https://tasteprobe.201-18-198-162.sslip.io with normal TLS verification. Env-file existence was checked, without reading contents: no .env, .env.local, .env.development[.local] or .env.production[.local] was present. No provider key was configured or printed. MCP used the real stdio server in a clean cwd; CLI ran in a clean environment.
 
-- Local dev :3101, private standalone :3102, labelled synthetic public demo :3103 from `e2e/stack.sh`; all server processes used `env -i` and explicit non-provider variables. Env-file existence was checked without reading contents; none could auto-load.
-- Additional no-token production target :3104 used `npm run start -- e2e/.run/standalone -H 127.0.0.1 -p 3104`. The isolated assembled build avoids the root `.next` files overwritten by `next dev`.
-- Real Google Chrome, channel `chrome`, headless, 1280×800 and 375×812. The hosted site `https://tasteprobe.201-18-198-162.sslip.io` was driven in the same browser. TLS verification remained enabled. Local and hosted named setup states passed; hosted site was reachable.
-- Per-row logs include actual console, page errors, request URLs/statuses, assertions and page text; per-row JPEGs are under 200 KB. Intentional 404/500 document/read statuses are identified, but their Chrome console errors still FAIL under the user's strict rule.
-- Loading/race/timeout checks delay and then continue real app requests. Storage-error cases temporarily corrupt only isolated harness audit stores and restore them. Paid UI POSTs stay absent; Next.js diagnostic POSTs in S-136 are not paid API requests.
-- Seeded records/answers remain visibly synthetic. They do not establish live provider success. Missing saved variants produce UNTESTED even when the available variant passed. S-075 and S-123 record expected-versus-observed synthetic-data mismatches, with fixture limitations explicitly named.
-- CLI calls used clean environment and the checked env-file-free cwd. MCP used real `src/mcp/server.mjs` JSON-RPC over stdio, a separate cwd with no dotenv files, and actual child exit codes. The local harness random run token was used internally for authorized guard requests and never logged. No provider key, wallet or secret file was read.
+No mocks or stubs remain on the tested product surface. Saved examples are explicitly stamped synthetic and illustrative landing/method data is labelled as examples. No React hydration errors, application console.error, pageerrors, unexpected failed requests, unexpected HTTP 4xx/5xx, paid UI POSTs or Next error-overlay POSTs remain in the tested audit rows. The only exempt console errors are Chrome’s native resource-load messages for the exact expected 404 not-found document and the exact 500 reads deliberately broken in S-041/S-104; those original lines remain in the evidence logs. React DevTools console.info is informational.
 
-## Verification
+The /no-such-page document still returns HTTP 404. The deliberately malformed store still returns HTTP 500. Store files were restored in finally blocks. The FAQ check holds real JavaScript requests, clicks all five native disclosures before hydration, releases those requests, verifies preserved open states, then opens/closes every FAQ and checks for horizontal scroll. No response is fulfilled or substituted by the driver.
 
-- `npm run build`: exit 0; `npm test`: 155 passed, exit 0; `npm run lint:no-mock`: exit 0; final `npm run typecheck`: exit 0.
-- Independent surface row driver completed and recorded row outcomes separately from runner completion.
-- Existing `npm run test:e2e` suite: 122 passed, 12 skipped, 4 failed, exit 1. All four failures are the existing report return-navigation test's ambiguous Setup required heading locator. It was not edited. This is B-136 FAIL, not evidence that the independently scoped return-navigation row failed.
-- B-005 observed `limit=0` returning the default 12 summaries instead of the specified minimum clamp to 1.
-- Interactive print-dialog cancellation could not be verified in headless Chrome; S-129 remains UNTESTED. The real print button was clicked and print-media control hiding checked.
-- Earlier audit-driver selector/type errors and the initial short-lived stack launch are retained in general execution logs. Final row-specific artifacts reflect corrected probes; product FAILs were not repaired.
+Commands: npm test — 155 passed, 0 failed, 0 skipped; npm run test:e2e — 126 passed, 12 skipped, 0 failed; npm run build, npm run typecheck and npm run lint:no-mock — exit 0. Browser videos/traces and build output are excluded. Independent audit row statuses, rather than its runner’s one passing test, are authoritative.
 
-## Shutdown
+UNTESTED dependencies: QLOO_API_KEY; NEBIUS_API_KEY; OPENAI_API_KEY or a complete MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_ID assistant slot (including configurations that require other real keys before a later setup check); genuinely stored live audits, raw re-pour/agent answers, report hash inventories and optional saved-record variants absent from the supplied labelled synthetic store; a genuine failed configuration-status response; an interactive Chrome print-dialog session; and the Linux root/chown/su-exec runtime absent on this non-root macOS host. The current all-missing Setup required states pass; distinct mixed-key configurations in B-018/B-019/B-020/B-100 remain UNTESTED because their required real keys are absent. Each row names its particular dependency. Synthetic data is never evidence of live provider success.
 
-`npm run e2e:stack:stop` killed recorded harness PIDs; a second call returned `no e2e/.run/pids`. The extra production process tree was killed by its recorded PIDs. All ports 3101–3104 refused connections afterward. The supervisor EXIT trap released `tasteprobe-audit`. See [B-139](B-139.txt) and [shutdown](shutdown.txt).
+The missing-build, PID-file, occupied-port and readiness-failure harness refusals were executed using a separate real harness directory. Its startup failures use invalid local ports, not substituted responses. B-139 records PID-based shutdown and verifies that all four application ports close; the supervisor EXIT trap releases tasteprobe-audit-recheck.
 
-No Playwright videos, traces, `.next`, `e2e/.run`, test-result directories or dependencies are included here.
+Evidence size before this small README: 9297479 bytes; largest JPEG: 47666 bytes. Every screenshot is JPEG and at most 200 KB; audit/ is below 15 MB.

@@ -1,11 +1,12 @@
 S-152
+Executed: 2026-10-26T16:29:21.623Z
 Status: PASS
-All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+All row assertions passed; no application console/page errors, unexpected HTTP errors, paid POSTs or Next error-overlay POSTs. Expected native HTTP messages, if any, are logged explicitly.
 
 === hosted-375 https://tasteprobe.201-18-198-162.sslip.io/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET https://tasteprobe.201-18-198-162.sslip.io/
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/
 request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2

@@ -2,7 +2,15 @@
 
 All tests run with Node's built-in runner and need no keys or network: `npm test` (`node --test test/*.test.mjs`).
 
-## Test count (counted from `node --test` output, one file at a time, 2026-10-23)
+## Final verification, 2026-10-26
+
+The executed `npm test` output reports **155 passed, 0 failed, 0 skipped** (155 tests). The executed `npm run test:e2e` output reports **126 passed, 12 skipped, 0 failed**, exit 0, using Playwright channel `chrome`. Build, typecheck and `lint:no-mock` also exited 0. Logs: [unit](audit/evidence/B-134.txt), [e2e](audit/evidence/B-136.txt), [build](audit/evidence/B-132.txt), [typecheck](audit/evidence/B-135.txt), [no-mock](audit/evidence/B-130.txt).
+
+The separate audit driver (`npx playwright test -c e2e/audit.config.ts`) executed 152 surface rows once, including early FAQ clicks with JavaScript held until after the clicks. Real HTTP, CLI and MCP checks cover the remaining 140 rows. [AUDIT.md](AUDIT.md) records 179 PASS, 0 FAIL, 113 UNTESTED. Live provider calls were not run.
+
+## Suite inventory
+
+Per-file counts below were recorded from individual Node test output on 2026-10-23; the aggregate count above was re-run on 2026-10-26.
 
 | File | Tests | Covers |
 |---|---:|---|
@@ -21,7 +29,7 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 | `test/qloo.test.mjs` | 7 | 200 parsed. `/search` 404 reads as no results and ends in the readable "no place" error. 404 elsewhere stays an error. 401 names the hackathon host. 403 names the refused `filter.type`. Non-JSON body. An error message never quotes Qloo's response body (messages are stored and served publicly). |
 | `test/storage.test.mjs` | 6 | 50 concurrent store updates all land with no temp files left. The old unlocked pattern loses updates or tears the file. A failing update does not break the queue. The lock serialises tasks. **Two separate processes making 60 updates each keep all 120 records** (62 before the lock file). A dead holder's lock is taken over; a live one makes the writer wait and time out readably. |
 | `test/live-audit.test.mjs` | 4 | The CLI with no keys prints `Setup required: VAR` and exits 1 before any API call. Argument errors. Replay from cached responses with a banner and SHA-256 hashes (synthetic run in a temp dir). Report recomputation detects a mismatch. |
-| `test/report-model.test.mjs` | 6 | Report model keeps shares, intervals and every denominator. A segment with no usable answers has no share instead of 0%. Text summary and listing. The listing pins the featured audit first with 13 newer copies, carries summaries only (a fraction of the full payload) and pages. Provenance: the synthetic fixture is never counted or described as a live run. Public reads show a private assistant host as 'custom endpoint' and keep public API hosts and model ids. |
+| `test/report-model.test.mjs` | 6 | Report model keeps shares, intervals and every denominator. A segment with no usable answers has no share instead of 0%. Text summary and listing. The listing pins the featured audit first with 13 newer copies, carries summaries only (a fraction of the full payload) and pages, including zero/negative limits clamped to one, non-numeric defaults and the maximum page size. Provenance: the synthetic fixture is never counted or described as a live run. Public reads show a private assistant host as 'custom endpoint' and keep public API hosts and model ids. |
 | `test/ui-state.test.mjs` | 4 | The room's race rules: a late fix result does not pull the view back to another audit; audit, fix and agent cannot run together and the audit cannot change mid-run; a slower earlier "open audit" request is aborted and ignored. The agent selects show what they send: clamped to the server caps and to the segment's minimum call cap, or no option and the minimum to explain. |
 | `test/readme-docs.test.mjs` | 5 | The README's "Try it in 2 minutes" block sits above the architecture; the persona step, the Qloo section and the form describe the `urn:entity` path (the hackathon key) before `urn:tag`; the form leaves Qloo integration unticked while the README says no live run has happened. |
 | `test/null-sim-docs.test.mjs` | 3 | `docs/null-sim.txt` holds the full 2000-run table (sizes 8/16/24, 1-2 assistants, 1-5 copies); one row reproduces from the code with its seed; the README and the form quote only the table's ranges. |
@@ -31,7 +39,7 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 | `test/partial-answers.test.mjs` | 2 | A fix that hits the deadline keeps its paid answers in `raw/<audit id>` (`complete: false`) and adds no attempt; an agent probe in flight at the deadline is in the trace with the answers already paid for. Providers are in-test stand-ins, not network calls. |
 | `test/nebius-catalog.test.mjs` | 1 | A hung Nebius catalog (in-test server that never answers): the status read answers "checking" at once, five callers share one request, and it fails within the timeout. |
 | `test/json.test.mjs` | 2 | Tolerant JSON parsing of reasoning-model output. |
-| **Total** | **155** (25 files) | `npm test`, about 8 s (the null simulation takes most of it) |
+| **Total** | **155** (25 files) | `npm test`: final aggregate output 155 passed, 0 failed, 0 skipped |
 
 ## Other checks
 
@@ -40,7 +48,7 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 | `npm run typecheck` | `tsc --noEmit` over app, lib and routes |
 | `npm run lint:no-mock` | `src/` has no mock/fake/dummy/lorem/TODO markers and never imports `test/fixtures` |
 | `npm run build` | Next.js production build |
-| `npm run audit:live -- --brand X --city Y` with no keys | Prints `Setup required: QLOO_API_KEY`, `NEBIUS_API_KEY`, `OPENAI_API_KEY ...` and exits 1. Checked on 2026-10-21. |
+| `npm run audit:live -- --brand X --city Y` with no keys | Prints `Setup required: QLOO_API_KEY`, `NEBIUS_API_KEY`, `OPENAI_API_KEY ...` and exits 1. Rechecked on 2026-10-26; see B-112. |
 
 ## Browser E2E (Playwright, real Google Chrome)
 
@@ -49,7 +57,7 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 - `next dev` on :3101 and the standalone server (`node server.js` through `scripts/docker-entrypoint.sh`, assembled like the Dockerfile) on :3102, both with an empty audit store: the honest no-keys journey. The standalone server sets `TASTEPROBE_RUNS_OPEN=1` (a private server); a separate test starts the same build without it.
 - The same standalone build on :3103 configured as a **public demo**: `TASTEPROBE_RUN_TOKEN` (a random test token written to `e2e/.run/run-token`), `TASTEPROBE_MAX_PERSONAS=24`, agent caps of 100 calls and 2 copies, and `TASTEPROBE_FEATURED_AUDIT_ID`, with a test-only store that `e2e/seed.mjs` fills from the SYNTHETIC fixture (the featured "Fixture Venue (synthetic)" plus 13 newer "Visitor Venue N (synthetic)" copies). Still no provider key.
 
-`TASTEPROBE_E2E_PORT_DEV`, `_STANDALONE` and `_PUBLIC` move the ports. Nothing is mocked. One test delays the app's own `GET /api/audits/<id>` with `page.route` and then lets the real server answer it. Each test records video, trace and screenshots, and fails on any console error, failed same-origin request or horizontal scroll.
+`TASTEPROBE_E2E_PORT_DEV`, `_STANDALONE` and `_PUBLIC` move the ports. Nothing is mocked. One test delays the app's own `GET /api/audits/<id>` with `page.route` and then lets the real server answer it. Each test records video, trace and screenshots, and fails on application console errors, unexpected failed same-origin requests or horizontal scroll. Only explicitly expected HTTP errors may use watch.allow; the independent audit uses the same narrow native-message rule and retains the original console lines.
 
 | Spec | Tests | Projects | Covers |
 |---|---:|---|---|
@@ -59,7 +67,7 @@ All tests run with Node's built-in runner and need no keys or network: `npm test
 | `e2e/tests/cli.spec.ts` | 3 | one project each | `npm run audit:live` with no keys exits 1 and names each key. The entrypoint refuses an unwritable data dir. The standalone build started with `NODE_ENV=production` and no run token answers 503 "Setup required: TASTEPROBE_RUN_TOKEN" on all three paid routes, spends no run, and the room lists it under Setup required. |
 | `e2e/tests/public.spec.ts` | 9 | public-desktop, public-mobile | The featured audit opens by default and stays pinned first with 13 newer audits ("2 older flights not listed"); no "unverified until first live run" stamp, and the FAQ answers from the store. "Show older flights" lists all 14 and each one opens. `GET /api/audits` carries only summary fields and pages. "Runs are disabled on the public demo" with a Run token field, the caps line, only 16 and 24 personas, the agent selects clamped to the caps (2 copies, 48 calls), every run button disabled. The paid routes answer 401 / 403 / 415 / 400 before the key check and 503 after it; reads stay open. A delayed answer for an earlier flight never replaces a later choice. Glasses are aria-pressed buttons inside list items, heatmap rows carry aria-pressed, no aria-live in the results view, the persona-source note. The featured printable report. Tasting notes page through every cached answer, 30 at a time. Synthetic flights are stamped "Synthetic fixture, not a live run" and the FAQ counts no live run. No horizontal scroll at 375 px. |
 
-Result on 2026-10-23, from the JSON reporter: desktop 27 passed, 3 skipped (the CLI checks and the status-timeout check run once); mobile 26 passed, 4 skipped; desktop-standalone 29 passed, 1 skipped; mobile-standalone 26 passed, 4 skipped; public-desktop 9 passed; public-mobile 9 passed. **126 passed, 12 skipped, 0 failed** (3.2 min).
+Result on 2026-10-26 from the actual command output: **126 passed, 12 skipped, 0 failed** (2.7 min), exit 0. The report return-navigation assertion targets the room’s unique Setup required heading. The existing project-specific skips remain unchanged. The independent 152-row audit is excluded from this suite and run once through its own config.
 
 ## Fixtures
 

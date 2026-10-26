@@ -1,32 +1,29 @@
 B-057
+Executed: 2026-10-26T16:29:22.796Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-MCP tools/call run_audit
-Arguments: {"brand":"Exact listing name","city":"Mumbai"}
-Body: {
-  "content": [
-    {
-      "type": "text",
-      "text": "Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY. Set them in .env.local (see .env.example) and restart the MCP server. No API call was made."
-    }
-  ],
-  "structuredContent": {
-    "error": "setup_required",
-    "missing": [
-      "QLOO_API_KEY",
-      "NEBIUS_API_KEY",
-      "OPENAI_API_KEY"
-    ]
+{
+  "tool": "run_audit",
+  "args": {
+    "brand": "Exact listing name",
+    "city": "Mumbai"
   },
-  "isError": true
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY. Set them in .env.local (see .env.example) and restart the MCP server. No API call was made."
+      }
+    ],
+    "structuredContent": {
+      "error": "setup_required",
+      "missing": [
+        "QLOO_API_KEY",
+        "NEBIUS_API_KEY",
+        "OPENAI_API_KEY"
+      ]
+    },
+    "isError": true
+  }
 }
-
-Independent stdio exit-evidence recheck
-MCP run_audit {"brand":"Exact listing name","city":"Mumbai"}
-Protocol result status: tool error
-Body: {"content":[{"type":"text","text":"Setup required: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY. Set them in .env.local (see .env.example) and restart the MCP server. No API call was made."}],"structuredContent":{"error":"setup_required","missing":["QLOO_API_KEY","NEBIUS_API_KEY","OPENAI_API_KEY"]},"isError":true}
-Server PID: 78145
-Exit code: 0
-Exit signal: null
-stderr: (empty)

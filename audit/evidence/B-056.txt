@@ -1,8 +1,7 @@
 B-056
+Executed: 2026-10-26T16:29:22.653Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
-
-MCP server: {"name":"tasteprobe","version":"1.0.0"}
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 {
   "tools": [
@@ -154,11 +153,3 @@ MCP server: {"name":"tasteprobe","version":"1.0.0"}
     }
   ]
 }
-
-Independent stdio exit-evidence recheck
-Identity: {"name":"tasteprobe","version":"1.0.0"}
-Tools: {"tools":[{"name":"run_audit","title":"Run a TasteProbe audit","description":"Live audit: resolve the venue in Qloo (in its own city only), build personas from its Qloo taste neighbourhood, ask the configured AI assistants for recommendations as each persona, extract what they recommended with NVIDIA Nemotron on Nebius Token Factory, and report share of voice per taste segment with 95% intervals. Takes minutes and spends API credits. Needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY (or MODEL_2_*).","inputSchema":{"type":"object","properties":{"brand":{"type":"string","minLength":2,"maxLength":100,"description":"Exact listing name, so Qloo can resolve it"},"city":{"type":"string","minLength":2,"maxLength":80,"description":"City the venue is in; namesakes elsewhere are never audited"},"category":{"type":"string","minLength":2,"maxLength":80,"default":"restaurant","description":"What the assistants are asked to recommend, e.g. 'cocktail bar'"},"personas":{"type":"integer","minimum":8,"maximum":200,"default":24,"description":"Persona count; each taste segment needs at least 8"}},"required":["brand","city"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"},"execution":{"taskSupport":"forbidden"}},{"name":"run_fix","title":"Run a placebo-controlled fix","description":"Nemotron on Nebius writes copy for one taste segment (the weakest by default); the same personas then re-ask every assistant three ways at once: baseline, a neutral placebo snippet, and the fix. Reports fix − placebo lift with a paired bootstrap 95% interval. Needs the same keys as run_audit.","inputSchema":{"type":"object","properties":{"audit_id":{"type":"string","format":"uuid","description":"id of a stored audit (see get_report)"},"segment":{"type":"string","minLength":1,"maxLength":120,"description":"segment id from the audit; omit for the weakest segment"}},"required":["audit_id"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"},"execution":{"taskSupport":"forbidden"}},{"name":"get_report","title":"Read a stored TasteProbe report","description":"Returns a stored audit as a report: share per taste segment with 95% intervals, dropped answers by cause, rival checks in Qloo, every fix attempt with its placebo arm, agent runs and the settings needed to reproduce the run. Without audit_id, lists stored audits. Reads local storage only; needs no keys.","inputSchema":{"type":"object","properties":{"audit_id":{"type":"string","format":"uuid","description":"id of a stored audit; omit to list audits"}},"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"},"execution":{"taskSupport":"forbidden"}},{"name":"qloo_taste_profile","title":"Read a Qloo taste profile","description":"Live Qloo /v2/insights call: the top entities of one type (with affinity) in the taste neighbourhood of a stored audit's venue, or of a rival that audit verified in Qloo, scoped to a city. Compare the venue with a rival to see where their audiences differ. On the Qloo hackathon host only urn:entity types are supported (urn:tag answers 403). Needs QLOO_API_KEY.","inputSchema":{"type":"object","properties":{"audit_id":{"type":"string","format":"uuid","description":"id of a stored audit (see get_report)"},"filter_type":{"type":"string","enum":["urn:entity:artist","urn:entity:book","urn:entity:brand","urn:entity:destination","urn:entity:movie","urn:entity:person","urn:entity:place","urn:entity:podcast","urn:entity:tv_show","urn:entity:video_game"],"description":"Qloo filter.type"},"entity":{"type":"string","minLength":1,"maxLength":200,"description":"\"venue\" (default) or the Qloo id of a rival the audit verified"},"location":{"type":"string","minLength":2,"maxLength":80,"description":"city for signal.location.query; defaults to the audit's city"}},"required":["audit_id","filter_type"],"additionalProperties":false,"$schema":"http://json-schema.org/draft-07/schema#"},"execution":{"taskSupport":"forbidden"}}]}
-Server PID: 78145
-Exit code: 0
-Exit signal: null
-stderr: (empty)

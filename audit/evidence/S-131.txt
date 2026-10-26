@@ -1,29 +1,27 @@
 S-131
-Final status: FAIL
-Observed result: Recovery links return to the real missing-key app, but opening the not-found page emits a Chrome resource-load console.error for HTTP 404 on both targets and widths.
-
-S-131
-Status: FAIL
-3101-1280: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3101-375: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-1280: console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-375: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+Executed: 2026-10-26T16:28:43.303Z
+Status: PASS
+All row assertions passed; no application console/page errors, unexpected HTTP errors, paid POSTs or Next error-overlay POSTs. Expected native HTTP messages, if any, are logged explicitly.
 
 === 3101-1280 http://127.0.0.1:3101/no-such-page ===
 Assertion: completed
-Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
-POST count: 0
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3101/no-such-page
 response: 404 http://127.0.0.1:3101/no-such-page
 console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+Expected native HTTP console message (exempt): Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3101/no-such-page
 request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012835
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012835
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030012835
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032121216
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032121216
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032121216
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012835
-response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032121216
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
 navigation status: 404
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012835
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032121216
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/
 response: 200 http://127.0.0.1:3101/
@@ -31,16 +29,16 @@ request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012940
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012940
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030012940
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032121307
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032121307
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032121307
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030012940
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030012940
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032121307
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032121307
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030012940
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032121307
 console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
@@ -181,22 +179,23 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 
 === 3101-375 http://127.0.0.1:3101/no-such-page ===
 Assertion: completed
-Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
-POST count: 0
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3101/no-such-page
 response: 404 http://127.0.0.1:3101/no-such-page
 console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+Expected native HTTP console message (exempt): Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3101/no-such-page
 request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013628
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013628
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030013628
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032121969
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032121969
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032121969
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032121969
+navigation status: 404
 response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013628
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013628
-navigation status: 404
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032121969
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/
 response: 200 http://127.0.0.1:3101/
@@ -204,16 +203,16 @@ request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013741
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013741
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030013741
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032122047
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032122047
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032122047
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030013741
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030013741
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032122047
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032122047
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030013741
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032122047
 console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
@@ -350,26 +349,27 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 
 === 3102-1280 http://127.0.0.1:3102/no-such-page ===
 Assertion: completed
-Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
-POST count: 0
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3102/no-such-page
 response: 404 http://127.0.0.1:3102/no-such-page
 console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+Expected native HTTP console message (exempt): Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3102/no-such-page
 request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
 request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
-response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
 response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
-response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
 navigation status: 404
-response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
 request: GET http://127.0.0.1:3102/
@@ -386,37 +386,38 @@ request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417
 response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-cb10b1ea31598d06.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-cb10b1ea31598d06.js
 request: GET http://127.0.0.1:3102/api/status
 request: GET http://127.0.0.1:3102/api/audits
 request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
-response: 200 http://127.0.0.1:3102/api/status
 response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/status
 response: 200 http://127.0.0.1:3102/api/audits
 
 
 === 3102-375 http://127.0.0.1:3102/no-such-page ===
 Assertion: completed
-Problems: console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
-POST count: 0
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3102/no-such-page
 response: 404 http://127.0.0.1:3102/no-such-page
 console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+Expected native HTTP console message (exempt): Failed to load resource: the server responded with a status of 404 (Not Found) @ http://127.0.0.1:3102/no-such-page
 request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
 request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
 response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
 response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
 navigation status: 404
 response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
@@ -436,10 +437,10 @@ request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417
 response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-cb10b1ea31598d06.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-cb10b1ea31598d06.js
 request: GET http://127.0.0.1:3102/api/status
 request: GET http://127.0.0.1:3102/api/audits
 request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501

@@ -1,0 +1,5 @@
+seeded 14 synthetic audits into e2e/.run/data-public
+stack up
+dev 52340
+standalone 52341
+public 52343

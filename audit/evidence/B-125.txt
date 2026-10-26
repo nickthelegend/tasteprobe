@@ -1,6 +1,7 @@
 B-125
+Executed: 2026-10-26T16:29:24.878Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 Command: npm run audit:live -- --replay
 Exit code: 1

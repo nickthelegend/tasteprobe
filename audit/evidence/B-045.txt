@@ -1,10 +1,9 @@
 B-045
+Executed: 2026-10-26T16:29:22.492Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000000/fix
+POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001/fix
 HTTP 403
 Headers: {"content-type":"application/json"}
 Body: {"error":"The run token was rejected. Stored audits stay open to read.","code":"run_token_rejected"}
-
-Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

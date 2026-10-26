@@ -1,3 +1,4 @@
 S-090
+Executed: 2026-10-26T16:27:49.807Z
 UNTESTED: needs a stored real agent run with confirmation variants; seeded synthetic store contains no agent runs
 No provider call made.

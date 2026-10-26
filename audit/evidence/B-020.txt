@@ -1,3 +1,6 @@
 B-020
+Executed: 2026-10-26T16:29:22.273Z
 Status: UNTESTED
 needs QLOO_API_KEY, NEBIUS_API_KEY and partial MODEL_2_API_KEY configuration. No upstream response fabricated or live provider call made.
+
+Dependency inventory: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY and MODEL_2_* are absent from the clean execution environment.

@@ -59,6 +59,11 @@ test("the listing pins the featured audit first even after 13 newer runs, and ca
   // Paging and bounds; an unknown featured id is ignored.
   assert.deepEqual(listAudits(store, { featuredId: audit.id, offset: 12, limit: 12 }).items.map((item) => item.id), [newer[11].id, newer[12].id]);
   assert.equal(listAudits(store, { limit: 500 }).items.length, 14);
+  assert.equal(listAudits(store, { limit: 0 }).items.length, 1);
+  assert.equal(listAudits(store, { limit: -1 }).items.length, 1);
+  assert.equal(listAudits(store, { limit: "not-a-number" }).items.length, 12);
+  assert.equal(listAudits(store).items.length, 12);
+  assert.equal(listAudits(Array(60).fill(audit), { limit: 51 }).items.length, 50);
   assert.equal(listAudits(store, { featuredId: "missing" }).featuredId, null);
 });
 

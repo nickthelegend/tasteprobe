@@ -1,8 +1,35 @@
-Recorded extra PID 15218: already exited
-Recorded extra PID 82457: already exited
-Terminated owned PID 87035
-Terminated owned PID 86980
-Post-shutdown port 3101: HTTP 000, curl exit 7
-Post-shutdown port 3102: HTTP 000, curl exit 7
-Post-shutdown port 3103: HTTP 000, curl exit 7
-Post-shutdown port 3104: HTTP 000, curl exit 7
+Command: npm run e2e:stack:stop
+Exit code: 0
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 e2e:stack:stop
+> e2e/stack.sh stop
+
+killed dev (52340)
+killed standalone (52341)
+killed public (52343)
+
+stderr:
+
+Command: npm run e2e:stack:stop
+Exit code: 0
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 e2e:stack:stop
+> e2e/stack.sh stop
+
+no e2e/.run/pids
+
+stderr:
+
+Killed PID 55039
+Killed PID 54982
+3101 closed
+3102 closed
+3103 closed
+3104 closed
+Closed MCP child PID 29751 via the stdio transport; its child process exited.
+no e2e/.run/pids
+Released tasteprobe-audit-recheck in supervisor EXIT trap.

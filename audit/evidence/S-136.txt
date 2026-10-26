@@ -1,197 +1,32 @@
 S-136
-Final status: FAIL
-Observed result: At 375px on next dev, rapidly toggling native method FAQs produced a React hydration console.error: server/client details open attributes differed. No audit POST occurred; diagnostic POSTs went to Next.js error tooling.
-
-S-136
-Status: FAIL
-3101-375: Error: No UI row authorized a paid request in the no-key audit  expect(received).toEqual(expected) // deep equality  - Expected  - 1 + Received  + 3  - Array [] + Array [ | 3101-375: console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch
-
-  ...
-    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-        <LoadingBoundary loading={null}>
-          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-            <RedirectBoundary>
-              <RedirectErrorBoundary router={{...}}>
-                <InnerLayoutRouter url="/method" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-                  <SegmentViewNode type="page" pagePath="method/pag...">
-                    <SegmentTrieNode>
-                    <Method>
-                      <main>
-                        <div className="sheet" id="top">
-                          <header>
-                          <section>
-                          <MethodSections>
-                            <section>
-                            <section>
-                            <section>
-                            <MethodSections>
-                              <section className="backlabel" id="label" aria-labelledby="label-title">
-                                <div>
-                                <div className="label-card">
-                                  <details
-+                                   open={true}
--                                   open={null}
-                                  >
-                                  <details>
-                                  <details
--                                   open=""
-                                  >
-                                  ...
-                                ...
-                        ...
-                  ...
-                ...
-      ...
-
+Executed: 2026-10-26T16:28:53.000Z
+Status: PASS
+All row assertions passed; no application console/page errors, unexpected HTTP errors, paid POSTs or Next error-overlay POSTs. Expected native HTTP messages, if any, are logged explicitly.
 
 === 3101-375 http://127.0.0.1:3101/method ===
-Assertion: Error: No UI row authorized a paid request in the no-key audit
-
-expect(received).toEqual(expected) // deep equality
-
-- Expected  - 1
-+ Received  + 3
-
-- Array []
-+ Array [
-+   "http://127.0.0.1:3101/__nextjs_original-stack-frames",
-+ ]
-Problems: console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch
-
-  ...
-    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-        <LoadingBoundary loading={null}>
-          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-            <RedirectBoundary>
-              <RedirectErrorBoundary router={{...}}>
-                <InnerLayoutRouter url="/method" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-                  <SegmentViewNode type="page" pagePath="method/pag...">
-                    <SegmentTrieNode>
-                    <Method>
-                      <main>
-                        <div className="sheet" id="top">
-                          <header>
-                          <section>
-                          <MethodSections>
-                            <section>
-                            <section>
-                            <section>
-                            <MethodSections>
-                              <section className="backlabel" id="label" aria-labelledby="label-title">
-                                <div>
-                                <div className="label-card">
-                                  <details
-+                                   open={true}
--                                   open={null}
-                                  >
-                                  <details>
-                                  <details
--                                   open=""
-                                  >
-                                  ...
-                                ...
-                        ...
-                  ...
-                ...
-      ...
-
-POST count: 1
+Assertion: completed
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3101/method
 response: 200 http://127.0.0.1:3101/method
 request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030022020
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030022020
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030022020
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032130021
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032130021
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032130021
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032130021
 response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030022020
-response: 200 http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030022020
-response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 navigation status: 200
-response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030022020
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032130021
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032130021
 console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
-console.error: A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
-
-- A server/client branch `if (typeof window !== 'undefined')`.
-- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
-- Date formatting in a user's locale which doesn't match the server.
-- External changing data without sending a snapshot of it along with the HTML.
-- Invalid HTML tag nesting.
-
-It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
-
-%s%s https://react.dev/link/hydration-mismatch
-
-  ...
-    <InnerScrollAndFocusHandler segmentPath={[...]} focusAndScrollRef={{apply:false, ...}}>
-      <ErrorBoundary errorComponent={undefined} errorStyles={undefined} errorScripts={undefined}>
-        <LoadingBoundary loading={null}>
-          <HTTPAccessFallbackBoundary notFound={undefined} forbidden={undefined} unauthorized={undefined}>
-            <RedirectBoundary>
-              <RedirectErrorBoundary router={{...}}>
-                <InnerLayoutRouter url="/method" tree={[...]} cacheNode={{lazyData:null, ...}} segmentPath={[...]}>
-                  <SegmentViewNode type="page" pagePath="method/pag...">
-                    <SegmentTrieNode>
-                    <Method>
-                      <main>
-                        <div className="sheet" id="top">
-                          <header>
-                          <section>
-                          <MethodSections>
-                            <section>
-                            <section>
-                            <section>
-                            <MethodSections>
-                              <section className="backlabel" id="label" aria-labelledby="label-title">
-                                <div>
-                                <div className="label-card">
-                                  <details
-+                                   open={true}
--                                   open={null}
-                                  >
-                                  <details>
-                                  <details
--                                   open=""
-                                  >
-                                  ...
-                                ...
-                        ...
-                  ...
-                ...
-      ...
-
 response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
-request: POST http://127.0.0.1:3101/__nextjs_original-stack-frames
-request: GET http://127.0.0.1:3101/__nextjs_font/geist-latin.woff2
-response: 200 http://127.0.0.1:3101/__nextjs_original-stack-frames
-response: 200 http://127.0.0.1:3101/__nextjs_font/geist-latin.woff2
 Visible text:
 TasteProbe
 Tasting room
@@ -309,7 +144,7 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 === 3102-375 http://127.0.0.1:3102/method ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3102/method
 response: 200 http://127.0.0.1:3102/method
 request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -318,16 +153,16 @@ request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3102/_next/static/chunks/app/method/page-a38c503bb940080f.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/method/page-b2f4fd932e383a67.js
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
 response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+navigation status: 200
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-02df9764f084896c.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
-response: 200 http://127.0.0.1:3102/_next/static/chunks/app/method/page-a38c503bb940080f.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/method/page-b2f4fd932e383a67.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
-navigation status: 200
 request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501

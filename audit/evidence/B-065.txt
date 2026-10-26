@@ -1,24 +1,20 @@
 B-065
+Executed: 2026-10-26T16:29:22.804Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-MCP tools/call run_fix
-Arguments: {"audit_id":"invalid"}
-Body: {
-  "content": [
-    {
-      "type": "text",
-      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_fix: Invalid uuid at audit_id"
-    }
-  ],
-  "isError": true
+{
+  "tool": "run_fix",
+  "args": {
+    "audit_id": "not-a-uuid"
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_fix: Invalid uuid at audit_id"
+      }
+    ],
+    "isError": true
+  }
 }
-
-Independent stdio exit-evidence recheck
-MCP run_fix {"audit_id":"invalid"}
-Protocol result status: tool error
-Body: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool run_fix: Invalid uuid at audit_id"}],"isError":true}
-Server PID: 78145
-Exit code: 0
-Exit signal: null
-stderr: (empty)

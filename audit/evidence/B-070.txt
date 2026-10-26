@@ -1,3 +1,6 @@
 B-070
+Executed: 2026-10-26T16:29:22.806Z
 Status: UNTESTED
-needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot. No upstream response fabricated or live provider call made.
+needs QLOO_API_KEY and a stored audit for a real qloo_taste_profile call. No upstream response fabricated or live provider call made.
+
+Dependency inventory: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY and MODEL_2_* are absent from the clean execution environment.

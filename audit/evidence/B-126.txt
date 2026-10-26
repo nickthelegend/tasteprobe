@@ -1,6 +1,7 @@
 B-126
+Executed: 2026-10-26T16:29:25.098Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 Command: npm run audit:live -- --replay 00000000-0000-4000-8000-000000000000
 Exit code: 1
@@ -12,7 +13,7 @@ stdout:
 
 
 stderr:
-No recorded run 00000000-0000-4000-8000-000000000000 in /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/data-dev/audits.json.
+No recorded run 00000000-0000-4000-8000-000000000000 in /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t9/e2e/.run/data-dev/audits.json.
 
 
 Command: npm run audit:live -- --replay 00000000-0000-4000-8000-000000000100
@@ -25,4 +26,4 @@ stdout:
 
 
 stderr:
-Run 00000000-0000-4000-8000-000000000100 has no cached responses at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/data-public/raw/00000000-0000-4000-8000-000000000100/responses.json; nothing to replay.
+Run 00000000-0000-4000-8000-000000000100 has no cached responses at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t9/e2e/.run/data-public/raw/00000000-0000-4000-8000-000000000100/responses.json; nothing to replay.

@@ -1,14 +1,15 @@
 B-114
+Executed: 2026-10-26T16:29:23.888Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-Command: npm run audit:live -- --brand Exact listing name
+Command: npm run audit:live -- --brand Any Venue
 Exit code: 1
 Signal: null
 stdout:
 
 > tasteprobe@1.0.0 audit:live
-> node scripts/live-audit.mjs --brand Exact listing name
+> node scripts/live-audit.mjs --brand Any Venue
 
 
 stderr:

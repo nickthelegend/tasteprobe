@@ -1,12 +1,28 @@
 B-098
-Status: UNTESTED
-Direct no-assistant helper returns [] and all-missing agent guard passed; assistant-only HTTP refusal needs QLOO_API_KEY and NEBIUS_API_KEY.
+Executed: 2026-10-26T16:29:23.356Z
+Status: PASS
+All-missing Setup required state passed: no assistant helper returns [], audit guard refuses Qloo first and agent names all three missing keys. The distinct mixed-key scenario remains UNTESTED in B-019; no live assistant call claimed.
 
-askAssistants(): []
+Command: /opt/homebrew/Cellar/node/26.5.0/bin/node --input-type=module -e import assert from 'node:assert/strict';import * as p from './src/lib/providers.ts';assert.deepEqual(await p.askAssistants('audit no-key check'),[]);console.log('No configured assistants: []');
+Exit code: 0
+Signal: null
+stdout:
+No configured assistants: []
+
+stderr:
+
+
+GET http://127.0.0.1:3101/api/status
+HTTP 200
+Headers: {"content-type":"application/json"}
+Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":false,"setupRequired":null,"maxPersonas":200,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":5,"maxAssistantCalls":480,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 503
+Headers: {"content-type":"application/json"}
+Body: {"error":"Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server."}
 
 POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000000/agent
 HTTP 503
 Headers: {"content-type":"application/json"}
 Body: {"error":"setup_required","missing":["QLOO_API_KEY","NEBIUS_API_KEY","OPENAI_API_KEY"],"message":"Setup required: QLOO_API_KEY; Setup required: NEBIUS_API_KEY; Setup required: OPENAI_API_KEY"}
-
-Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).
