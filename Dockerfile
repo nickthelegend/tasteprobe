@@ -34,6 +34,7 @@ RUN apk add --no-cache su-exec \
 # App files stay root-owned and read-only to the server; only .next (runtime cache) and /data are writable.
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
+COPY --from=build /app/public ./public
 COPY --chmod=755 scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 USER node
 EXPOSE 3000

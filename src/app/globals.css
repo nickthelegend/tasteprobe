@@ -205,6 +205,32 @@ button.board-slot:hover { background: rgba(255, 244, 250, .05); }
 .label-card p { margin-top: 10px; color: var(--muted); font-size: 15px; }
 .label-foot { margin-top: 16px; font: 12.5px var(--mono); color: var(--muted); }
 
+/* The pour band: full-bleed generated art of a rosé flight (public/art/flight.webp), right after the hero. Decorative, never a result. */
+.pour { position: relative; isolation: isolate; overflow: hidden; margin: 0 calc(50% - 50vw) 128px; aspect-ratio: 16 / 6; background: var(--paper); }
+.pour-art { position: absolute; inset: 0; z-index: -1; }
+.pour-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 75% 55%; }
+.pour-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--paper) 0%, rgba(251, 243, 246, .7) 26%, rgba(251, 243, 246, 0) 50%); }
+.pour-art::before { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: soft-light; background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .55) 50%, transparent 62%) no-repeat; background-size: 260% 100%; background-position: 150% 0; }
+.pour-credit { position: absolute; right: 14px; bottom: 12px; z-index: 2; font: 500 11px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: rgba(251, 243, 246, .78); padding: 5px 8px; border-radius: 999px; }
+.pour-copy { height: 100%; max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); display: flex; align-items: center; }
+.pour h2 { font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -.045em; max-width: 10.5em; }
+.pour h2 em { font-style: normal; color: var(--pink-text); }
+@media (prefers-reduced-motion: no-preference) {
+  .pour-art { animation: tp-drift 24s ease-in-out infinite alternate; }
+  .pour-art::before { animation: tp-sweep 9s cubic-bezier(.45, 0, .25, 1) 2.6s infinite; }
+  @keyframes tp-drift { from { transform: scale(1); } to { transform: scale(1.05) translate3d(-1.2%, -.8%, 0); } }
+  @keyframes tp-sweep { 0% { background-position: 150% 0; } 55%, 100% { background-position: -50% 0; } }
+}
+@media (max-width: 900px) {
+  .pour { aspect-ratio: auto; }
+  .pour-art { position: relative; aspect-ratio: 16 / 9; }
+  .pour-art img { object-position: 70% 50%; }
+  .pour-art::after { background: linear-gradient(0deg, var(--paper) 0%, rgba(251, 243, 246, 0) 34%); }
+  .pour-copy { height: auto; padding-top: 8px; }
+  .pour h2 { max-width: 14em; }
+}
+@media (max-width: 640px) { .pour { margin-bottom: 88px; } }
+
 /* Below the fold: three short bands (how, proof, what's live), then the tasting room. */
 .band { padding: 0 0 128px; }
 .band > h2 { font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -.045em; max-width: 18ch; }

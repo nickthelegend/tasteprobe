@@ -104,6 +104,16 @@ export function Landing({ status, auditCount, liveCount, featured = null }: { st
         caption={<><b>{EXAMPLE_LABEL}.</b> Real flights fill only from live Qloo, Nebius and assistant calls.</>} />
     </section>
 
+    <section className="pour" aria-labelledby="pour-title">
+      <div className="pour-art">
+        <img src="/art/flight.webp" alt="Illustration: four glasses of rosé, pale to deep, on a wooden tasting board" width={1600} height={901} loading="lazy" decoding="async" />
+        <span className="pour-credit">Illustration (AI-generated)</span>
+      </div>
+      <div className="pour-copy">
+        <h2 id="pour-title">Every audience tastes differently. <em>Pour one glass for each.</em></h2>
+      </div>
+    </section>
+
     <section className="band" id="how" aria-labelledby="how-title">
       <h2 id="how-title">Three pours, one honest number</h2>
       <ol className="steps">
