@@ -1,4 +1,5 @@
 B-124
+Executed: 2026-10-26T16:29:24.766Z
 Status: UNTESTED
 Labelled synthetic cached replay executed; raw hash-change warning needs a prior real report/hash inventory.
 
@@ -12,6 +13,9 @@ stdout:
 
 Replay of run 00000000-0000-4000-8000-000000000001 recorded 2026-10-21T12:00:00.000Z
 Overall share 0% recomputed from 45 cached answers (DIFFERS from the stored summary).
-Wrote /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/data-public/reports/00000000-0000-4000-8000-000000000001.replay.html and /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/data-public/reports/00000000-0000-4000-8000-000000000001.replay.json
+Wrote /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t9/e2e/.run/data-public/reports/00000000-0000-4000-8000-000000000001.replay.html and /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t9/e2e/.run/data-public/reports/00000000-0000-4000-8000-000000000001.replay.json
 
 stderr:
+
+
+Dependency inventory: QLOO_API_KEY, NEBIUS_API_KEY, OPENAI_API_KEY and MODEL_2_* are absent from the clean execution environment.

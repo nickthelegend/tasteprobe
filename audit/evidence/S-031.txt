@@ -1,3 +1,4 @@
 S-031
-UNTESTED: needs QLOO_API_KEY, NEBIUS_API_KEY, an OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot and required owner run token
+Executed: 2026-10-26T16:26:07.717Z
+UNTESTED: needs QLOO_API_KEY, NEBIUS_API_KEY, an OPENAI_API_KEY or complete MODEL_2_* assistant slot and required owner run token
 No provider call made.

@@ -1,3 +1,4 @@
 S-058
-UNTESTED: needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot
+Executed: 2026-10-26T16:27:26.581Z
+UNTESTED: needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or complete MODEL_2_* assistant slot
 No provider call made.

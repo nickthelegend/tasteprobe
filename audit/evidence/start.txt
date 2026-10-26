@@ -1,0 +1,11 @@
+
+> tasteprobe@1.0.0 start
+> next start e2e/.run/standalone -H 127.0.0.1 -p 3104
+
+   ▲ Next.js 15.5.28
+   - Local:        http://127.0.0.1:3104
+   - Network:      http://127.0.0.1:3104
+
+ ✓ Starting...
+ ⚠ "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.
+ ✓ Ready in 132ms

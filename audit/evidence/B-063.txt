@@ -1,504 +1,520 @@
 B-063
-Status: UNTESTED
-Stored/list MCP reads passed against labelled synthetic data; real store-read failure branch not executed. No HTTP publicAudit host-redaction requirement inferred for MCP structuredContent.
+Executed: 2026-10-26T16:29:22.803Z
+Status: PASS
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-MCP get_report {}
 {
-  "content": [
-    {
-      "type": "text",
-      "text": "00000000-0000-4000-8000-000000000100  Visitor Venue 1 (synthetic), Testville  2026-10-22T01:00:00.000Z\n00000000-0000-4000-8000-000000000101  Visitor Venue 2 (synthetic), Testville  2026-10-22T00:00:00.000Z\n00000000-0000-4000-8000-000000000102  Visitor Venue 3 (synthetic), Testville  2026-10-21T23:00:00.000Z\n00000000-0000-4000-8000-000000000103  Visitor Venue 4 (synthetic), Testville  2026-10-21T22:00:00.000Z\n00000000-0000-4000-8000-000000000104  Visitor Venue 5 (synthetic), Testville  2026-10-21T21:00:00.000Z\n00000000-0000-4000-8000-000000000105  Visitor Venue 6 (synthetic), Testville  2026-10-21T20:00:00.000Z\n00000000-0000-4000-8000-000000000106  Visitor Venue 7 (synthetic), Testville  2026-10-21T19:00:00.000Z\n00000000-0000-4000-8000-000000000107  Visitor Venue 8 (synthetic), Testville  2026-10-21T18:00:00.000Z\n00000000-0000-4000-8000-000000000108  Visitor Venue 9 (synthetic), Testville  2026-10-21T17:00:00.000Z\n00000000-0000-4000-8000-000000000109  Visitor Venue 10 (synthetic), Testville  2026-10-21T16:00:00.000Z\n00000000-0000-4000-8000-000000000110  Visitor Venue 11 (synthetic), Testville  2026-10-21T15:00:00.000Z\n00000000-0000-4000-8000-000000000111  Visitor Venue 12 (synthetic), Testville  2026-10-21T14:00:00.000Z\n00000000-0000-4000-8000-000000000112  Visitor Venue 13 (synthetic), Testville  2026-10-21T13:00:00.000Z\n00000000-0000-4000-8000-000000000001  Fixture Venue (synthetic), Testville  2026-10-21T12:00:00.000Z"
-    }
-  ],
-  "structuredContent": {
-    "audits": [
+  "tool": "get_report",
+  "args": {},
+  "result": {
+    "content": [
       {
-        "id": "00000000-0000-4000-8000-000000000100",
-        "brand": "Visitor Venue 1 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-22T01:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000101",
-        "brand": "Visitor Venue 2 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-22T00:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000102",
-        "brand": "Visitor Venue 3 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T23:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000103",
-        "brand": "Visitor Venue 4 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T22:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000104",
-        "brand": "Visitor Venue 5 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T21:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000105",
-        "brand": "Visitor Venue 6 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T20:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000106",
-        "brand": "Visitor Venue 7 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T19:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000107",
-        "brand": "Visitor Venue 8 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T18:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000108",
-        "brand": "Visitor Venue 9 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T17:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000109",
-        "brand": "Visitor Venue 10 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T16:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000110",
-        "brand": "Visitor Venue 11 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T15:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000111",
-        "brand": "Visitor Venue 12 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T14:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000112",
-        "brand": "Visitor Venue 13 (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T13:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": "web",
-        "provenance": "synthetic"
-      },
-      {
-        "id": "00000000-0000-4000-8000-000000000001",
-        "brand": "Fixture Venue (synthetic)",
-        "city": "Testville",
-        "category": "restaurant",
-        "createdAt": "2026-10-21T12:00:00.000Z",
-        "share": 0.2,
-        "answers": 30,
-        "personas": 2,
-        "personaSource": "urn:tag",
-        "origin": null,
-        "provenance": "synthetic"
+        "type": "text",
+        "text": "00000000-0000-4000-8000-000000000100  Visitor Venue 1 (synthetic), Testville  2026-10-22T01:00:00.000Z\n00000000-0000-4000-8000-000000000101  Visitor Venue 2 (synthetic), Testville  2026-10-22T00:00:00.000Z\n00000000-0000-4000-8000-000000000102  Visitor Venue 3 (synthetic), Testville  2026-10-21T23:00:00.000Z\n00000000-0000-4000-8000-000000000103  Visitor Venue 4 (synthetic), Testville  2026-10-21T22:00:00.000Z\n00000000-0000-4000-8000-000000000104  Visitor Venue 5 (synthetic), Testville  2026-10-21T21:00:00.000Z\n00000000-0000-4000-8000-000000000105  Visitor Venue 6 (synthetic), Testville  2026-10-21T20:00:00.000Z\n00000000-0000-4000-8000-000000000106  Visitor Venue 7 (synthetic), Testville  2026-10-21T19:00:00.000Z\n00000000-0000-4000-8000-000000000107  Visitor Venue 8 (synthetic), Testville  2026-10-21T18:00:00.000Z\n00000000-0000-4000-8000-000000000108  Visitor Venue 9 (synthetic), Testville  2026-10-21T17:00:00.000Z\n00000000-0000-4000-8000-000000000109  Visitor Venue 10 (synthetic), Testville  2026-10-21T16:00:00.000Z\n00000000-0000-4000-8000-000000000110  Visitor Venue 11 (synthetic), Testville  2026-10-21T15:00:00.000Z\n00000000-0000-4000-8000-000000000111  Visitor Venue 12 (synthetic), Testville  2026-10-21T14:00:00.000Z\n00000000-0000-4000-8000-000000000112  Visitor Venue 13 (synthetic), Testville  2026-10-21T13:00:00.000Z\n00000000-0000-4000-8000-000000000001  Fixture Venue (synthetic), Testville  2026-10-21T12:00:00.000Z"
       }
-    ]
-  }
-}
-MCP get_report stored id
-{
-  "content": [
-    {
-      "type": "text",
-      "text": "Fixture Venue (synthetic) (restaurant, Testville) · audit 00000000-0000-4000-8000-000000000001 · 2026-10-21T12:00:00.000Z\nSynthetic fixture, not a live run.\nPersonas from Qloo urn:tag taste tags.\nWhole flight: 20% of 30 usable answers recommend it (95% 9–38%); 2 of 32 dropped (1 call errors, 1 unparseable, 0 extraction errors).\n- Restaurant genre: 33% (5/15, 95% 15–58%, 8 personas); poured most instead: Rival One (synthetic)\n- Place keyword: 7% (1/15, 95% 1–30%, 8 personas); poured most instead: Rival One (synthetic)\nFix attempt 1 on Place keyword: fix − placebo +33 pts (95% 10–55%), clears zero.\nExtraction: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B on Nebius Token Factory, 12000 in / 3400 out tokens.\nPrintable report: /audits/00000000-0000-4000-8000-000000000001/report"
-    }
-  ],
-  "structuredContent": {
-    "id": "00000000-0000-4000-8000-000000000001",
-    "provenance": "synthetic",
-    "venue": {
-      "brand": "Fixture Venue (synthetic)",
-      "category": "restaurant",
-      "city": "Testville",
-      "address": "1 Test Street, Testville",
-      "qlooEntityId": "FIXTURE-ENTITY-ID"
-    },
-    "createdAt": "2026-10-21T12:00:00.000Z",
-    "durationSeconds": 61,
-    "personas": 2,
-    "personaSource": "urn:tag",
-    "personaSourceNote": null,
-    "tagScope": null,
-    "assistants": [
-      "assistant-a",
-      "assistant-b"
     ],
-    "overall": {
-      "id": "all-personas",
-      "name": "All personas",
-      "personas": 16,
-      "mentions": 6,
-      "answers": 30,
-      "attempted": 32,
-      "dropped": {
-        "assistant": 1,
-        "unparseable": 1,
-        "extraction": 0
-      },
-      "share": 0.2,
-      "ci": [
-        0.09,
-        0.38
-      ],
-      "rivals": [
+    "structuredContent": {
+      "audits": [
         {
-          "name": "Rival One (synthetic)",
-          "mentions": 12,
-          "share": 0.4
+          "id": "00000000-0000-4000-8000-000000000100",
+          "brand": "Visitor Venue 1 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-22T01:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
         },
         {
-          "name": "Rival Two (synthetic)",
-          "mentions": 5,
-          "share": 0.1667
+          "id": "00000000-0000-4000-8000-000000000101",
+          "brand": "Visitor Venue 2 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-22T00:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000102",
+          "brand": "Visitor Venue 3 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T23:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000103",
+          "brand": "Visitor Venue 4 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T22:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000104",
+          "brand": "Visitor Venue 5 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T21:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000105",
+          "brand": "Visitor Venue 6 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T20:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000106",
+          "brand": "Visitor Venue 7 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T19:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000107",
+          "brand": "Visitor Venue 8 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T18:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000108",
+          "brand": "Visitor Venue 9 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T17:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000109",
+          "brand": "Visitor Venue 10 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T16:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000110",
+          "brand": "Visitor Venue 11 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T15:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000111",
+          "brand": "Visitor Venue 12 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T14:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000112",
+          "brand": "Visitor Venue 13 (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T13:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": "web",
+          "provenance": "synthetic"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000001",
+          "brand": "Fixture Venue (synthetic)",
+          "city": "Testville",
+          "category": "restaurant",
+          "createdAt": "2026-10-21T12:00:00.000Z",
+          "share": 0.2,
+          "answers": 30,
+          "personas": 2,
+          "personaSource": "urn:tag",
+          "origin": null,
+          "provenance": "synthetic"
         }
       ]
-    },
-    "segments": [
+    }
+  }
+}
+
+{
+  "tool": "get_report",
+  "args": {
+    "audit_id": "00000000-0000-4000-8000-000000000001"
+  },
+  "result": {
+    "content": [
       {
-        "id": "restaurant-genre",
-        "name": "Restaurant genre",
-        "personas": 8,
-        "mentions": 5,
-        "answers": 15,
-        "attempted": 16,
+        "type": "text",
+        "text": "Fixture Venue (synthetic) (restaurant, Testville) · audit 00000000-0000-4000-8000-000000000001 · 2026-10-21T12:00:00.000Z\nSynthetic fixture, not a live run.\nPersonas from Qloo urn:tag taste tags.\nWhole flight: 20% of 30 usable answers recommend it (95% 9–38%); 2 of 32 dropped (1 call errors, 1 unparseable, 0 extraction errors).\n- Restaurant genre: 33% (5/15, 95% 15–58%, 8 personas); poured most instead: Rival One (synthetic)\n- Place keyword: 7% (1/15, 95% 1–30%, 8 personas); poured most instead: Rival One (synthetic)\nFix attempt 1 on Place keyword: fix − placebo +33 pts (95% 10–55%), clears zero.\nExtraction: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B on Nebius Token Factory, 12000 in / 3400 out tokens.\nPrintable report: /audits/00000000-0000-4000-8000-000000000001/report"
+      }
+    ],
+    "structuredContent": {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "provenance": "synthetic",
+      "venue": {
+        "brand": "Fixture Venue (synthetic)",
+        "category": "restaurant",
+        "city": "Testville",
+        "address": "1 Test Street, Testville",
+        "qlooEntityId": "FIXTURE-ENTITY-ID"
+      },
+      "createdAt": "2026-10-21T12:00:00.000Z",
+      "durationSeconds": 61,
+      "personas": 2,
+      "personaSource": "urn:tag",
+      "personaSourceNote": null,
+      "tagScope": null,
+      "assistants": [
+        "assistant-a",
+        "assistant-b"
+      ],
+      "overall": {
+        "id": "all-personas",
+        "name": "All personas",
+        "personas": 16,
+        "mentions": 6,
+        "answers": 30,
+        "attempted": 32,
         "dropped": {
           "assistant": 1,
-          "unparseable": 0,
-          "extraction": 0
-        },
-        "share": 0.3333,
-        "ci": [
-          0.15,
-          0.58
-        ],
-        "rivals": [
-          {
-            "name": "Rival One (synthetic)",
-            "mentions": 4,
-            "share": 0.2667
-          }
-        ]
-      },
-      {
-        "id": "place-keyword",
-        "name": "Place keyword",
-        "personas": 8,
-        "mentions": 1,
-        "answers": 15,
-        "attempted": 16,
-        "dropped": {
-          "assistant": 0,
           "unparseable": 1,
           "extraction": 0
         },
-        "share": 0.0667,
+        "share": 0.2,
         "ci": [
-          0.01,
-          0.3
+          0.09,
+          0.38
         ],
         "rivals": [
           {
             "name": "Rival One (synthetic)",
-            "mentions": 8,
-            "share": 0.5333
-          }
-        ]
-      }
-    ],
-    "byAssistant": [
-      {
-        "model": "assistant-a",
-        "segments": [
-          {
-            "id": "restaurant-genre",
-            "name": "Restaurant genre",
-            "personas": 8,
-            "mentions": 3,
-            "answers": 8,
-            "attempted": 8,
-            "dropped": {
-              "assistant": 0,
-              "unparseable": 0,
-              "extraction": 0
-            },
-            "share": 0.375,
-            "ci": [
-              0.13,
-              0.69
-            ],
-            "rivals": []
+            "mentions": 12,
+            "share": 0.4
           },
           {
-            "id": "place-keyword",
-            "name": "Place keyword",
-            "personas": 8,
-            "mentions": 0,
-            "answers": 7,
-            "attempted": 8,
-            "dropped": {
-              "assistant": 0,
-              "unparseable": 1,
-              "extraction": 0
-            },
-            "share": 0,
-            "ci": [
-              0,
-              0.35
-            ],
-            "rivals": []
+            "name": "Rival Two (synthetic)",
+            "mentions": 5,
+            "share": 0.1667
           }
         ]
-      }
-    ],
-    "answers": {
-      "usable": 30,
-      "dropped": 2,
-      "attempted": 32,
-      "droppedByKind": {
-        "assistant": 1,
-        "unparseable": 1,
-        "extraction": 0
-      }
-    },
-    "rivalChecks": [
-      {
-        "name": "Rival One (synthetic)",
-        "status": "verified",
-        "detail": null
       },
-      {
-        "name": "Rival Two (synthetic)",
-        "status": "unverified",
-        "detail": "closest Qloo listing in Testville is Something Else"
-      }
-    ],
-    "extractionCheck": [
-      {
-        "model": "assistant-a",
-        "listed": 10,
-        "brandDisagreementRate": 0.1,
-        "setDisagreementRate": 0.2
-      }
-    ],
-    "qlooSignals": {
-      "domains": [
+      "segments": [
         {
-          "type": "artist",
-          "entities": [
-            "Test Artist"
+          "id": "restaurant-genre",
+          "name": "Restaurant genre",
+          "personas": 8,
+          "mentions": 5,
+          "answers": 15,
+          "attempted": 16,
+          "dropped": {
+            "assistant": 1,
+            "unparseable": 0,
+            "extraction": 0
+          },
+          "share": 0.3333,
+          "ci": [
+            0.15,
+            0.58
           ],
-          "error": null
+          "rivals": [
+            {
+              "name": "Rival One (synthetic)",
+              "mentions": 4,
+              "share": 0.2667
+            }
+          ]
         },
         {
-          "type": "book",
-          "entities": [],
-          "error": "Qloo /v2/insights returned 403 for filter.type=urn:entity:book"
+          "id": "place-keyword",
+          "name": "Place keyword",
+          "personas": 8,
+          "mentions": 1,
+          "answers": 15,
+          "attempted": 16,
+          "dropped": {
+            "assistant": 0,
+            "unparseable": 1,
+            "extraction": 0
+          },
+          "share": 0.0667,
+          "ci": [
+            0.01,
+            0.3
+          ],
+          "rivals": [
+            {
+              "name": "Rival One (synthetic)",
+              "mentions": 8,
+              "share": 0.5333
+            }
+          ]
         }
       ],
-      "demographics": null,
-      "demographicsError": "synthetic: not requested"
-    },
-    "fixes": [
-      {
-        "attempt": 1,
-        "segment": "Place keyword",
-        "personas": 8,
-        "copy": "Synthetic fix copy <b>with markup</b> that must be escaped.",
-        "rationale": "synthetic",
-        "placebo": "Fixture Venue (synthetic) is a restaurant in Testville.",
+      "byAssistant": [
+        {
+          "model": "assistant-a",
+          "segments": [
+            {
+              "id": "restaurant-genre",
+              "name": "Restaurant genre",
+              "personas": 8,
+              "mentions": 3,
+              "answers": 8,
+              "attempted": 8,
+              "dropped": {
+                "assistant": 0,
+                "unparseable": 0,
+                "extraction": 0
+              },
+              "share": 0.375,
+              "ci": [
+                0.13,
+                0.69
+              ],
+              "rivals": []
+            },
+            {
+              "id": "place-keyword",
+              "name": "Place keyword",
+              "personas": 8,
+              "mentions": 0,
+              "answers": 7,
+              "attempted": 8,
+              "dropped": {
+                "assistant": 0,
+                "unparseable": 1,
+                "extraction": 0
+              },
+              "share": 0,
+              "ci": [
+                0,
+                0.35
+              ],
+              "rivals": []
+            }
+          ]
+        }
+      ],
+      "answers": {
+        "usable": 30,
+        "dropped": 2,
+        "attempted": 32,
+        "droppedByKind": {
+          "assistant": 1,
+          "unparseable": 1,
+          "extraction": 0
+        }
+      },
+      "rivalChecks": [
+        {
+          "name": "Rival One (synthetic)",
+          "status": "verified",
+          "detail": null
+        },
+        {
+          "name": "Rival Two (synthetic)",
+          "status": "unverified",
+          "detail": "closest Qloo listing in Testville is Something Else"
+        }
+      ],
+      "extractionCheck": [
+        {
+          "model": "assistant-a",
+          "listed": 10,
+          "brandDisagreementRate": 0.1,
+          "setDisagreementRate": 0.2
+        }
+      ],
+      "qlooSignals": {
+        "domains": [
+          {
+            "type": "artist",
+            "entities": [
+              "Test Artist"
+            ],
+            "error": null
+          },
+          {
+            "type": "book",
+            "entities": [],
+            "error": "Qloo /v2/insights returned 403 for filter.type=urn:entity:book"
+          }
+        ],
+        "demographics": null,
+        "demographicsError": "synthetic: not requested"
+      },
+      "fixes": [
+        {
+          "attempt": 1,
+          "segment": "Place keyword",
+          "personas": 8,
+          "copy": "Synthetic fix copy <b>with markup</b> that must be escaped.",
+          "rationale": "synthetic",
+          "placebo": "Fixture Venue (synthetic) is a restaurant in Testville.",
+          "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
+          "createdAt": "2026-10-21T12:05:00.000Z",
+          "arms": {
+            "baseline": {
+              "share": 0.0667,
+              "mentions": 1,
+              "answers": 15,
+              "failed": 1,
+              "ci": [
+                0.01,
+                0.3
+              ]
+            },
+            "placebo": {
+              "share": 0.2,
+              "mentions": 3,
+              "answers": 15,
+              "failed": 1,
+              "ci": [
+                0.07,
+                0.45
+              ]
+            },
+            "fix": {
+              "share": 0.5333,
+              "mentions": 8,
+              "answers": 15,
+              "failed": 1,
+              "ci": [
+                0.3,
+                0.75
+              ]
+            }
+          },
+          "lift": {
+            "fixVsPlacebo": {
+              "delta": 0.3333,
+              "ci": [
+                0.1,
+                0.55
+              ],
+              "clearsZero": true
+            },
+            "placeboVsBaseline": {
+              "delta": 0.1333,
+              "ci": [
+                -0.05,
+                0.3
+              ],
+              "clearsZero": false
+            },
+            "fixVsBaseline": {
+              "delta": 0.4667,
+              "ci": [
+                0.2,
+                0.7
+              ],
+              "clearsZero": true
+            }
+          }
+        }
+      ],
+      "agentRuns": [],
+      "extraction": {
         "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
-        "createdAt": "2026-10-21T12:05:00.000Z",
-        "arms": {
-          "baseline": {
-            "share": 0.0667,
-            "mentions": 1,
-            "answers": 15,
-            "failed": 1,
-            "ci": [
-              0.01,
-              0.3
-            ]
-          },
-          "placebo": {
-            "share": 0.2,
-            "mentions": 3,
-            "answers": 15,
-            "failed": 1,
-            "ci": [
-              0.07,
-              0.45
-            ]
-          },
-          "fix": {
-            "share": 0.5333,
-            "mentions": 8,
-            "answers": 15,
-            "failed": 1,
-            "ci": [
-              0.3,
-              0.75
-            ]
+        "inputTokens": 12000,
+        "outputTokens": 3400,
+        "estimatedCostUsd": null
+      },
+      "reproducibility": {
+        "assistants": [
+          {
+            "name": "assistant-a",
+            "model": "a-1",
+            "host": "example.test"
           }
-        },
-        "lift": {
-          "fixVsPlacebo": {
-            "delta": 0.3333,
-            "ci": [
-              0.1,
-              0.55
-            ],
-            "clearsZero": true
-          },
-          "placeboVsBaseline": {
-            "delta": 0.1333,
-            "ci": [
-              -0.05,
-              0.3
-            ],
-            "clearsZero": false
-          },
-          "fixVsBaseline": {
-            "delta": 0.4667,
-            "ci": [
-              0.2,
-              0.7
-            ],
-            "clearsZero": true
-          }
-        }
+        ],
+        "assistantTemperature": 0.7,
+        "personaSeed": 7,
+        "liftBootstrapSeed": 41,
+        "nemotronMaxTokens": 8192,
+        "nemotronThinking": "model default",
+        "extractionSystemPrompt": "extract"
       }
-    ],
-    "agentRuns": [],
-    "extraction": {
-      "model": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B",
-      "inputTokens": 12000,
-      "outputTokens": 3400,
-      "estimatedCostUsd": null
-    },
-    "reproducibility": {
-      "assistants": [
-        {
-          "name": "assistant-a",
-          "model": "a-1",
-          "host": "example.test"
-        }
-      ],
-      "assistantTemperature": 0.7,
-      "personaSeed": 7,
-      "liftBootstrapSeed": 41,
-      "nemotronMaxTokens": 8192,
-      "nemotronThinking": "model default",
-      "extractionSystemPrompt": "extract"
     }
   }
 }
 
-Independent stdio exit-evidence recheck
-MCP get_report stored id
-Body: {"content":[{"type":"text","text":"Fixture Venue (synthetic) (restaurant, Testville) · audit 00000000-0000-4000-8000-000000000001 · 2026-10-21T12:00:00.000Z\nSynthetic fixture, not a live run.\nPersonas from Qloo urn:tag taste tags.\nWhole flight: 20% of 30 usable answers recommend it (95% 9–38%); 2 of 32 dropped (1 call errors, 1 unparseable, 0 extraction errors).\n- Restaurant genre: 33% (5/15, 95% 15–58%, 8 personas); poured most instead: Rival One (synthetic)\n- Place keyword: 7% (1/15, 95% 1–30%, 8 personas); poured most instead: Rival One (synthetic)\nFix attempt 1 on Place keyword: fix − placebo +33 pts (95% 10–55%), clears zero.\nExtraction: nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B on Nebius Token Factory, 12000 in / 3400 out tokens.\nPrintable report: /audits/00000000-0000-4000-8000-000000000001/report"}],"structuredContent":{"id":"00000000-0000-4000-8000-000000000001","provenance":"synthetic","venue":{"brand":"Fixture Venue (synthetic)","category":"restaurant","city":"Testville","address":"1 Test Street, Testville","qlooEntityId":"FIXTURE-ENTITY-ID"},"createdAt":"2026-10-21T12:00:00.000Z","durationSeconds":61,"personas":2,"personaSource":"urn:tag","personaSourceNote":null,"tagScope":null,"assistants":["assistant-a","assistant-b"],"overall":{"id":"all-personas","name":"All personas","personas":16,"mentions":6,"answers":30,"attempted":32,"dropped":{"assistant":1,"unparseable":1,"extraction":0},"share":0.2,"ci":[0.09,0.38],"rivals":[{"name":"Rival One (synthetic)","mentions":12,"share":0.4},{"name":"Rival Two (synthetic)","mentions":5,"share":0.1667}]},"segments":[{"id":"restaurant-genre","name":"Restaurant genre","personas":8,"mentions":5,"answers":15,"attempted":16,"dropped":{"assistant":1,"unparseable":0,"extraction":0},"share":0.3333,"ci":[0.15,0.58],"rivals":[{"name":"Rival One (synthetic)","mentions":4,"share":0.2667}]},{"id":"place-keyword","name":"Place keyword","personas":8,"mentions":1,"answers":15,"attempted":16,"dropped":{"assistant":0,"unparseable":1,"extraction":0},"share":0.0667,"ci":[0.01,0.3],"rivals":[{"name":"Rival One (synthetic)","mentions":8,"share":0.5333}]}],"byAssistant":[{"model":"assistant-a","segments":[{"id":"restaurant-genre","name":"Restaurant genre","personas":8,"mentions":3,"answers":8,"attempted":8,"dropped":{"assistant":0,"unparseable":0,"extraction":0},"share":0.375,"ci":[0.13,0.69],"rivals":[]},{"id":"place-keyword","name":"Place keyword","personas":8,"mentions":0,"answers":7,"attempted":8,"dropped":{"assistant":0,"unparseable":1,"extraction":0},"share":0,"ci":[0,0.35],"rivals":[]}]}],"answers":{"usable":30,"dropped":2,"attempted":32,"droppedByKind":{"assistant":1,"unparseable":1,"extraction":0}},"rivalChecks":[{"name":"Rival One (synthetic)","status":"verified","detail":null},{"name":"Rival Two (synthetic)","status":"unverified","detail":"closest Qloo listing in Testville is Something Else"}],"extractionCheck":[{"model":"assistant-a","listed":10,"brandDisagreementRate":0.1,"setDisagreementRate":0.2}],"qlooSignals":{"domains":[{"type":"artist","entities":["Test Artist"],"error":null},{"type":"book","entities":[],"error":"Qloo /v2/insights returned 403 for filter.type=urn:entity:book"}],"demographics":null,"demographicsError":"synthetic: not requested"},"fixes":[{"attempt":1,"segment":"Place keyword","personas":8,"copy":"Synthetic fix copy <b>with markup</b> that must be escaped.","rationale":"synthetic","placebo":"Fixture Venue (synthetic) is a restaurant in Testville.","model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","createdAt":"2026-10-21T12:05:00.000Z","arms":{"baseline":{"share":0.0667,"mentions":1,"answers":15,"failed":1,"ci":[0.01,0.3]},"placebo":{"share":0.2,"mentions":3,"answers":15,"failed":1,"ci":[0.07,0.45]},"fix":{"share":0.5333,"mentions":8,"answers":15,"failed":1,"ci":[0.3,0.75]}},"lift":{"fixVsPlacebo":{"delta":0.3333,"ci":[0.1,0.55],"clearsZero":true},"placeboVsBaseline":{"delta":0.1333,"ci":[-0.05,0.3],"clearsZero":false},"fixVsBaseline":{"delta":0.4667,"ci":[0.2,0.7],"clearsZero":true}}}],"agentRuns":[],"extraction":{"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","inputTokens":12000,"outputTokens":3400,"estimatedCostUsd":null},"reproducibility":{"assistants":[{"name":"assistant-a","model":"a-1","host":"example.test"}],"assistantTemperature":0.7,"personaSeed":7,"liftBootstrapSeed":41,"nemotronMaxTokens":8192,"nemotronThinking":"model default","extractionSystemPrompt":"extract"}}}
-Server PID: 79143
-Exit code: 0
-Exit signal: null
-stderr: (empty)
+{
+  "tool": "get_report",
+  "args": {},
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Could not read the audit store: Unexpected token 'i', \"invalid JS\"... is not valid JSON"
+      }
+    ],
+    "isError": true
+  }
+}

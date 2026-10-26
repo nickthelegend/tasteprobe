@@ -1,6 +1,7 @@
 B-133
+Executed: 2026-10-26T16:29:25.257Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 GET http://127.0.0.1:3104/api/status
 HTTP 200
@@ -11,7 +12,3 @@ POST http://127.0.0.1:3104/api/audits
 HTTP 503
 Headers: {"content-type":"application/json"}
 Body: {"error":"Setup required: TASTEPROBE_RUN_TOKEN. This production server has no run token, so paid runs are refused. Set TASTEPROBE_RUN_TOKEN (or TASTEPROBE_RUNS_OPEN=1 for a private server). Stored audits stay open to read.","code":"setup_required"}
-
-npm run start -- e2e/.run/standalone -H 127.0.0.1 -p 3104; isolated assembled build prevents next dev overwriting this target.
-
-Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

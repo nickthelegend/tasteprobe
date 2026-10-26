@@ -1,12 +1,23 @@
 B-086
-Status: UNTESTED
-Absent-key helper and status passed; guarded Nebius-only 503 needs QLOO_API_KEY plus an OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot in a later configuration.
+Executed: 2026-10-26T16:29:22.958Z
+Status: PASS
+All-missing Setup required state passed: real no-key Nebius helper/status and first-Qloo HTTP refusal. The distinct mixed-key scenario remains UNTESTED in B-018; no live catalog call claimed.
 
-checkNebiusModel(): {"ok":false,"detail":"NEBIUS_API_KEY not set"}
+Command: /opt/homebrew/Cellar/node/26.5.0/bin/node --input-type=module -e import assert from 'node:assert/strict';import * as p from './src/lib/providers.ts';assert.deepEqual(await p.checkNebiusModel(),{ok:false,detail:'NEBIUS_API_KEY not set'});console.log(JSON.stringify(await p.checkNebiusModel()));
+Exit code: 0
+Signal: null
+stdout:
+{"ok":false,"detail":"NEBIUS_API_KEY not set"}
+
+stderr:
+
 
 GET http://127.0.0.1:3101/api/status
 HTTP 200
 Headers: {"content-type":"application/json"}
 Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":false,"setupRequired":null,"maxPersonas":200,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":5,"maxAssistantCalls":480,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
 
-Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).
+POST http://127.0.0.1:3101/api/audits
+HTTP 503
+Headers: {"content-type":"application/json"}
+Body: {"error":"Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server."}

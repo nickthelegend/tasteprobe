@@ -1,9 +1,15 @@
 B-135
+Executed: 2026-10-26T16:29:26.318Z
 Status: PASS
-Final typecheck after completing audit driver.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
+
+Command: npm run typecheck
+Exit code: 0
+Signal: null
+stdout:
 
 > tasteprobe@1.0.0 typecheck
 > tsc --noEmit
 
 
-Exit code: 0
+stderr:

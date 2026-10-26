@@ -1,6 +1,27 @@
 B-082
+Executed: 2026-10-26T16:29:22.860Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-Helper exception: ConfigError: Qloo key not configured: add QLOO_API_KEY to .env.local and restart the server.
-Probe exit code: 0 (expected exception captured)
+{
+  "tool": "qloo_taste_profile",
+  "args": {
+    "audit_id": "00000000-0000-4000-8000-000000000000",
+    "filter_type": "urn:entity:artist"
+  },
+  "result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "Setup required: QLOO_API_KEY. Set it in .env.local (see .env.example) and restart the MCP server. No API call was made."
+      }
+    ],
+    "structuredContent": {
+      "error": "setup_required",
+      "missing": [
+        "QLOO_API_KEY"
+      ]
+    },
+    "isError": true
+  }
+}

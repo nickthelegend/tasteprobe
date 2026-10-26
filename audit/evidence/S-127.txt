@@ -1,3 +1,4 @@
 S-127
+Executed: 2026-10-26T16:28:38.470Z
 UNTESTED: needs saved agent runs with confirmation variants; current labelled synthetic store has no agent runs
 No provider call made.

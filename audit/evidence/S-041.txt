@@ -1,32 +1,29 @@
 S-041
-Final status: FAIL
-Observed result: Real malformed-store read returned HTTP 500. The expected error alert and Dismiss worked, but Chrome logged console.error for the 500, so FAIL under the required console rule.
-
-S-041
-Status: FAIL
-3101-1280: console.error: Failed to load resource: the server responded with a status of 500 (Internal Server Error) | 3101-375: console.error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+Executed: 2026-10-26T16:27:12.648Z
+Status: PASS
+All row assertions passed; no application console/page errors, unexpected HTTP errors, paid POSTs or Next error-overlay POSTs. Expected native HTTP messages, if any, are logged explicitly.
 
 === 3101-1280 http://127.0.0.1:3101/ ===
 Assertion: completed
-Problems: console.error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
-POST count: 0
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3101/
 response: 200 http://127.0.0.1:3101/
 request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029882516
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029882516
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029882516
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032031327
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032031327
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032031327
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029882516
-response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032031327
 response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029882516
-response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 navigation status: 200
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032031327
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029882516
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032031327
 console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
@@ -35,6 +32,7 @@ request: GET http://127.0.0.1:3101/api/audits
 response: 200 http://127.0.0.1:3101/api/status
 response: 500 http://127.0.0.1:3101/api/audits
 console.error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+Expected native HTTP console message (exempt): Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://127.0.0.1:3101/api/audits
 Visible text:
 TasteProbe
 How it works
@@ -168,25 +166,25 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 
 === 3101-375 http://127.0.0.1:3101/ ===
 Assertion: completed
-Problems: console.error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
-POST count: 0
+Problems: none
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3101/
 response: 200 http://127.0.0.1:3101/
 request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
-request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029883250
-request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029883250
-request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029883250
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032032008
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032032008
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032032008
 request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
 request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793032032008
+navigation status: 200
 response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
-response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793029883250
-response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793029883250
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793032032008
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
-navigation status: 200
 response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
-response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793029883250
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793032032008
 console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
 request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
@@ -195,6 +193,7 @@ request: GET http://127.0.0.1:3101/api/audits
 response: 200 http://127.0.0.1:3101/api/status
 response: 500 http://127.0.0.1:3101/api/audits
 console.error: Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+Expected native HTTP console message (exempt): Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://127.0.0.1:3101/api/audits
 Visible text:
 TasteProbe
 Tasting room

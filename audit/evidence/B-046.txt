@@ -1,28 +1,14 @@
 B-046
+Executed: 2026-10-26T16:29:22.510Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000000/fix
+POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000001/fix
 HTTP 415
 Headers: {"content-type":"application/json"}
 Body: {"error":"Send the request as JSON (Content-Type: application/json).","code":"json_required"}
 
-POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000000/fix without content-type
-HTTP 415
-{"error":"Send the request as JSON (Content-Type: application/json).","code":"json_required"}
-
-POST http://127.0.0.1:3102/api/audits/00000000-0000-4000-8000-000000000000/fix
+POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000001/fix
 HTTP 415
 Headers: {"content-type":"application/json"}
 Body: {"error":"Send the request as JSON (Content-Type: application/json).","code":"json_required"}
-
-POST http://127.0.0.1:3102/api/audits/00000000-0000-4000-8000-000000000000/fix without content-type
-HTTP 415
-{"error":"Send the request as JSON (Content-Type: application/json).","code":"json_required"}
-
-POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000000/fix
-HTTP 415
-Headers: {"content-type":"application/json"}
-Body: {"error":"Send the request as JSON (Content-Type: application/json).","code":"json_required"}
-
-Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

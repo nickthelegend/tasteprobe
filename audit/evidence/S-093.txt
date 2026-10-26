@@ -1,11 +1,12 @@
 S-093
+Executed: 2026-10-26T16:27:53.213Z
 Status: UNTESTED
 Loading and empty-segment variants verified; failed-read variant needs a real store read failure.
 
 === 3103-1280 http://127.0.0.1:3103/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3103/
 response: 200 http://127.0.0.1:3103/
 request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -14,15 +15,15 @@ request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
 response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 navigation status: 200
-response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/api/status
@@ -138,7 +139,7 @@ Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_I
 there is no assistant to test.
 Runs are disabled on the public demo
 
-Every audit, re-pour and agent run spends this server’s Qloo, Nebius and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slots, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.
+Every audit, re-pour and agent run spends this server’s Qloo, Nebius and assistant keys, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.
 
 RUN TOKEN
 Order a flight
@@ -368,7 +369,7 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 === 3103-375 http://127.0.0.1:3103/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3103/
 response: 200 http://127.0.0.1:3103/
 request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -377,15 +378,15 @@ request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
-response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
 navigation status: 200
-response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-cb10b1ea31598d06.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/api/status
@@ -497,7 +498,7 @@ Setup required: OPENAI_API_KEY or MODEL_2_API_KEY / MODEL_2_BASE_URL / MODEL_2_I
 there is no assistant to test.
 Runs are disabled on the public demo
 
-Every audit, re-pour and agent run spends this server’s Qloo, Nebius and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slots, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.
+Every audit, re-pour and agent run spends this server’s Qloo, Nebius and assistant keys, so starting one needs the owner’s run token. Stored flights and their printable reports stay open to read.
 
 RUN TOKEN
 Order a flight

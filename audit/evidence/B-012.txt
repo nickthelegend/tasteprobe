@@ -1,23 +1,9 @@
 B-012
+Executed: 2026-10-26T16:29:22.222Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 POST http://127.0.0.1:3101/api/audits
-HTTP 400
-Headers: {"content-type":"application/json"}
-Body: {"error":"Enter a category."}
-
-POST http://127.0.0.1:3102/api/audits
-HTTP 400
-Headers: {"content-type":"application/json"}
-Body: {"error":"Enter a category."}
-
-POST http://127.0.0.1:3101/api/audits
-HTTP 400
-Headers: {"content-type":"application/json"}
-Body: {"error":"Enter a category."}
-
-POST http://127.0.0.1:3102/api/audits
 HTTP 400
 Headers: {"content-type":"application/json"}
 Body: {"error":"Enter a category."}
@@ -27,9 +13,7 @@ HTTP 400
 Headers: {"content-type":"application/json"}
 Body: {"error":"Enter a category."}
 
-POST http://127.0.0.1:3102/api/audits
+POST http://127.0.0.1:3101/api/audits
 HTTP 400
 Headers: {"content-type":"application/json"}
 Body: {"error":"Enter a category."}
-
-Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

@@ -1,6 +1,7 @@
 B-129
+Executed: 2026-10-26T16:29:25.128Z
 Status: PASS
-Source-only Docker/Compose/Railway launch and health contract inspected; no deployment performed.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 Dockerfile
 # syntax=docker/dockerfile:1
@@ -45,6 +46,7 @@ EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "server.js"]
 
+
 docker-compose.yml
 # Lightweight hackathon-demo deployment on the VPS behind Coolify's Traefik (network "coolify").
 # Redeploy: cd /opt/hk/tasteprobe && docker compose up -d --build
@@ -87,6 +89,7 @@ volumes:
 networks:
   coolify:
     external: true
+
 
 railway.json
 {

@@ -1,11 +1,12 @@
 S-129
+Executed: 2026-10-26T16:28:39.825Z
 Status: UNTESTED
 needs interactive Chrome print dialog cancellation; headless window.print invocation and print styles checked in evidence, no dialog outcome claimed
 
 === 3103-1280 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
 response: 200 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
 request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -14,15 +15,15 @@ request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
-response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-3ae90719d8cca1fd.js
 response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
-navigation status: 200
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-3ae90719d8cca1fd.js
+navigation status: 200
 response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
@@ -128,7 +129,7 @@ TasteProbe · MIT · Copyright (c) 2026 Nivesh Gajengi
 === 3103-375 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
 response: 200 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
 request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -137,17 +138,17 @@ request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
 request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
-request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
-response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
-response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
-response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-3ae90719d8cca1fd.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
-response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-02df9764f084896c.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-3ae90719d8cca1fd.js
 navigation status: 200
-response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
 request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
 response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
 Visible text:

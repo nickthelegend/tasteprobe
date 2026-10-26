@@ -1,12 +1,21 @@
 B-140
+Executed: 2026-10-26T16:31:14.064Z
 Status: PASS
-Repository inventory found no chain contract, RPC client, transaction-send or wallet-send integration.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
-rg files exit 0
+Command: rg --files src scripts
+Exit code: 0
+Signal: null
+stdout:
 scripts/check-no-mock.mjs
 scripts/live-audit.mjs
 scripts/docker-entrypoint.sh
 scripts/null-sim.mjs
+src/mcp/server.mjs
+src/app/not-found.tsx
+src/app/method/page.tsx
+src/app/globals.css
+src/app/page.tsx
 src/lib/qloo.d.mts
 src/lib/persona-source.mjs
 src/lib/filestore.mjs
@@ -48,6 +57,7 @@ src/lib/persona-source.d.mts
 src/lib/stats.mjs
 src/lib/ndjson-stream.mjs
 src/lib/json.d.mts
+src/app/api/status/route.ts
 src/components/AgentLoop.tsx
 src/components/Evidence.tsx
 src/components/Tray.tsx
@@ -59,22 +69,23 @@ src/components/Flight.tsx
 src/components/Charts.tsx
 src/components/PrintButton.tsx
 src/components/Counterfactual.tsx
+src/components/FaqDetails.tsx
 src/components/Personas.tsx
-src/mcp/server.mjs
-src/app/not-found.tsx
-src/app/method/page.tsx
-src/app/globals.css
-src/app/page.tsx
-src/app/api/status/route.ts
 src/app/api/audits/[id]/fix/route.ts
 src/app/api/audits/[id]/route.ts
-src/app/api/audits/[id]/agent/route.ts
-src/app/api/audits/route.ts
-src/app/layout.tsx
-src/app/icon.svg
 src/app/audits/[id]/report/page.tsx
 src/app/favicon.ico
+src/app/layout.tsx
+src/app/icon.svg
+src/app/api/audits/route.ts
+src/app/api/audits/[id]/agent/route.ts
 
-rg integration-symbol search exit 1
+stderr:
+
+
+Command: rg -n -i ethers|viem|web3|sendTransaction|sendRawTransaction|eth_send|cardano-cli src scripts package.json
+Exit code: 1
+Signal: null
 stdout:
+
 stderr:

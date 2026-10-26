@@ -1,6 +1,7 @@
 B-112
+Executed: 2026-10-26T16:29:23.673Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 Command: npm run audit:live -- --brand Exact listing name --city Mumbai
 Exit code: 1

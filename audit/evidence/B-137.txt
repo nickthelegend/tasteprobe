@@ -1,31 +1,10 @@
 B-137
+Executed: 2026-10-26T16:29:26.320Z
 Status: PASS
-Independent real requests/assertions passed; no provider call authorized.
-
-
-> tasteprobe@1.0.0 e2e:stack
-> e2e/stack.sh
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
 seeded 14 synthetic audits into e2e/.run/data-public
 stack up
-dev 18177
-standalone 18178
-public 18180
-
-Exit code: 0
-
-
-GET http://127.0.0.1:3101/api/status
-HTTP 200
-Headers: {"content-type":"application/json"}
-Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":false,"setupRequired":null,"maxPersonas":200,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":5,"maxAssistantCalls":480,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
-
-GET http://127.0.0.1:3102/api/status
-HTTP 200
-Headers: {"content-type":"application/json"}
-Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":false,"setupRequired":null,"maxPersonas":200,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":5,"maxAssistantCalls":480,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
-
-GET http://127.0.0.1:3103/api/status
-HTTP 200
-Headers: {"content-type":"application/json"}
-Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":true,"setupRequired":null,"maxPersonas":24,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":2,"maxAssistantCalls":100,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
+dev 52340
+standalone 52341
+public 52343

@@ -1,11 +1,12 @@
 S-151
+Executed: 2026-10-26T16:29:20.987Z
 Status: PASS
-All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+All row assertions passed; no application console/page errors, unexpected HTTP errors, paid POSTs or Next error-overlay POSTs. Expected native HTTP messages, if any, are logged explicitly.
 
 === hosted-1280 https://tasteprobe.201-18-198-162.sslip.io/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET https://tasteprobe.201-18-198-162.sslip.io/
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/
 request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -19,12 +20,12 @@ request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/css/acd208839f2fd550.css
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main-app-2ecc3bf42ae2d122.js
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
+navigation status: 200
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
-navigation status: 200
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/page-dc9b35fda8d8e9fc.js
-response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
 request: GET https://tasteprobe.201-18-198-162.sslip.io/api/status
 request: GET https://tasteprobe.201-18-198-162.sslip.io/api/audits
 request: GET https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
@@ -168,7 +169,7 @@ github.com/nickthelegend/tasteprobe · MIT · Copyright (c) 2026 Nivesh Gajengi
 === hosted-375 https://tasteprobe.201-18-198-162.sslip.io/ ===
 Assertion: completed
 Problems: none
-POST count: 0
+Paid POST count: 0; all POST count: 0
 request: GET https://tasteprobe.201-18-198-162.sslip.io/
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/
 request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
@@ -181,19 +182,19 @@ request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main
 request: GET https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/page-dc9b35fda8d8e9fc.js
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/css/acd208839f2fd550.css
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/main-app-2ecc3bf42ae2d122.js
-response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
-response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
-response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
 navigation status: 200
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/webpack-c727077660f226a3.js
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/app/page-dc9b35fda8d8e9fc.js
-response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/_next/static/chunks/255-b1e2483a7e02feee.js
 request: GET https://tasteprobe.201-18-198-162.sslip.io/api/status
 request: GET https://tasteprobe.201-18-198-162.sslip.io/api/audits
 request: GET https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/api/status
-response: 200 https://tasteprobe.201-18-198-162.sslip.io/api/audits
 response: 200 https://tasteprobe.201-18-198-162.sslip.io/icon.svg?29586943ea538501
+response: 200 https://tasteprobe.201-18-198-162.sslip.io/api/audits
 console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
 Visible text:
 TasteProbe

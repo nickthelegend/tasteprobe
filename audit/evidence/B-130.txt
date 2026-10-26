@@ -1,11 +1,16 @@
 B-130
+Executed: 2026-10-26T16:29:25.242Z
 Status: PASS
-Executed command; Exit code: 0
+Real HTTP/CLI/MCP or specified command/source checks passed; no external provider call.
 
+Command: npm run lint:no-mock
+Exit code: 0
+Signal: null
+stdout:
 
 > tasteprobe@1.0.0 lint:no-mock
 > node scripts/check-no-mock.mjs
 
 src/ is free of mock, fake, dummy, lorem and TODO markers.
 
-Exit code: 0
+stderr:
