@@ -1,0 +1,7 @@
+
+> tasteprobe@1.0.0 e2e:stack:stop
+> e2e/stack.sh stop
+
+dev (64985) already gone
+standalone (64986) already gone
+public (64988) already gone

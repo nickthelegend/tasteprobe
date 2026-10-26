@@ -1,0 +1,16 @@
+B-114
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Command: npm run audit:live -- --brand Exact listing name
+Exit code: 1
+Signal: null
+stdout:
+
+> tasteprobe@1.0.0 audit:live
+> node scripts/live-audit.mjs --brand Exact listing name
+
+
+stderr:
+Usage: npm run audit:live -- --brand "Exact listing name" --city City [--category restaurant] [--personas 24]
+       npm run audit:live -- --replay <run id>

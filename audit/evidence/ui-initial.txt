@@ -1,0 +1,376 @@
+
+Running 1 test using 1 worker
+
+[1/1] [desktop] › e2e/tests/zero-tolerance.spec.ts:151:1 › execute independent AUDIT surface rows with real Chrome
+[desktop] › e2e/tests/zero-tolerance.spec.ts:151:1 › execute independent AUDIT surface rows with real Chrome
+S-001 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-002 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-003 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-004 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-005 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-006 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-007 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-009 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-010 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-011 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-012 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-014 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-015 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-016 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-017 FAIL 3101-1280: Error: expect(locator).toHaveAttribute(expected) failed  Locator: getByRole('link', { name: 'Source on GitHub', e
+
+S-018 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-019 FAIL 3101-1280: Error: expect(locator).toHaveText(expected) failed  Locator: locator('.order-stamp') Expected: "checking"
+
+S-020 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-022 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-024 FAIL 3101-1280: Error: expect(locator).toContainText(expected) failed  Locator: getByRole('region', { name: 'Connections' }) Expe
+
+  1) [desktop] › e2e/tests/zero-tolerance.spec.ts:151:1 › execute independent AUDIT surface rows with real Chrome
+
+    Test was interrupted.
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-5.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-6.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-7.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #8: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-9.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #9: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-8.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #10: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-10.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #11: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-11.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #12: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-13.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #13: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-12.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #14: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-14.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #15: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-16.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #16: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-17.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #17: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-18.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #18: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-19.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #19: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-15.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #20: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-20.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #21: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-21.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #22: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-22.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #23: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-23.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #24: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-24.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #25: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-25.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #26: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-27.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #27: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-28.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #28: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-26.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #29: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-29.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #30: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-30.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #31: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-31.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #32: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-33.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #33: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-34.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #34: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-35.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #35: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-32.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #36: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-36.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #37: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-37.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #38: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-38.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #39: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-41.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #40: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-39.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #41: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-40.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #42: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-42.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #43: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-43.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #44: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-44.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #45: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-46.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #46: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-47.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #47: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-48.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #48: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-45.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #49: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-49.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #50: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-51.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #51: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-52.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #52: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-50.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #53: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-53.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #54: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-54.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #55: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-55.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #56: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-56.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #57: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-57.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #58: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-58.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #59: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-59.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #60: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-60.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #61: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-61.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #62: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-62.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #63: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-63.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #64: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-64.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #65: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-65.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #66: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-66.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #67: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-67.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #68: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-68.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #69: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-69.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #70: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-70.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #71: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-71.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #72: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-72.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #73: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-73.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #74: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-74.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #75: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-76.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #76: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-77.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #77: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-78.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #78: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-79.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #79: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-80.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #80: screenshot (image/png) ─────────────────────────────────────────────────────────
+    e2e/test-results/zero/zero-tolerance-execute-ind-67a9f-rface-rows-with-real-Chrome-desktop/test-failed-75.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+S-026 FAIL 3101-1280: Error: expect(locator).toContainText(expected) failed  Locator: getByRole('region', { name: 'Connections' }) Expe
+
+  1 interrupted
+    [desktop] › e2e/tests/zero-tolerance.spec.ts:151:1 › execute independent AUDIT surface rows with real Chrome
+
+Exit code: 130

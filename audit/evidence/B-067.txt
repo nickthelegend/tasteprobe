@@ -1,0 +1,24 @@
+B-067
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+MCP tools/call qloo_taste_profile
+Arguments: {"audit_id":"invalid","filter_type":"urn:entity:artist"}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool qloo_taste_profile: Invalid uuid at audit_id"
+    }
+  ],
+  "isError": true
+}
+
+Independent stdio exit-evidence recheck
+MCP qloo_taste_profile {"audit_id":"invalid","filter_type":"urn:entity:artist"}
+Protocol result status: tool error
+Body: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool qloo_taste_profile: Invalid uuid at audit_id"}],"isError":true}
+Server PID: 78145
+Exit code: 0
+Exit signal: null
+stderr: (empty)

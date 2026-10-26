@@ -1,0 +1,35 @@
+B-011
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Enter the business name."}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Enter the business name."}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Enter the business name."}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Enter the business name."}
+
+POST http://127.0.0.1:3101/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Enter the business name."}
+
+POST http://127.0.0.1:3102/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"Enter the business name."}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

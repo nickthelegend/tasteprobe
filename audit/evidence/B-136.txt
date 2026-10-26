@@ -1,0 +1,328 @@
+B-136
+Final status: FAIL
+Observed result: npm run test:e2e: exit 1; 122 passed, 12 skipped, 4 failed. Existing report return-navigation test has a strict locator matching both Setup required headings, on dev/standalone at both widths. Existing specs unchanged.
+
+
+> tasteprobe@1.0.0 test:e2e
+> playwright test -c e2e/playwright.config.ts --grep-invert execute independent AUDIT surface rows
+
+
+Running 138 tests using 1 worker
+
+  ✓    1 [desktop] › e2e/tests/cli.spec.ts:26:1 › npm run audit:live preflight exits 1 and names every missing key before any API call (346ms)
+  -    2 [desktop] › e2e/tests/cli.spec.ts:40:1 › the standalone entrypoint refuses to start when the data dir is not writable
+  -    3 [desktop] › e2e/tests/cli.spec.ts:68:1 › a production server with no run token refuses paid runs with Setup required: TASTEPROBE_RUN_TOKEN
+  ✓    4 [desktop] › e2e/tests/landing.spec.ts:7:3 › landing: the tasting sheet › loads with one headline, three bands and the live cellar line: every key missing, no flights poured (864ms)
+  ✓    5 [desktop] › e2e/tests/landing.spec.ts:24:3 › landing: the tasting sheet › hero flight board is stamped as an example and has four labelled glasses (778ms)
+  ✓    6 [desktop] › e2e/tests/landing.spec.ts:50:3 › landing: the tasting sheet › method page: seven numbered courses with their sponsor tags, every example stamped (802ms)
+  ✓    7 [desktop] › e2e/tests/landing.spec.ts:68:3 › landing: the tasting sheet › glass anatomy: one example glass with fill, both pour lines and four definitions (781ms)
+  ✓    8 [desktop] › e2e/tests/landing.spec.ts:85:3 › landing: the tasting sheet › three flights: baseline, placebo and fix, with the lift rule and the notebook rules (843ms)
+  ✓    9 [desktop] › e2e/tests/landing.spec.ts:101:3 › landing: the tasting sheet › back-label FAQ on the method page: five questions, first open, each one opens and closes; the landing answers the sixth from the store (1.8s)
+  ✓   10 [desktop] › e2e/tests/landing.spec.ts:132:3 › landing: the tasting sheet › header nav anchors jump to each band and the method page (desktop; the nav is hidden below 900 px) (5.8s)
+  ✓   11 [desktop] › e2e/tests/landing.spec.ts:154:3 › landing: the tasting sheet › calls to action: Tasting room, Pour a flight, How it is poured, and the logo back to top (5.9s)
+  ✓   12 [desktop] › e2e/tests/landing.spec.ts:177:3 › landing: the tasting sheet › outbound links point at the public repo and open in place (1.2s)
+  ✓   13 [desktop] › e2e/tests/landing.spec.ts:190:3 › landing: the tasting sheet › reduced motion: glasses render filled with no pour animation (669ms)
+  ✓   14 [desktop] › e2e/tests/landing.spec.ts:201:3 › landing: the tasting sheet › no control on the landing is labelled with "log" (651ms)
+  ✓   15 [desktop] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/00000000-0000-4000-8000-000000000000/report shows the honest empty state (669ms)
+  ✓   16 [desktop] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/not-a-real-id/report shows the honest empty state (656ms)
+  ✘   17 [desktop] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state (1.4s)
+  ✓   18 [desktop] › e2e/tests/report.spec.ts:29:3 › printable report with an empty store › no control on the report page is labelled with "log" (685ms)
+  ✓   19 [desktop] › e2e/tests/report.spec.ts:35:1 › an unknown page renders the not-found page, not a crash (614ms)
+  ✓   20 [desktop] › e2e/tests/room.spec.ts:21:3 › tasting room with no keys › Setup required names every missing key; the cellar shows each connection missing (1.2s)
+  ✓   21 [desktop] › e2e/tests/room.spec.ts:46:3 › tasting room with no keys › empty flight: glasses sized by persona count, and the order note recomputes (1.5s)
+  ✓   22 [desktop] › e2e/tests/room.spec.ts:72:3 › tasting room with no keys › filling the order form leaves Run audit disabled, and Enter sends nothing (1.4s)
+  ✓   23 [desktop] › e2e/tests/room.spec.ts:92:3 › tasting room with no keys › starting an audit from the page answers 503 with a readable Setup message (750ms)
+  ✓   24 [desktop] › e2e/tests/room.spec.ts:119:3 › tasting room with no keys › re-pour and agent endpoints answer Setup required / not found without a stored audit (735ms)
+  ✓   25 [desktop] › e2e/tests/room.spec.ts:140:3 › tasting room with no keys › a JSON null (or array) body answers 400 on the re-pour and agent routes, before any lookup or key check (219ms)
+  ✓   26 [desktop] › e2e/tests/room.spec.ts:153:3 › tasting room with no keys › no results chrome without an audit: no room nav, no past flights, no report link (950ms)
+  ✓   27 [desktop] › e2e/tests/room.spec.ts:162:3 › tasting room with no keys › an open server: no lock, its caps listed under the order, and a non-JSON POST refused before the key check (728ms)
+  -   28 [desktop] › e2e/tests/room.spec.ts:174:3 › tasting room with no keys › a status read that never answers ends in 'status unavailable', not an endless Checking
+  ✓   29 [desktop] › e2e/tests/room.spec.ts:189:3 › tasting room with no keys › the image optimizer is off: /_next/image answers 404 for any image (357ms)
+  ✓   30 [desktop] › e2e/tests/room.spec.ts:198:3 › tasting room with no keys › no control in the tasting room is labelled with "log" (781ms)
+  -   31 [mobile] › e2e/tests/cli.spec.ts:26:1 › npm run audit:live preflight exits 1 and names every missing key before any API call
+  -   32 [mobile] › e2e/tests/cli.spec.ts:40:1 › the standalone entrypoint refuses to start when the data dir is not writable
+  -   33 [mobile] › e2e/tests/cli.spec.ts:68:1 › a production server with no run token refuses paid runs with Setup required: TASTEPROBE_RUN_TOKEN
+  ✓   34 [mobile] › e2e/tests/landing.spec.ts:7:3 › landing: the tasting sheet › loads with one headline, three bands and the live cellar line: every key missing, no flights poured (870ms)
+  ✓   35 [mobile] › e2e/tests/landing.spec.ts:24:3 › landing: the tasting sheet › hero flight board is stamped as an example and has four labelled glasses (804ms)
+  ✓   36 [mobile] › e2e/tests/landing.spec.ts:50:3 › landing: the tasting sheet › method page: seven numbered courses with their sponsor tags, every example stamped (865ms)
+  ✓   37 [mobile] › e2e/tests/landing.spec.ts:68:3 › landing: the tasting sheet › glass anatomy: one example glass with fill, both pour lines and four definitions (793ms)
+  ✓   38 [mobile] › e2e/tests/landing.spec.ts:85:3 › landing: the tasting sheet › three flights: baseline, placebo and fix, with the lift rule and the notebook rules (809ms)
+  ✓   39 [mobile] › e2e/tests/landing.spec.ts:101:3 › landing: the tasting sheet › back-label FAQ on the method page: five questions, first open, each one opens and closes; the landing answers the sixth from the store (1.8s)
+  ✓   40 [mobile] › e2e/tests/landing.spec.ts:132:3 › landing: the tasting sheet › header nav anchors jump to each band and the method page (desktop; the nav is hidden below 900 px) (653ms)
+  ✓   41 [mobile] › e2e/tests/landing.spec.ts:154:3 › landing: the tasting sheet › calls to action: Tasting room, Pour a flight, How it is poured, and the logo back to top (8.9s)
+  ✓   42 [mobile] › e2e/tests/landing.spec.ts:177:3 › landing: the tasting sheet › outbound links point at the public repo and open in place (1.2s)
+  ✓   43 [mobile] › e2e/tests/landing.spec.ts:190:3 › landing: the tasting sheet › reduced motion: glasses render filled with no pour animation (689ms)
+  ✓   44 [mobile] › e2e/tests/landing.spec.ts:201:3 › landing: the tasting sheet › no control on the landing is labelled with "log" (669ms)
+  ✓   45 [mobile] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/00000000-0000-4000-8000-000000000000/report shows the honest empty state (666ms)
+  ✓   46 [mobile] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/not-a-real-id/report shows the honest empty state (681ms)
+  ✘   47 [mobile] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state (1.4s)
+  ✓   48 [mobile] › e2e/tests/report.spec.ts:29:3 › printable report with an empty store › no control on the report page is labelled with "log" (720ms)
+  ✓   49 [mobile] › e2e/tests/report.spec.ts:35:1 › an unknown page renders the not-found page, not a crash (620ms)
+  ✓   50 [mobile] › e2e/tests/room.spec.ts:21:3 › tasting room with no keys › Setup required names every missing key; the cellar shows each connection missing (1.8s)
+  ✓   51 [mobile] › e2e/tests/room.spec.ts:46:3 › tasting room with no keys › empty flight: glasses sized by persona count, and the order note recomputes (1.5s)
+  ✓   52 [mobile] › e2e/tests/room.spec.ts:72:3 › tasting room with no keys › filling the order form leaves Run audit disabled, and Enter sends nothing (1.4s)
+  ✓   53 [mobile] › e2e/tests/room.spec.ts:92:3 › tasting room with no keys › starting an audit from the page answers 503 with a readable Setup message (723ms)
+  ✓   54 [mobile] › e2e/tests/room.spec.ts:119:3 › tasting room with no keys › re-pour and agent endpoints answer Setup required / not found without a stored audit (240ms)
+  ✓   55 [mobile] › e2e/tests/room.spec.ts:140:3 › tasting room with no keys › a JSON null (or array) body answers 400 on the re-pour and agent routes, before any lookup or key check (229ms)
+  ✓   56 [mobile] › e2e/tests/room.spec.ts:153:3 › tasting room with no keys › no results chrome without an audit: no room nav, no past flights, no report link (881ms)
+  ✓   57 [mobile] › e2e/tests/room.spec.ts:162:3 › tasting room with no keys › an open server: no lock, its caps listed under the order, and a non-JSON POST refused before the key check (728ms)
+  -   58 [mobile] › e2e/tests/room.spec.ts:174:3 › tasting room with no keys › a status read that never answers ends in 'status unavailable', not an endless Checking
+  ✓   59 [mobile] › e2e/tests/room.spec.ts:189:3 › tasting room with no keys › the image optimizer is off: /_next/image answers 404 for any image (230ms)
+  ✓   60 [mobile] › e2e/tests/room.spec.ts:198:3 › tasting room with no keys › no control in the tasting room is labelled with "log" (716ms)
+  -   61 [desktop-standalone] › e2e/tests/cli.spec.ts:26:1 › npm run audit:live preflight exits 1 and names every missing key before any API call
+  ✓   62 [desktop-standalone] › e2e/tests/cli.spec.ts:40:1 › the standalone entrypoint refuses to start when the data dir is not writable (182ms)
+  ✓   63 [desktop-standalone] › e2e/tests/cli.spec.ts:68:1 › a production server with no run token refuses paid runs with Setup required: TASTEPROBE_RUN_TOKEN (723ms)
+  ✓   64 [desktop-standalone] › e2e/tests/landing.spec.ts:7:3 › landing: the tasting sheet › loads with one headline, three bands and the live cellar line: every key missing, no flights poured (332ms)
+  ✓   65 [desktop-standalone] › e2e/tests/landing.spec.ts:24:3 › landing: the tasting sheet › hero flight board is stamped as an example and has four labelled glasses (296ms)
+  ✓   66 [desktop-standalone] › e2e/tests/landing.spec.ts:50:3 › landing: the tasting sheet › method page: seven numbered courses with their sponsor tags, every example stamped (396ms)
+  ✓   67 [desktop-standalone] › e2e/tests/landing.spec.ts:68:3 › landing: the tasting sheet › glass anatomy: one example glass with fill, both pour lines and four definitions (323ms)
+  ✓   68 [desktop-standalone] › e2e/tests/landing.spec.ts:85:3 › landing: the tasting sheet › three flights: baseline, placebo and fix, with the lift rule and the notebook rules (366ms)
+  ✓   69 [desktop-standalone] › e2e/tests/landing.spec.ts:101:3 › landing: the tasting sheet › back-label FAQ on the method page: five questions, first open, each one opens and closes; the landing answers the sixth from the store (892ms)
+  ✓   70 [desktop-standalone] › e2e/tests/landing.spec.ts:132:3 › landing: the tasting sheet › header nav anchors jump to each band and the method page (desktop; the nav is hidden below 900 px) (5.8s)
+  ✓   71 [desktop-standalone] › e2e/tests/landing.spec.ts:154:3 › landing: the tasting sheet › calls to action: Tasting room, Pour a flight, How it is poured, and the logo back to top (5.0s)
+  ✓   72 [desktop-standalone] › e2e/tests/landing.spec.ts:177:3 › landing: the tasting sheet › outbound links point at the public repo and open in place (325ms)
+  ✓   73 [desktop-standalone] › e2e/tests/landing.spec.ts:190:3 › landing: the tasting sheet › reduced motion: glasses render filled with no pour animation (262ms)
+  ✓   74 [desktop-standalone] › e2e/tests/landing.spec.ts:201:3 › landing: the tasting sheet › no control on the landing is labelled with "log" (234ms)
+  ✓   75 [desktop-standalone] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/00000000-0000-4000-8000-000000000000/report shows the honest empty state (206ms)
+  ✓   76 [desktop-standalone] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/not-a-real-id/report shows the honest empty state (211ms)
+  ✘   77 [desktop-standalone] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state (350ms)
+  ✓   78 [desktop-standalone] › e2e/tests/report.spec.ts:29:3 › printable report with an empty store › no control on the report page is labelled with "log" (259ms)
+  ✓   79 [desktop-standalone] › e2e/tests/report.spec.ts:35:1 › an unknown page renders the not-found page, not a crash (213ms)
+  ✓   80 [desktop-standalone] › e2e/tests/room.spec.ts:21:3 › tasting room with no keys › Setup required names every missing key; the cellar shows each connection missing (1.3s)
+  ✓   81 [desktop-standalone] › e2e/tests/room.spec.ts:46:3 › tasting room with no keys › empty flight: glasses sized by persona count, and the order note recomputes (1.4s)
+  ✓   82 [desktop-standalone] › e2e/tests/room.spec.ts:72:3 › tasting room with no keys › filling the order form leaves Run audit disabled, and Enter sends nothing (884ms)
+  ✓   83 [desktop-standalone] › e2e/tests/room.spec.ts:92:3 › tasting room with no keys › starting an audit from the page answers 503 with a readable Setup message (254ms)
+  ✓   84 [desktop-standalone] › e2e/tests/room.spec.ts:119:3 › tasting room with no keys › re-pour and agent endpoints answer Setup required / not found without a stored audit (195ms)
+  ✓   85 [desktop-standalone] › e2e/tests/room.spec.ts:140:3 › tasting room with no keys › a JSON null (or array) body answers 400 on the re-pour and agent routes, before any lookup or key check (194ms)
+  ✓   86 [desktop-standalone] › e2e/tests/room.spec.ts:153:3 › tasting room with no keys › no results chrome without an audit: no room nav, no past flights, no report link (375ms)
+  ✓   87 [desktop-standalone] › e2e/tests/room.spec.ts:162:3 › tasting room with no keys › an open server: no lock, its caps listed under the order, and a non-JSON POST refused before the key check (260ms)
+  ✓   88 [desktop-standalone] › e2e/tests/room.spec.ts:174:3 › tasting room with no keys › a status read that never answers ends in 'status unavailable', not an endless Checking (10.8s)
+  ✓   89 [desktop-standalone] › e2e/tests/room.spec.ts:189:3 › tasting room with no keys › the image optimizer is off: /_next/image answers 404 for any image (189ms)
+  ✓   90 [desktop-standalone] › e2e/tests/room.spec.ts:198:3 › tasting room with no keys › no control in the tasting room is labelled with "log" (268ms)
+  -   91 [mobile-standalone] › e2e/tests/cli.spec.ts:26:1 › npm run audit:live preflight exits 1 and names every missing key before any API call
+  -   92 [mobile-standalone] › e2e/tests/cli.spec.ts:40:1 › the standalone entrypoint refuses to start when the data dir is not writable
+  -   93 [mobile-standalone] › e2e/tests/cli.spec.ts:68:1 › a production server with no run token refuses paid runs with Setup required: TASTEPROBE_RUN_TOKEN
+  ✓   94 [mobile-standalone] › e2e/tests/landing.spec.ts:7:3 › landing: the tasting sheet › loads with one headline, three bands and the live cellar line: every key missing, no flights poured (401ms)
+  ✓   95 [mobile-standalone] › e2e/tests/landing.spec.ts:24:3 › landing: the tasting sheet › hero flight board is stamped as an example and has four labelled glasses (331ms)
+  ✓   96 [mobile-standalone] › e2e/tests/landing.spec.ts:50:3 › landing: the tasting sheet › method page: seven numbered courses with their sponsor tags, every example stamped (441ms)
+  ✓   97 [mobile-standalone] › e2e/tests/landing.spec.ts:68:3 › landing: the tasting sheet › glass anatomy: one example glass with fill, both pour lines and four definitions (363ms)
+  ✓   98 [mobile-standalone] › e2e/tests/landing.spec.ts:85:3 › landing: the tasting sheet › three flights: baseline, placebo and fix, with the lift rule and the notebook rules (386ms)
+  ✓   99 [mobile-standalone] › e2e/tests/landing.spec.ts:101:3 › landing: the tasting sheet › back-label FAQ on the method page: five questions, first open, each one opens and closes; the landing answers the sixth from the store (954ms)
+  ✓  100 [mobile-standalone] › e2e/tests/landing.spec.ts:132:3 › landing: the tasting sheet › header nav anchors jump to each band and the method page (desktop; the nav is hidden below 900 px) (227ms)
+  ✓  101 [mobile-standalone] › e2e/tests/landing.spec.ts:154:3 › landing: the tasting sheet › calls to action: Tasting room, Pour a flight, How it is poured, and the logo back to top (8.0s)
+  ✓  102 [mobile-standalone] › e2e/tests/landing.spec.ts:177:3 › landing: the tasting sheet › outbound links point at the public repo and open in place (306ms)
+  ✓  103 [mobile-standalone] › e2e/tests/landing.spec.ts:190:3 › landing: the tasting sheet › reduced motion: glasses render filled with no pour animation (246ms)
+  ✓  104 [mobile-standalone] › e2e/tests/landing.spec.ts:201:3 › landing: the tasting sheet › no control on the landing is labelled with "log" (230ms)
+  ✓  105 [mobile-standalone] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/00000000-0000-4000-8000-000000000000/report shows the honest empty state (239ms)
+  ✓  106 [mobile-standalone] › e2e/tests/report.spec.ts:5:5 › printable report with an empty store › /audits/not-a-real-id/report shows the honest empty state (248ms)
+  ✘  107 [mobile-standalone] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state (335ms)
+  ✓  108 [mobile-standalone] › e2e/tests/report.spec.ts:29:3 › printable report with an empty store › no control on the report page is labelled with "log" (256ms)
+  ✓  109 [mobile-standalone] › e2e/tests/report.spec.ts:35:1 › an unknown page renders the not-found page, not a crash (235ms)
+  ✓  110 [mobile-standalone] › e2e/tests/room.spec.ts:21:3 › tasting room with no keys › Setup required names every missing key; the cellar shows each connection missing (1.3s)
+  ✓  111 [mobile-standalone] › e2e/tests/room.spec.ts:46:3 › tasting room with no keys › empty flight: glasses sized by persona count, and the order note recomputes (1.4s)
+  ✓  112 [mobile-standalone] › e2e/tests/room.spec.ts:72:3 › tasting room with no keys › filling the order form leaves Run audit disabled, and Enter sends nothing (906ms)
+  ✓  113 [mobile-standalone] › e2e/tests/room.spec.ts:92:3 › tasting room with no keys › starting an audit from the page answers 503 with a readable Setup message (262ms)
+  ✓  114 [mobile-standalone] › e2e/tests/room.spec.ts:119:3 › tasting room with no keys › re-pour and agent endpoints answer Setup required / not found without a stored audit (188ms)
+  ✓  115 [mobile-standalone] › e2e/tests/room.spec.ts:140:3 › tasting room with no keys › a JSON null (or array) body answers 400 on the re-pour and agent routes, before any lookup or key check (181ms)
+  ✓  116 [mobile-standalone] › e2e/tests/room.spec.ts:153:3 › tasting room with no keys › no results chrome without an audit: no room nav, no past flights, no report link (432ms)
+  ✓  117 [mobile-standalone] › e2e/tests/room.spec.ts:162:3 › tasting room with no keys › an open server: no lock, its caps listed under the order, and a non-JSON POST refused before the key check (254ms)
+  -  118 [mobile-standalone] › e2e/tests/room.spec.ts:174:3 › tasting room with no keys › a status read that never answers ends in 'status unavailable', not an endless Checking
+  ✓  119 [mobile-standalone] › e2e/tests/room.spec.ts:189:3 › tasting room with no keys › the image optimizer is off: /_next/image answers 404 for any image (182ms)
+  ✓  120 [mobile-standalone] › e2e/tests/room.spec.ts:198:3 › tasting room with no keys › no control in the tasting room is labelled with "log" (256ms)
+  ✓  121 [public-desktop] › e2e/tests/public.spec.ts:14:3 › public demo: featured audit, listing, spend guard › the featured audit opens by default and stays pinned first, however many audits came after it (2.2s)
+  ✓  122 [public-desktop] › e2e/tests/public.spec.ts:51:3 › public demo: featured audit, listing, spend guard › Show older flights pages in the rest of the store; every flight opens (3.8s)
+  ✓  123 [public-desktop] › e2e/tests/public.spec.ts:75:3 › public demo: featured audit, listing, spend guard › GET /api/audits is summaries only: no personas, Qloo ids, affinities or answers (220ms)
+  ✓  124 [public-desktop] › e2e/tests/public.spec.ts:95:3 › public demo: featured audit, listing, spend guard › runs are locked: the room says so, offers a token field and lists the server's caps (1.3s)
+  ✓  125 [public-desktop] › e2e/tests/public.spec.ts:121:3 › public demo: featured audit, listing, spend guard › paid routes refuse before the key check: 401 without the token, 415 for non-JSON, 400 over the cap (194ms)
+  ✓  126 [public-desktop] › e2e/tests/public.spec.ts:146:3 › public demo: featured audit, listing, spend guard › switching flights: a slow answer for an earlier choice never replaces the later one (5.5s)
+  ✓  127 [public-desktop] › e2e/tests/public.spec.ts:167:3 › public demo: featured audit, listing, spend guard › results view accessibility: glasses are pressed buttons inside list items; heatmap rows say which is selected (2.8s)
+  ✓  128 [public-desktop] › e2e/tests/public.spec.ts:193:3 › public demo: featured audit, listing, spend guard › tasting notes page through every cached answer, 30 at a time (2.9s)
+  ✓  129 [public-desktop] › e2e/tests/public.spec.ts:209:3 › public demo: featured audit, listing, spend guard › the featured audit's printable report renders, with its persona source (201ms)
+  ✓  130 [public-mobile] › e2e/tests/public.spec.ts:14:3 › public demo: featured audit, listing, spend guard › the featured audit opens by default and stays pinned first, however many audits came after it (1.9s)
+  ✓  131 [public-mobile] › e2e/tests/public.spec.ts:51:3 › public demo: featured audit, listing, spend guard › Show older flights pages in the rest of the store; every flight opens (3.8s)
+  ✓  132 [public-mobile] › e2e/tests/public.spec.ts:75:3 › public demo: featured audit, listing, spend guard › GET /api/audits is summaries only: no personas, Qloo ids, affinities or answers (176ms)
+  ✓  133 [public-mobile] › e2e/tests/public.spec.ts:95:3 › public demo: featured audit, listing, spend guard › runs are locked: the room says so, offers a token field and lists the server's caps (1.3s)
+  ✓  134 [public-mobile] › e2e/tests/public.spec.ts:121:3 › public demo: featured audit, listing, spend guard › paid routes refuse before the key check: 401 without the token, 415 for non-JSON, 400 over the cap (200ms)
+  ✓  135 [public-mobile] › e2e/tests/public.spec.ts:146:3 › public demo: featured audit, listing, spend guard › switching flights: a slow answer for an earlier choice never replaces the later one (5.5s)
+  ✓  136 [public-mobile] › e2e/tests/public.spec.ts:167:3 › public demo: featured audit, listing, spend guard › results view accessibility: glasses are pressed buttons inside list items; heatmap rows say which is selected (2.8s)
+  ✓  137 [public-mobile] › e2e/tests/public.spec.ts:193:3 › public demo: featured audit, listing, spend guard › tasting notes page through every cached answer, 30 at a time (2.9s)
+  ✓  138 [public-mobile] › e2e/tests/public.spec.ts:209:3 › public demo: featured audit, listing, spend guard › the featured audit's printable report renders, with its persona source (214ms)
+
+
+  1) [desktop] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Setup required' })
+    Expected: visible
+    Error: strict mode violation: getByRole('heading', { name: 'Setup required' }) resolved to 2 elements:
+        1) <h3>…</h3> aka locator('#live').getByRole('heading', { name: 'Setup required' })
+        2) <h3 id="setup-title">Setup required</h3> aka locator('#setup-title')
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Setup required' }) with timeout 10000ms
+      - waiting for getByRole('heading', { name: 'Setup required' })
+
+
+      23 |     await page.getByRole("link", { name: "Back to the tasting room" }).click();
+      24 |     await expect(page).toHaveURL(/\/#room$/);
+    > 25 |     await expect(page.getByRole("heading", { name: "Setup required" })).toBeVisible();
+         |                                                                         ^
+      26 |     await expectInViewport(page, "#room");
+      27 |   });
+      28 |
+        at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/tests/report.spec.ts:25:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Setup required' })
+    Expected: visible
+    Error: strict mode violation: getByRole('heading', { name: 'Setup required' }) resolved to 2 elements:
+        1) <h3>…</h3> aka locator('#live').getByRole('heading', { name: 'Setup required' })
+        2) <h3 id="setup-title">Setup required</h3> aka locator('#setup-title')
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Setup required' }) with timeout 10000ms
+      - waiting for getByRole('heading', { name: 'Setup required' })
+
+
+      23 |     await page.getByRole("link", { name: "Back to the tasting room" }).click();
+      24 |     await expect(page).toHaveURL(/\/#room$/);
+    > 25 |     await expect(page.getByRole("heading", { name: "Setup required" })).toBeVisible();
+         |                                                                         ^
+      26 |     await expectInViewport(page, "#room");
+      27 |   });
+      28 |
+        at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/tests/report.spec.ts:25:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [desktop-standalone] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Setup required' })
+    Expected: visible
+    Error: strict mode violation: getByRole('heading', { name: 'Setup required' }) resolved to 2 elements:
+        1) <h3>…</h3> aka locator('#live').getByRole('heading', { name: 'Setup required' })
+        2) <h3 id="setup-title">Setup required</h3> aka locator('#setup-title')
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Setup required' }) with timeout 10000ms
+      - waiting for getByRole('heading', { name: 'Setup required' })
+
+
+      23 |     await page.getByRole("link", { name: "Back to the tasting room" }).click();
+      24 |     await expect(page).toHaveURL(/\/#room$/);
+    > 25 |     await expect(page.getByRole("heading", { name: "Setup required" })).toBeVisible();
+         |                                                                         ^
+      26 |     await expectInViewport(page, "#room");
+      27 |   });
+      28 |
+        at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/tests/report.spec.ts:25:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop-standalone/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop-standalone/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop-standalone/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop-standalone/trace.zip
+    Usage:
+
+        npx playwright show-trace e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-desktop-standalone/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [mobile-standalone] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Setup required' })
+    Expected: visible
+    Error: strict mode violation: getByRole('heading', { name: 'Setup required' }) resolved to 2 elements:
+        1) <h3>…</h3> aka locator('#live').getByRole('heading', { name: 'Setup required' })
+        2) <h3 id="setup-title">Setup required</h3> aka locator('#setup-title')
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Setup required' }) with timeout 10000ms
+      - waiting for getByRole('heading', { name: 'Setup required' })
+
+
+      23 |     await page.getByRole("link", { name: "Back to the tasting room" }).click();
+      24 |     await expect(page).toHaveURL(/\/#room$/);
+    > 25 |     await expect(page.getByRole("heading", { name: "Setup required" })).toBeVisible();
+         |                                                                         ^
+      26 |     await expectInViewport(page, "#room");
+      27 |   });
+      28 |
+        at /Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/tests/report.spec.ts:25:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile-standalone/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile-standalone/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile-standalone/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile-standalone/trace.zip
+    Usage:
+
+        npx playwright show-trace e2e/test-results/report-printable-report-wi-ae99a-room-s-Setup-required-state-mobile-standalone/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [desktop] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+    [mobile] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+    [desktop-standalone] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+    [mobile-standalone] › e2e/tests/report.spec.ts:21:3 › printable report with an empty store › Back to the tasting room returns to the room's Setup required state
+  12 skipped
+  122 passed (2.8m)
+
+Exit code: 1

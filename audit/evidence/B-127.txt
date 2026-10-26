@@ -1,0 +1,12 @@
+B-127
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Command: sh scripts/docker-entrypoint.sh sh -c echo SHOULD_NOT_EXECUTE
+Exit code: 1
+Signal: null
+stdout:
+
+stderr:
+TasteProbe cannot start: TASTEPROBE_DATA_DIR=/Volumes/Extreme SSD/Projects/.loom-worktrees/tasteprobe-2534c0f730f6/omvpdevxf/t8/e2e/.run/unwritable is not writable by uid 501.
+On Railway, set RAILWAY_RUN_UID=0 on the service: this entrypoint then chowns the volume and runs the server as the node user.

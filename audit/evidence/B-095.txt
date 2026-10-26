@@ -1,0 +1,3 @@
+B-095
+Status: UNTESTED
+needs NEBIUS_API_KEY and live request acceptance of reasoning fields. No upstream response fabricated or live provider call made.

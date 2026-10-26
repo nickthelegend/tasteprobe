@@ -1,0 +1,3 @@
+S-073
+UNTESTED: needs QLOO_API_KEY for a real saved rival verification; synthetic saved badges are not live evidence
+No provider call made.

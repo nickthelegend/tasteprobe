@@ -1,0 +1,6 @@
+B-089
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+Helper exception: ConfigError: Nebius key not configured: add NEBIUS_API_KEY to .env.local to run NVIDIA Nemotron on Nebius.
+Probe exit code: 0 (expected exception captured)

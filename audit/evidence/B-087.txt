@@ -1,0 +1,3 @@
+B-087
+Status: UNTESTED
+needs NEBIUS_API_KEY and actual unavailable-model/401/403 catalog response. No upstream response fabricated or live provider call made.

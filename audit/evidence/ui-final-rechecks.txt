@@ -1,0 +1,18 @@
+
+Running 1 test using 1 worker
+
+[1/1] [desktop] › e2e/tests/zero-tolerance.spec.ts:163:1 › execute independent AUDIT surface rows with real Chrome
+[desktop] › e2e/tests/zero-tolerance.spec.ts:163:1 › execute independent AUDIT surface rows with real Chrome
+S-036 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-047 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-103 PASS All explicit row assertions passed, with no console/page errors or unexpected HTTP errors; no paid POST.
+
+S-129 UNTESTED needs interactive Chrome print dialog cancellation; headless window.print invocation and print styles checked in evidence, no dialog outcome claimed
+
+S-140 FAIL 3101-1280: Error: expect(locator).toHaveCSS(expected) failed  Locator: locator('.spinner').first() Expected: "1.6s"
+
+  1 passed (36.0s)
+
+Exit code: 0

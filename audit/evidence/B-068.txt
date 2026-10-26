@@ -1,0 +1,96 @@
+B-068
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+MCP tools/call run_audit
+Arguments: {"city":"Mumbai"}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: Required at brand"
+    }
+  ],
+  "isError": true
+}
+
+MCP tools/call run_audit
+Arguments: {"brand":"x","city":"Mumbai"}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: String must contain at least 2 character(s) at brand"
+    }
+  ],
+  "isError": true
+}
+
+MCP tools/call run_audit
+Arguments: {"brand":"Venue","city":"x"}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: String must contain at least 2 character(s) at city"
+    }
+  ],
+  "isError": true
+}
+
+MCP tools/call run_audit
+Arguments: {"brand":"Venue","city":"Mumbai","category":"x"}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: String must contain at least 2 character(s) at category"
+    }
+  ],
+  "isError": true
+}
+
+MCP tools/call run_audit
+Arguments: {"brand":"Venue","city":"Mumbai","personas":7}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: Number must be greater than or equal to 8 at personas"
+    }
+  ],
+  "isError": true
+}
+
+MCP tools/call run_audit
+Arguments: {"brand":"Venue","city":"Mumbai","personas":201}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: Number must be less than or equal to 200 at personas"
+    }
+  ],
+  "isError": true
+}
+
+MCP tools/call run_audit
+Arguments: {"brand":"Venue","city":"Mumbai","personas":8.5}
+Body: {
+  "content": [
+    {
+      "type": "text",
+      "text": "MCP error -32602: Input validation error: Invalid arguments for tool run_audit: Expected integer, received float at personas"
+    }
+  ],
+  "isError": true
+}
+
+Independent stdio exit-evidence recheck
+MCP run_audit {"brand":"x","city":"Mumbai"}
+Protocol result status: tool error
+Body: {"content":[{"type":"text","text":"MCP error -32602: Input validation error: Invalid arguments for tool run_audit: String must contain at least 2 character(s) at brand"}],"isError":true}
+Server PID: 78145
+Exit code: 0
+Exit signal: null
+stderr: (empty)

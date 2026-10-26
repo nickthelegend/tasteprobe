@@ -1,0 +1,10 @@
+B-017
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3103/api/audits
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"This server allows at most 24 personas per audit (TASTEPROBE_MAX_PERSONAS).","code":"persona_cap","maxPersonas":24}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

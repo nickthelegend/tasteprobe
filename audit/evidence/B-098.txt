@@ -1,0 +1,12 @@
+B-098
+Status: UNTESTED
+Direct no-assistant helper returns [] and all-missing agent guard passed; assistant-only HTTP refusal needs QLOO_API_KEY and NEBIUS_API_KEY.
+
+askAssistants(): []
+
+POST http://127.0.0.1:3101/api/audits/00000000-0000-4000-8000-000000000000/agent
+HTTP 503
+Headers: {"content-type":"application/json"}
+Body: {"error":"setup_required","missing":["QLOO_API_KEY","NEBIUS_API_KEY","OPENAI_API_KEY"],"message":"Setup required: QLOO_API_KEY; Setup required: NEBIUS_API_KEY; Setup required: OPENAI_API_KEY"}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

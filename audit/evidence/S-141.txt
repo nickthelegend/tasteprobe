@@ -1,0 +1,582 @@
+S-141
+Final status: FAIL
+Observed result: Keyboard/no-log-control probes ran, but visiting the intentional not-found state emits Chrome console.error for HTTP 404. This fails the required any-console-error rule.
+
+S-141
+Status: FAIL
+3101-1280: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page; console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3101-375: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page; console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-1280: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page; console.error: Failed to load resource: the server responded with a status of 404 (Not Found) | 3102-375: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page; console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+
+=== 3101-1280 http://127.0.0.1:3101/ ===
+Assertion: completed
+Problems: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030030653
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030030653
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030030653
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030030653
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+navigation status: 200
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030030653
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030030653
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030031020
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030031020
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030031020
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030031020
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030031020
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030031020
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+request: GET http://127.0.0.1:3101/method
+response: 200 http://127.0.0.1:3101/method
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030031513
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030031513
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030031513
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030031513
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030031513
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030031513
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3103/
+response: 200 http://127.0.0.1:3103/
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/api/status
+request: GET http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/status
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
+request: GET http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+response: 200 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030032555
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030032555
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030032555
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030032555
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030032555
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030032555
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+Visible text:
+TASTEPROBE
+404 · NOT FOUND
+Tasting room
+Back to TasteProbe
+Nothing poured here
+
+There is no page at this address. Flights are poured in the tasting room, and each stored audit has its printable report at /audits/<id>/report.
+
+=== 3101-375 http://127.0.0.1:3101/ ===
+Assertion: completed
+Problems: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030033324
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030033324
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030033324
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030033324
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+navigation status: 200
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030033324
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030033324
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030033697
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030033697
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030033697
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030033697
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030033697
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030033697
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+request: GET http://127.0.0.1:3101/method
+response: 200 http://127.0.0.1:3101/method
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030034196
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030034196
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030034196
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030034196
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030034196
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030034196
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3103/
+response: 200 http://127.0.0.1:3103/
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/api/status
+request: GET http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/status
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
+request: GET http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+response: 200 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030035242
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030035242
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030035242
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030035242
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030035242
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030035242
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+Visible text:
+TASTEPROBE
+404 · NOT FOUND
+Tasting room
+Back to TasteProbe
+Nothing poured here
+
+There is no page at this address. Flights are poured in the tasting room, and each stored audit has its printable report at /audits/<id>/report.
+
+=== 3102-1280 http://127.0.0.1:3102/ ===
+Assertion: completed
+Problems: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3102/
+response: 200 http://127.0.0.1:3102/
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+navigation status: 200
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/api/status
+request: GET http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/status
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030036071
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030036071
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030036071
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030036071
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030036071
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030036071
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+request: GET http://127.0.0.1:3101/method
+response: 200 http://127.0.0.1:3101/method
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030036561
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030036561
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030036561
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030036561
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030036561
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030036561
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3103/
+response: 200 http://127.0.0.1:3103/
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/api/status
+request: GET http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/status
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
+request: GET http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+response: 200 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030037605
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030037605
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030037605
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030037605
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030037605
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030037605
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+
+
+=== 3102-375 http://127.0.0.1:3102/ ===
+Assertion: completed
+Problems: Unexpected HTTP 404: http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+POST count: 0
+request: GET http://127.0.0.1:3102/
+response: 200 http://127.0.0.1:3102/
+request: GET http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3102/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3102/_next/static/chunks/webpack-c727077660f226a3.js
+navigation status: 200
+response: 200 http://127.0.0.1:3102/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3102/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3102/api/status
+request: GET http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/status
+response: 200 http://127.0.0.1:3102/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3102/api/audits
+request: GET http://127.0.0.1:3101/
+response: 200 http://127.0.0.1:3101/
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030038403
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030038403
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030038403
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030038403
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030038403
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030038403
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/api/status
+request: GET http://127.0.0.1:3101/api/audits
+response: 200 http://127.0.0.1:3101/api/status
+response: 200 http://127.0.0.1:3101/api/audits
+request: GET http://127.0.0.1:3101/method
+response: 200 http://127.0.0.1:3101/method
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030038881
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030038881
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030038881
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+request: GET http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030038881
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app/method/page.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030038881
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030038881
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3103/
+response: 200 http://127.0.0.1:3103/
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/page-087851367aa9f7e7.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/api/status
+request: GET http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/status
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/api/audits
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001
+request: GET http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+response: 200 http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001?evidence=1&attempt=cf1
+console.verbose: [DOM] Password field is not contained in a form: (More info: https://goo.gl/9p2vKq) %o
+request: GET http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+response: 200 http://127.0.0.1:3103/audits/00000000-0000-4000-8000-000000000001/report
+request: GET http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3103/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+response: 200 http://127.0.0.1:3103/_next/static/css/acd208839f2fd550.css
+request: GET http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/webpack-c727077660f226a3.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/4bd1b696-c023c6e3521b1417.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/255-b1e2483a7e02feee.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/main-app-e096997494bd8f72.js
+request: GET http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+response: 200 http://127.0.0.1:3103/_next/static/chunks/app/audits/%5Bid%5D/report/page-c5dbc1dcd8537d2d.js
+request: GET http://127.0.0.1:3103/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3103/icon.svg?29586943ea538501
+request: GET http://127.0.0.1:3101/no-such-page
+response: 404 http://127.0.0.1:3101/no-such-page
+console.error: Failed to load resource: the server responded with a status of 404 (Not Found)
+request: GET http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/7b0b24f36b1a6d0b-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+response: 200 http://127.0.0.1:3101/_next/static/media/bccd6a6241c00262-s.p.woff2
+request: GET http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030039921
+request: GET http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030039921
+request: GET http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030039921
+request: GET http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/css/app/layout.css?v=1793030039921
+response: 200 http://127.0.0.1:3101/_next/static/chunks/webpack.js?v=1793030039921
+response: 200 http://127.0.0.1:3101/_next/static/chunks/app-pages-internals.js
+response: 200 http://127.0.0.1:3101/_next/static/chunks/main-app.js?v=1793030039921
+console.info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+request: GET http://127.0.0.1:3101/icon.svg?29586943ea538501
+response: 200 http://127.0.0.1:3101/icon.svg?29586943ea538501

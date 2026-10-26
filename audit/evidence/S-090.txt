@@ -1,0 +1,3 @@
+S-090
+UNTESTED: needs a stored real agent run with confirmation variants; seeded synthetic store contains no agent runs
+No provider call made.

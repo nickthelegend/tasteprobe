@@ -1,0 +1,3 @@
+S-050
+UNTESTED: needs QLOO_API_KEY, NEBIUS_API_KEY and OPENAI_API_KEY or a complete MODEL_2_API_KEY/MODEL_2_BASE_URL/MODEL_2_ID slot
+No provider call made.

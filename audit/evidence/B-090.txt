@@ -1,0 +1,3 @@
+B-090
+Status: UNTESTED
+needs NEBIUS_API_KEY and actual truncated/invalid completion. No upstream response fabricated or live provider call made.

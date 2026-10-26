@@ -1,0 +1,20 @@
+B-039
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3104/api/audits
+HTTP 503
+Headers: {"content-type":"application/json"}
+Body: {"error":"Setup required: TASTEPROBE_RUN_TOKEN. This production server has no run token, so paid runs are refused. Set TASTEPROBE_RUN_TOKEN (or TASTEPROBE_RUNS_OPEN=1 for a private server). Stored audits stay open to read.","code":"setup_required"}
+
+GET http://127.0.0.1:3104/api/status
+HTTP 200
+Headers: {"content-type":"application/json"}
+Body: {"qloo":false,"nebius":{"configured":false,"ok":false,"model":"nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B","detail":"NEBIUS_API_KEY not set"},"systems":[],"runs":{"locked":false,"setupRequired":"TASTEPROBE_RUN_TOKEN","maxPersonas":200,"runsPerIpPerHour":10,"dailyRuns":100,"deadlineSeconds":900,"agentCaps":{"maxTries":5,"maxAssistantCalls":480,"maxNemotronTokens":400000,"maxTurns":20},"oneAtATime":true},"gate":{"running":null,"runsToday":0}}
+
+GET http://127.0.0.1:3104/api/audits
+HTTP 200
+Headers: {"content-type":"application/json","x-live-count":"0","x-total-count":"0"}
+Body: []
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).

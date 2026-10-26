@@ -1,0 +1,10 @@
+B-025
+Status: PASS
+Independent real requests/assertions passed; no provider call authorized.
+
+POST http://127.0.0.1:3103/api/audits/00000000-0000-4000-8000-000000000001/fix
+HTTP 400
+Headers: {"content-type":"application/json"}
+Body: {"error":"This segment has no personas to re-test."}
+
+Audit HTTP probe runner exit code: 0 (row result recorded above; HTTP status/body are independent of runner exit).
